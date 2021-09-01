@@ -10,6 +10,7 @@ setup(name='neurotools',
       packages=find_packages(),
       install_requires=[
           'scikit-learn',
+          'scipy',
           'numpy',
           'pandas',
           'nibabel',
