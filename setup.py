@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(name='neurotools',
       version='0.1',
-      description='General functions for working with neuroimaging data.',
+      description='General helper functions for working with neuroimaging data.',
       url='http://github.com/sahahn/neurotools',
       author='Sage Hahn',
       author_email='sahahn@uvm.edu',
