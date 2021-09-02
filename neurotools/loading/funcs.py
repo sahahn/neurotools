@@ -1,12 +1,11 @@
 import nibabel as nib
 import numpy as np
 import os
+import time
 
 from joblib import Parallel, delayed
 from nibabel import freesurfer as fs
 from nibabel import GiftiImage
-
-
 
 def _get_print(verbose, _print=None):
     
@@ -230,6 +229,9 @@ def get_data(subjects, template_path, contrast=None, mask=None,
         If >= 2, full verbosity will be enabled.
     '''
     
+    # Keep track of loading time
+    start_time = time.time()
+    
     # Either init _print or use passed value
     _print = _get_print(verbose, _print=_print)
     
@@ -259,7 +261,14 @@ def get_data(subjects, template_path, contrast=None, mask=None,
                 _print=_print) for subject in subjects)
 
     # Return array with shape as the number of subjects by the sum of the mask
-    return np.stack(subjs_data)
+
+    data = np.stack(subjs_data)
+
+    _print('Loaded:', data.shape, 'in',
+            time.time() - start_time,
+            'seconds.', level=1)
+
+    return data
 
 def reverse_mask_data(data, mask):
     '''This function is used to reverse applying a mask.

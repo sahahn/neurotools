@@ -1,5 +1,6 @@
 from sklearn.preprocessing import OrdinalEncoder
 import statsmodels.api as sm
+import time
 
 def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
     '''Wrapper code for running a mixed linear model with either one random effect
@@ -66,3 +67,25 @@ def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
                                 vc_formula=vc_formula, data=df)
     result = model.fit()
     return result
+
+'''
+def run_full_model(data, df, random_effects_vars, indep_var, fixed_effects_vars):
+    
+    results = []
+    start_time = time.time()
+
+    for i in range(data.shape[1]):
+
+        print('Vertex:', i, flush=True)
+        start_run = time.time()
+
+        df['data'] = data[:, i]  
+        result = _run_model(df, random_effects_vars,
+                            indep_var, fixed_effects_vars)
+
+        print('single run time:', time.time() - start_run, flush=True)
+        results.append(result)        
+
+    print('full run time:', time.time() - start_time, flush=True)
+    return results
+'''
