@@ -44,7 +44,10 @@ use_short_jobs = True
 # for the function run_slurm_mm
 
 # Load in rds with relevant cols - no NaN's
-df = load_from_abcd_rds(cols=fixed_effects_vars + random_effects_vars,
+all_vars = fixed_effects_vars + random_effects_vars
+
+df = load_from_abcd_rds(cols=all_vars,
+                        rds_loc=rds_loc,
                         eventname='baseline_year_1_arm_1',
                         drop_nan=True)
 
