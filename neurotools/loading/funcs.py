@@ -119,7 +119,9 @@ def _load_subject(subject, contrast, template_path, mask=None,
                   index_slice=None, _print=print):
 
     # Get the specific path for this subject based on the passed template
-    f = _apply_template(subject, template_path, contrast=contrast)
+    f = _apply_template(subject=subject,
+                        template_path=template_path,
+                        contrast=contrast)
 
     _print('Loading:', f, level=2)
     raw = load(f, index_slice=index_slice)
@@ -365,7 +367,9 @@ def get_overlap_subjects(df, template_path, contrast=None, verbose=1, _print=Non
     
     # Only include subject if found as file
     all_subjects = [s for s in df.index if 
-                    os.path.exists(_apply_template(s, contrast, template_path))]
+                    os.path.exists(_apply_template(subject=s,
+                                                   template_path=template_path,
+                                                   contrast=contrast))]
     _print('Found', len(all_subjects), 'subjects with data', level=1)
     
     # Print missing subjects if high enough verbose
