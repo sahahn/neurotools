@@ -8,6 +8,7 @@ import os
 from sklearn.model_selection import GroupShuffleSplit
 from scipy.stats import pearsonr, ttest_1samp
 from statsmodels.stats.multitest import fdrcorrection
+from ..stats.basic import get_cohens
 
 
 def get_non_nan_overlap_mask(c1, c2):

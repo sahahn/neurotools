@@ -1,8 +1,9 @@
-from numpy.core.fromnumeric import var
 import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
+from joblib.hashing import hash as joblib_hash
+from sklearn.preprocessing import LabelEncoder
 
-def load_from_abcd_rds(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_nan=False):
+def load_from_csv(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_nan=False):
     '''Special function to load specific columns from a csv saved
     version of the DEAP release RDS file for the ABCD Study.
 
@@ -95,3 +96,103 @@ def load_from_abcd_rds(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_na
         data[cat_vars] = OrdinalEncoder().fit_transform(data[cat_vars])
 
     return data
+
+
+def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year_1_arm_1'):
+    '''This method is still very much a first draft, still needs some tweaking.
+
+    Should be able to select from some different options, like treat twins
+    in some way x or add site as an outer layer, etc...
+
+    Base / current rules
+
+    - Families of the same type can be shuffled (Same number of members + of same status)
+    - Siblings of the same type can be shuffled - does that mean within families??????
+    - Treat DZ as ordinary sibs
+    - Treat MZ seperately
+
+    Parameters
+    ----------
+    rds_loc : str / file path
+        The location of the csv saved version of the DEAP release
+        RDS file for the ABCD Study.
+
+    subjects : None or array-like, optional
+        Can optionally specify that the block structure be created on a subset of subjects,
+        though note if any missing values are present in rel_relationship or rel_family_id
+        within this subset, then those will be further dropped.
+        If passed, should be passed as valid array-like or pandas Index style
+        set of subjects.
+
+        ::
+
+            default = None
+
+     eventname : str, array-like or None, optional
+        A single eventname as a str in which to specify data by.
+
+        TODO: Add in support for what a block structure with
+        multiple eventnames, i.e., longitudinal data, and what
+        that would look like.
+
+        ::
+
+            default = 'baseline_year_1_arm_1'
+    '''
+
+    # Load in needed columns, w/o NaNs
+    rel_cols = ['rel_family_id', 'rel_relationship', 'genetic_zygosity_status_1']
+    data = load_from_csv(rel_cols, rds_loc,
+                         eventname=eventname,
+                         drop_nan=False)
+
+    # Set to subset of passed subjects if any,
+    if subjects is not None:
+        data = data.loc[subjects]
+
+    # Drop any data points if rel_family_id or rel_relationship is missing
+    to_drop = data[pd.isnull(data[['rel_relationship',
+                                   'rel_family_id']]).any(axis=1)].index
+    data = data.drop(to_drop)
+
+    # Treat twins if dyzy as normal siblings, basically if not labelled mono, then normal sib
+    treat_as_siblings = data[((data['rel_relationship'] == 'twin') | (data['rel_relationship'] == 'triplet')) &\
+                              (data['genetic_zygosity_status_1'] != 'monozygotic')].index
+    data.loc[treat_as_siblings, 'rel_relationship'] = 'sibling'
+
+    # Create dict mapping subj to family
+    families = {}
+    for subj in data.index:
+        rel_family_id = data.loc[subj, 'rel_family_id']
+        family = data[data['rel_family_id'] == rel_family_id].index
+        families[subj] = family
+
+    # Init column
+    data['family_type'] = 0
+    hashes = {}
+    cnt = 0
+
+    # Fill in unique value for every type of family
+    for subj in data.index:
+        
+        # Get unique hash
+        h = joblib_hash(data.loc[families[subj], 'rel_relationship'].values)
+        
+        try:
+            u = hashes[h]
+        except KeyError:
+            hashes[h] = cnt
+            u = cnt
+            cnt += 1
+            
+        data.loc[subj, 'family_type'] = u
+
+    # Ordinally encode cols
+    data['rel_relationship'] = LabelEncoder().fit_transform(data['rel_relationship'])
+    data['rel_family_id'] = LabelEncoder().fit_transform(data['rel_family_id'])
+    
+    # Add outer col with -1's
+    data['neg_ones'] = -1
+
+    # The blocks are in a specific order
+    return data[['neg_ones', 'family_type', 'rel_family_id', 'rel_relationship']]
