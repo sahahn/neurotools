@@ -263,7 +263,6 @@ def get_data(subjects, template_path, contrast=None, mask=None,
                 _print=_print) for subject in subjects)
 
     # Return array with shape as the number of subjects by the sum of the mask
-
     data = np.stack(subjs_data)
 
     _print('Loaded:', data.shape, 'in',
