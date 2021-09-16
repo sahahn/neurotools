@@ -3,7 +3,7 @@ from nilearn.surface import load_surf_data
 import numpy as np
 import nibabel as nib
 import os
-from . import data_dr as def_data_dr
+from .. import data_dr as def_data_dr
 
 def save_mapping(mapping, loc):
     
