@@ -6,6 +6,10 @@ def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
     '''Wrapper code for running a mixed linear model with either one random effect
     or two nested random effects.
 
+    Note: Since the mixed model does not support NaN data, any rows
+    with any missing data will be dropped, and the model run on
+    just subjects without missing data.
+
     Parameters
     -----------
     df : pandas DataFrame
@@ -36,6 +40,10 @@ def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
         Returns an instance of MixedLMResults with fitted results.
 
     '''
+
+    # Check for missing data, if any, drop those subjects
+    valid = df[~df['data'].isnull()].index
+    df = df.loc[valid]
     
     # If just one random effect specified
     if len(random_effects_vars) == 1:

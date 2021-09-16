@@ -30,12 +30,12 @@ random_effects_vars = ['rel_family_id']
 # The template path used when loading the data where CONTRAST and SUBJECT are
 # replaced by contrast and each subject's loaded index name respectively.
 # This is used to provide a way of mapping subjects to their saved file location.
-template_path = '/users/s/a/sahahn/ABCD_Data/All_Merged_Vertex_2.0.1/CONTRAST/SUBJECT_lh.mgz'
+template_path = '/users/s/a/sahahn/ABCD_Data/CONTRAST/SUBJECT.npy'
 
 # The contrast used in template_path above
 # Note this can be set to None and then CONTRAST removed from
 # above also, as it is optional.
-contrast = '2_back_vs_0_back'
+contrast = '2_back_vs_0_back_concat'
 
 # Use short jobs (3hr limit) or bluemoon jobs if False (30hr limit)
 # tradeoff is will need less of bluemoon jobs but they will take longer.
@@ -66,9 +66,9 @@ if qc_subjs_loc:
     df = df.loc[overlap]
 
 # Replace periods in both loaded df and var names
-df = name_replace(df, '.', '-')
-fixed_effects_vars = name_replace(fixed_effects_vars, '.', '-')
-random_effects_vars = name_replace(random_effects_vars, '.', '-')
+df = name_replace(df, '.', '')
+fixed_effects_vars = name_replace(fixed_effects_vars, '.', '')
+random_effects_vars = name_replace(random_effects_vars, '.', '')
 
 # Loads subjects as NDAR_ style, change to just base
 df.index = [i.replace('NDAR_', '') for i in df.index]
@@ -91,4 +91,5 @@ run_slurm_mm(df=df, data=data,
              fixed_effects_vars=fixed_effects_vars,
              random_effects_vars=random_effects_vars,
              results_loc=results_loc,
-             use_short_jobs=use_short_jobs)
+             use_short_jobs=use_short_jobs,
+             job_mem='1G')

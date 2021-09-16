@@ -145,8 +145,8 @@ def single_run(temp_dr, df, args):
     job_start_time = time.time()
     df['data'] = data
     
-    # Run mixed model
-    result = run_mixed_model(df,
+    # Run mixed model - pass copy of df, as df can change
+    result = run_mixed_model(df.copy(),
                              fixed_effects_vars=args['fixed_effects_vars'],
                              random_effects_vars=args['random_effects_vars'])
 
