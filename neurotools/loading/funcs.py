@@ -137,7 +137,8 @@ def _load_subject(subject, contrast, template_path, mask=None,
     return flat_data
  
 def get_data(subjects, template_path, contrast=None, mask=None,
-             index_slice=None, n_jobs=1, verbose=1, _print=None):
+             index_slice=None, zero_as_nan=False,
+             n_jobs=1, verbose=1, _print=None):
     '''This method is designed to load data saved in a particular way,
     specifically where each subject / participants data is saved seperately.
 
@@ -218,6 +219,16 @@ def get_data(subjects, template_path, contrast=None, mask=None,
 
             default = None
 
+    zero_as_nan : bool, optional
+        Often in neuroimaging data, NaN values
+        are encoded as 0's (no i'm not sure why either).
+        If this flag is set to True, then any 0's
+        found in the loaded data will be replaced with NaN.
+        
+        ::
+
+            default = False
+
     n_jobs : int
         The number of jobs to try and use for loading data.
 
@@ -268,6 +279,11 @@ def get_data(subjects, template_path, contrast=None, mask=None,
     _print('Loaded:', data.shape, 'in',
             time.time() - start_time,
             'seconds.', level=1)
+
+    # Process zero_as_nan flag
+    if zero_as_nan:
+        _print(f'Setting {len(data[data == 0])} == 0 data points to NaN.')
+        data[data == 0] = np.nan
 
     return data
 

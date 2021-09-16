@@ -3,7 +3,9 @@ from sklearn.preprocessing import OrdinalEncoder
 from joblib.hashing import hash as joblib_hash
 from sklearn.preprocessing import LabelEncoder
 
-def load_from_csv(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_nan=False):
+def load_from_csv(cols, rds_loc,
+                  eventname='baseline_year_1_arm_1',
+                  drop_nan=False, encode_cat_as='ordinal'):
     '''Special function to load specific columns from a csv saved
     version of the DEAP release RDS file for the ABCD Study.
 
@@ -43,6 +45,25 @@ def load_from_csv(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_nan=Fal
         ::
 
             default = False
+
+    encode_cat_as : {'ordinal', 'one hot', 'dummy'}, optional
+        The way in which categorical vars, any wrapped in C(),
+        should be categorically encoded.
+
+        - 'ordindal':
+            The variables in encoded sequentially in one
+            column with the original name, with values 0 to k-1
+            where k is the number of unique categorical values.
+            This method uses the OrdinalEncoder from sklearn.
+
+        - 'one hot':
+            The variables is one hot encoded, adding columns
+            for each unique value. This method uses
+            the get_dummies function from pandas.
+
+        - 'dummy':
+            Same as 'one hot', except one of the columns is then dropped,
+            dummy coding.
 
     Returns
     -------
@@ -91,9 +112,17 @@ def load_from_csv(cols, rds_loc, eventname='baseline_year_1_arm_1', drop_nan=Fal
     if drop_nan:
         data.dropna(inplace=True)
     
-    # Ordinally encode any C wrapped vars
+    # Ordinally encode any C wrapped vars - categorical vars
     if len(cat_vars) > 0:
-        data[cat_vars] = OrdinalEncoder().fit_transform(data[cat_vars])
+
+        if encode_cat_as == 'ordinal':
+            data[cat_vars] = OrdinalEncoder().fit_transform(data[cat_vars])
+        elif encode_cat_as == 'one hot':
+            data = pd.get_dummies(data=data, columns=cat_vars, drop_first=False)
+        elif encode_cat_as == 'dummy':
+            data = pd.get_dummies(data=data, columns=cat_vars, drop_first=True)
+        else:
+            raise RuntimeError(f'encode_cat_as {encode_cat_as} not valid option.')    
 
     return data
 

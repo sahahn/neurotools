@@ -2,6 +2,7 @@ from funcs import run_slurm_mm
 from neurotools.loading import get_overlap_subjects, get_data
 from neurotools.loading.abcd import load_from_csv
 from neurotools.misc.text import name_replace
+import pandas as pd
 
 #### User defined variables / pieces ####
 
@@ -40,6 +41,11 @@ contrast = '2_back_vs_0_back'
 # tradeoff is will need less of bluemoon jobs but they will take longer.
 use_short_jobs = True
 
+# Optionally, pass location of files with the name
+# of one subject per row, to filter subjects by, i.e., only
+# subjects that exist in this file will be used.
+qc_subjs_loc = '/users/s/a/sahahn/ABCD_Data/nback_valid_subjs.txt'
+
 
 #### Code starts Below ####
 # Essentially this whole file is just preparing arguments
@@ -53,6 +59,12 @@ df = load_from_csv(cols=all_vars,
                    eventname=eventname,
                    drop_nan=True)
 
+# Load in set of qc'ed subjects, then set overlap
+if qc_subjs_loc:
+    qc_valid_subjs = pd.Index(pd.read_csv(qc_subjs_loc, header=None)[0])
+    overlap = df.index.intersection(qc_valid_subjs)
+    df = df.loc[overlap]
+
 # Replace periods in both loaded df and var names
 df = name_replace(df, '.', '-')
 fixed_effects_vars = name_replace(fixed_effects_vars, '.', '-')
@@ -65,15 +77,13 @@ df.index = [i.replace('NDAR_', '') for i in df.index]
 subjects = get_overlap_subjects(df=df, template_path=template_path,
                                 contrast=contrast, verbose=1)
 
-# Optionally here filter subjects further, e.g,
-# subjects = list(set(subjects) - set(invalid_subjects))
-
 # Re-index base df
 df = df.loc[subjects]
 
 # Load in the imaging data
 data = get_data(subjects=subjects, template_path=template_path,
                 contrast=contrast, mask=None, index_slice=None,
+                zero_as_nan=True,
                 n_jobs=1, verbose=1)
 
 # Submit job to run on slurm cluster multi-proc
