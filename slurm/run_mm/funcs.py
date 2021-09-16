@@ -69,8 +69,8 @@ def run_slurm_mm(df, data, fixed_effects_vars,
 
     print(f'Submitted {int(jobs_needed)} jobs.')
     print('If this is not enough and more jobs need to be run, you can submit')
-    print('more jobs by modifying the following command (change 20 to number of extra jobs):')
-    print(submit_cmd.replace(str(int(jobs_needed)), '20'))
+    print('more jobs by modifying the following command:')
+    print(submit_cmd)
 
     print()
     print(f'Final results when finished will be saved in directory: {results_loc}')
