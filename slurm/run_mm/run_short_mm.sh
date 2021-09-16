@@ -14,4 +14,4 @@ source /users/s/a/sahahn/.bashrc
 
 cd ${SLURM_SUBMIT_DIR}
 
-python submit_mm.py $1 1
+python run_mm.py $1 1

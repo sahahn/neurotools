@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --partition=bluemoon
 #SBATCH --time=30:00:00
-#SBATCH --job-name=runMM
+#SBATCH --job-name=run_mm
 #SBATCH --output=Job_Logs/%x_%j.out
 #SBATCH --error=Job_Logs/%x_%j.err
 
@@ -14,4 +14,5 @@ source /users/s/a/sahahn/.bashrc
 
 cd ${SLURM_SUBMIT_DIR}
 
-python run_mm.py $1 0
+srun python run_mm.py $1 0
+

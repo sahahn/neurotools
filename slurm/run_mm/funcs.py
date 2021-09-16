@@ -58,9 +58,9 @@ def run_slurm_mm(df, data, fixed_effects_vars,
     jobs_needed = (data.shape[1] // each_job) + 1
 
     if use_short_jobs:
-        script_name = 'submit_short_mm.sh'
+        script_name = 'run_short_mm.sh'
     else:
-        script_name = 'submit_mm.sh'
+        script_name = 'run_mm.sh'
 
     # Submit array of jobs to finish
     print()

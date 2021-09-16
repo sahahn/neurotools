@@ -2,7 +2,7 @@
 #SBATCH --partition=short
 #SBATCH --time=3:00:00
 #SBATCH --mem=8G
-#SBATCH --job-name=submit_mm
+#SBATCH --job-name=submitMM
 #SBATCH --output=Job_Logs/%x_%j.out
 #SBATCH --error=Job_Logs/%x_%j.err
 
@@ -15,4 +15,4 @@ source /users/s/a/sahahn/.bashrc
 
 cd ${SLURM_SUBMIT_DIR}
 
-srun python submit_mm.py
+python submit_mm.py
