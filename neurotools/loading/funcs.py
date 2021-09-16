@@ -58,6 +58,10 @@ def load(f, index_slice=None):
             default = None
     '''
     
+    # If already numpy array, return as is
+    if type(f) is np.ndarray:
+        return f
+    
     # Freesurfer cases (from nilearn load func)
     if (f.endswith('area')
         or f.endswith('curv')

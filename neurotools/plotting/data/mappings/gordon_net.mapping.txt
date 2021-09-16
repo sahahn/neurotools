@@ -1,0 +1,14 @@
+unknown,unknown
+visual,visual
+salience,salience
+frontoparietal,frontoparietal
+smhand,smhand
+default,default
+retrosplenialtemporal,retrosplenialtemporal
+auditory,auditory
+smmouth,smmouth
+ventralattn,ventralattn
+none,none
+cinguloparietal,cinguloparietal
+dorsalattn,dorsalattn
+cingulooperc,cingulooperc
