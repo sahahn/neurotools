@@ -58,47 +58,61 @@ def load(f, index_slice=None):
             default = None
     '''
     
-    # If already numpy array, return as is
+    # If already numpy array, return of as is
     if type(f) is np.ndarray:
-        return f
-    
-    # Freesurfer cases (from nilearn load func)
-    if (f.endswith('area')
-        or f.endswith('curv')
-        or f.endswith('sulc')
-        or f.endswith('thickness')):
-        raw = fs.io.read_morph_data(f)
+        raw = f.copy()
 
-    elif f.endswith('annot'):
-        raw = fs.io.read_annot(f)[0]
-
-    elif f.endswith('label'):
-        f = fs.io.read_label(f)
+    # Keep as None if None
+    elif f is None:
+        return None
     
-    # Numpy case
-    elif f.endswith('.npy') or f.endswith('.npz'):
-        raw = np.load(f)
+    # If loading from file
+    elif isinstance(f, str):
     
-    # Otherwise, try to load with nibabel
-    else:
+        # Freesurfer cases (from nilearn load func)
+        if (f.endswith('area')
+            or f.endswith('curv')
+            or f.endswith('sulc')
+            or f.endswith('thickness')):
+            raw = fs.io.read_morph_data(f)
 
-        data = nib.load(f)
+        elif f.endswith('annot'):
+            raw = fs.io.read_annot(f)[0]
+
+        elif f.endswith('label'):
+            f = fs.io.read_label(f)
         
-        # If Gifti, handle special
-        if isinstance(data, GiftiImage):
-            raw = np.asarray([arr.data for arr in data.darrays]).T.squeeze()
+        # Numpy case
+        elif f.endswith('.npy') or f.endswith('.npz'):
+            raw = np.load(f)
         
-        # Special case if load with nibabel and index_slice is
-        # passed, load from the dataobj
-        elif index_slice is not None:
-            
-            # Return directly here
-            return data.dataobj[index_slice]
-        
-        # Otherwise just load full
+        # Otherwise, try to load with nibabel
         else:
-            raw = data.get_fdata()
-    
+
+            data = nib.load(f)
+            
+            # If Gifti, handle special
+            if isinstance(data, GiftiImage):
+                raw = np.asarray([arr.data for arr in data.darrays]).T.squeeze()
+            
+            # Special case if load with nibabel and index_slice is
+            # passed, load from the dataobj
+            elif index_slice is not None:
+                
+                # Return directly here
+                return data.dataobj[index_slice]
+            
+            # Otherwise just load full
+            else:
+                raw = data.get_fdata()
+
+    # If a Parc object
+    elif hasattr(f, 'get_parc'):
+        raw = f.get_parc(copy=True)
+
+    else:
+        raise RuntimeError(f'Unable to load passed {f}')
+
     # Return either array or index'ed array
     if index_slice is not None:
         return raw[index_slice]
