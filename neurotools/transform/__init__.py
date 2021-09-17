@@ -1,1 +1,3 @@
-from .rois import SurfMaps, SurfLabels
+from .rois import SurfLabels, SurfMaps
+
+__all__ = [SurfLabels, SurfMaps]
