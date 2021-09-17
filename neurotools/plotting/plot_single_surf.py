@@ -51,13 +51,13 @@ def _crop_colorbar(cbar, cbar_vmin, cbar_vmax):
     cbar.set_ticks(new_tick_locs, update_ticks=True)
 
 
-def plot_surf(surf_mesh, surf_map=None, bg_map=None,
-              hemi='left', view='lateral', cmap=None, colorbar=False,
-              avg_method='mean', threshold=None, alpha='auto',
-              bg_on_data=False, darkness=1, vmin=None, vmax=None,
-              cbar_vmin=None, cbar_vmax=None,
-              title=None, output_file=None, axes=None, figure=None,
-              midpoint=None, dist=6.5, **kwargs):
+def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
+                     hemi='left', view='lateral', cmap=None, colorbar=False,
+                     avg_method='mean', threshold=None, alpha='auto',
+                     bg_on_data=False, darkness=1, vmin=None, vmax=None,
+                     cbar_vmin=None, cbar_vmax=None,
+                     title=None, output_file=None, axes=None, figure=None,
+                     midpoint=None, dist=6.5, **kwargs):
     """
 
     Parameters

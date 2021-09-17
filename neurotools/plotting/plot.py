@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from .plot_surf import plot_surf, add_collage_colorbar
+from .plot_single_surf import plot_single_surf, add_collage_colorbar
 from nilearn.plotting import plot_glass_brain, plot_stat_map
 from ..loading import load
 from .ref import SurfRef
@@ -108,7 +108,7 @@ def _setup_fig_axes(figure, axes, subplot_spec,
 def plot_surf_hemi(data, ref, hemi,
                    surf_mesh='inflated',
                    bg_map='sulc', **kwargs):
-    
+
     if hemi == 'lh':
         hemi = 'left'
     if hemi == 'rh':
@@ -116,12 +116,13 @@ def plot_surf_hemi(data, ref, hemi,
 
     surf_mesh = ref.get_surf(surf_mesh, hemi)
     bg_map = ref.get_surf(bg_map, hemi)
-    
-    return plot_surf(surf_mesh=surf_mesh,
-                     surf_map=data,
-                     bg_map=bg_map,
-                     hemi=hemi,
-                     **kwargs)
+
+    return plot_single_surf(data,
+                            surf_mesh=surf_mesh,
+                            surf_map=data,
+                            bg_map=bg_map,
+                            hemi=hemi,
+                            **kwargs)
 
 def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       bg_map='sulc', view='standard',
@@ -338,10 +339,10 @@ def _load_data_and_ref(data, space=None, hemi=None):
             else:
                 lh, rh = data[:len(data) // 2], data[len(data) // 2:]
 
-        elif hemi == 'lh':
+        elif hemi == 'lh' or hemi == 'left':
             lh, rh = data, None
 
-        elif hemi == 'rh':
+        elif hemi == 'rh' or hemi == 'right':
             lh, rh = None, data
 
         else:
