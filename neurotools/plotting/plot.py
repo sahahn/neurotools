@@ -450,6 +450,7 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
                           darkness=darkness,
                           wspace=wspace, hspace=hspace,
                           colorbar=colorbar, **kwargs)
+        return
 
     # Just lh case
     if data[1] is None:
