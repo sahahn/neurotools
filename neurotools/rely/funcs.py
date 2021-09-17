@@ -2,13 +2,15 @@
 
 import numpy as np
 import random
+from pandas.core.frame import DataFrame
 from sklearn.model_selection import train_test_split
 from joblib import Parallel, delayed
 import os
 from sklearn.model_selection import GroupShuffleSplit
 from scipy.stats import pearsonr, ttest_1samp
 from statsmodels.stats.multitest import fdrcorrection
-from ..stats.basic import get_cohens
+from ..stats.basic import get_cohens, get_resid, fast_corr
+from ..loading.funcs import get_data, reverse_mask_data, get_overlap_subjects, _get_print
 
 
 def get_non_nan_overlap_mask(c1, c2):
@@ -145,35 +147,6 @@ def rely(proc_type, covars, data, base_map, proc_covars_func,
     all_p_values = [o[1] for o in output]
          
     return all_corrs, all_p_values
-
-def setup_subjects(covars_df, data_df, template_path, contrast, n_jobs, verbose):
-
-    def _print(*args, **kwargs):
-
-        if 'level' in kwargs:
-            level = kwargs.pop('level')
-        else:
-            level = 1
-
-        if verbose >= level:
-            print(*args, **kwargs, flush=True)
-
-    _print('Passed covars df with shape', covars_df.shape)
-    _print('Determining valid subjects')
-    
-    # Only include subject if found in data or as files
-    if data_df is not None:
-        all_subjects = [s for s in covars_df.index if s in data_df.index]
-    else:
-        all_subjects = [s for s in covars_df.index if 
-                        os.path.exists(_apply_template(s, contrast, template_path))]
-    _print('Found', len(all_subjects), 'subjects with data')
-
-    missing_subjects = [s for s in covars_df.index if s not in all_subjects]
-    _print('Missing:', missing_subjects)
-
-    return all_subjects, _print
-
 
 def _test_split(all_subjects, stratify, groups, split_random_state):
     
@@ -407,8 +380,13 @@ def run_rely(covars_df, data_df=None,
         If >= 2, full verbosity will be enabled.
     '''
     
-    # Get all subjects and setup
-    all_subjects, _print = setup_subjects(covars_df, data_df, template_path, contrast, n_jobs, verbose)
+    # Get print
+    _print = _get_print(verbose=verbose)
+    
+    # Get overlapping subjects
+    all_subjects = get_overlap_subjects(df=covars_df, template_path=template_path,
+                                        contrast=contrast,
+                                        data_df=data_df, _print=_print)
 
     _print('Performing group split, w/ stratify =', stratify is not None,
            ', w/ groups =', groups is not None, ', '
@@ -422,15 +400,19 @@ def run_rely(covars_df, data_df=None,
 
         # Load the data from files
         _print('Loading Group 1 Data')
-        d1 = get_data(g1_subjects, contrast,
-                      template_path, mask=mask,
+        d1 = get_data(subjects=g1_subjects,
+                      contrast=contrast,
+                      template_path=template_path,
+                      mask=mask,
                       index_slice=index_slice,
                       n_jobs=n_jobs,
                       _print=_print)
 
         _print('Loading Group 2 Data')
-        d2  = get_data(g2_subjects, contrast,
-                       template_path, mask=mask,
+        d2  = get_data(subjects=g2_subjects,
+                       contrast=contrast,
+                       template_path=template_path,
+                       mask=mask,
                        index_slice=index_slice,
                        n_jobs=n_jobs,
                        _print=_print)
@@ -565,30 +547,37 @@ def load_resid_data(covars_df, contrast, template_path, mask=None,
         If >= 2, full verbosity will be enabled.
     '''
 
-    # Get all subjects and setup
-    all_subjects, _print = setup_subjects(covars_df, None, template_path, contrast, n_jobs, verbose)
+    # Get print
+    _print = _get_print(verbose=verbose)
+    
+    # Get overlapping subjects
+    all_subjects = get_overlap_subjects(df=covars_df, template_path=template_path,
+                                        contrast=contrast,
+                                        _print=_print)
 
     # Set covars to just the subjects found
     covars = covars_df.loc[all_subjects].copy()
 
     # Load all data
-    _print('Loading Data')
-    data = get_data(all_subjects, contrast,
-                    template_path, mask=mask,
+    _print('Loading Data', level=1)
+    data = get_data(subjects=all_subjects,
+                    contrast=contrast,
+                    template_path=template_path,
+                    mask=mask,
                     index_slice=index_slice,
                     n_jobs=n_jobs,
                     _print=_print)
 
     if resid:
 
-        _print('Residualizing Data')
+        _print('Residualizing Data', level=1)
         resid = get_resid(covars, data)
 
         return all_subjects, resid
 
     else:
 
-        _print('Returning Raw Data')
+        _print('Returning Raw Data', level=1)
         return all_subjects, data
 
 def run_1samp_summary(covars_df, contrast,

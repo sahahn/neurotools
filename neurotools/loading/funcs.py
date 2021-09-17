@@ -346,19 +346,21 @@ def _project_single_subj(subj, mask, mask_affine):
 
     return proj_subj
 
-def get_overlap_subjects(df, template_path, contrast=None, verbose=1, _print=None):
+def get_overlap_subjects(df, template_path=None, contrast=None,
+                         data_df=None, verbose=1, _print=None):
     '''Helper function to be used when working with template_path style saved
     data in order to compute an overlapping set of subjects between a dataframe
     and a template path.
 
     Parameters
     ----------
-    subjects : array-like
-        A list or array-like with the names of the subjects to load, where
-        the names correspond in some way to the way the way the subject's data
-        is saved. This correspondence is specified in template_path.
+    df : pandas DataFrame
+        A df that is index'ed by the names of the subjects in which to overlap.
+        Where  the names correspond in some way to the
+        way the way the subject's data
+        is saved.
 
-    template_path : str
+    template_path : str, optional
         A str indicating the template form for how a single
         subjects data should be loaded (or in this case located),
         where SUBJECT will be replaced with that subjects name,
@@ -370,12 +372,31 @@ def get_overlap_subjects(df, template_path, contrast=None, verbose=1, _print=Non
 
         Note that the use of a CONTRAST argument is optional.
 
+        Note that if this parameter is passed, then data_df will
+        be ignored!
+
+        ::
+
+            default = None
+
     contrast : str, optional
         The name of the contrast, used along with the template
         path to define where to load data.
 
         If passed None, then it is assumed that CONTRAST
         is not present in the template_path and will be ignored.
+
+        Note that if this parameter is passed, then data_df will
+        be ignored! This parameter is used only with the template_path option.
+
+        ::
+
+            default = None
+
+    data_df : pandas DataFrame, optional
+        Optionally specify a DataFrame, index'ed by subject, in which
+        to overlap INSTEAD of a template_path and / or contrast set of arguments.
+        Explicitly, if specifying a data_df, a template_path should not be passed!
 
         ::
 
@@ -399,11 +420,17 @@ def get_overlap_subjects(df, template_path, contrast=None, verbose=1, _print=Non
     _print('Determining valid overlap subjects', level=1)
     
     # Only include subject if found as file
-    all_subjects = [s for s in df.index if 
-                    os.path.exists(_apply_template(subject=s,
-                                                   template_path=template_path,
-                                                   contrast=contrast))]
-    _print('Found', len(all_subjects), 'subjects with data', level=1)
+    if template_path is not None:
+        all_subjects = [s for s in df.index if 
+                        os.path.exists(_apply_template(subject=s,
+                                                    template_path=template_path,
+                                                    contrast=contrast))]
+
+    # Unless computing overlap with data df
+    else:
+        all_subjects = [s for s in df.index if s in data_df.index]
+
+    _print('Found', len(all_subjects), 'subjects with data.', level=1)
     
     # Print missing subjects if high enough verbose
     missing_subjects = [s for s in df.index if s not in all_subjects]
