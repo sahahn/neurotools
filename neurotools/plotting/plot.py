@@ -117,8 +117,7 @@ def plot_surf_hemi(data, ref, hemi,
     surf_mesh = ref.get_surf(surf_mesh, hemi)
     bg_map = ref.get_surf(bg_map, hemi)
 
-    return plot_single_surf(data,
-                            surf_mesh=surf_mesh,
+    return plot_single_surf(surf_mesh=surf_mesh,
                             surf_map=data,
                             bg_map=bg_map,
                             hemi=hemi,
