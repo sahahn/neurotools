@@ -31,3 +31,13 @@ def test_rely_basic():
     run_rely(covars_df,
              template_path=os.path.join(fake_dr, 'SUBJECT.npy'),
              max_size=30, verbose=-1)
+
+
+def test_rely_basic_data_df():
+
+    covars_df = pd.DataFrame(np.random.random((100, 2)))
+    data_df = pd.DataFrame(np.random.random((100, 20)))
+
+    run_rely(covars_df,
+             data_df=data_df,
+             max_size=30, verbose=-1)
