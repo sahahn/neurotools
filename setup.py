@@ -15,9 +15,9 @@ setup(name='neurotools',
           'scikit-learn>=0.24.0',
           'scipy',
           'numpy',
-          'pandas',
+          'pandas>=1.1',
           'nibabel>=3.2.1',
           'joblib',
-          'statsmodels',
+          'statsmodels>=0.12',
           'matplotlib>=3.3.4'
       ])
