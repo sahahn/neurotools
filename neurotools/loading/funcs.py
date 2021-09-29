@@ -25,6 +25,9 @@ def _get_print(verbose, _print=None):
 
     return _print
 
+def _gifti_to_np(data):
+    return np.asarray([arr.data for arr in data.darrays]).T.squeeze()
+
 def load(f, index_slice=None):
     '''Smart loading function for neuro-imaging type data.
 
@@ -61,6 +64,14 @@ def load(f, index_slice=None):
     # If already numpy array, return of as is
     if type(f) is np.ndarray:
         raw = f.copy()
+    
+    # If gifti already
+    elif isinstance(f, GiftiImage):
+        raw = _gifti_to_np(f)
+    
+    # If nifti like
+    elif isinstance(f, (nib.Cifti2Image, nib.Nifti1Image)):
+        raw = f.get_fdata()
 
     # Keep as None if None
     elif f is None:
@@ -93,14 +104,14 @@ def load(f, index_slice=None):
             
             # If Gifti, handle special
             if isinstance(data, GiftiImage):
-                raw = np.asarray([arr.data for arr in data.darrays]).T.squeeze()
+                raw = _gifti_to_np(data)
             
             # Special case if load with nibabel and index_slice is
             # passed, load from the dataobj
             elif index_slice is not None:
                 
                 # Return directly here
-                return data.dataobj[index_slice]
+                return np.squeeze(data.dataobj[index_slice])
             
             # Otherwise just load full
             else:
@@ -115,9 +126,9 @@ def load(f, index_slice=None):
 
     # Return either array or index'ed array
     if index_slice is not None:
-        return raw[index_slice]
+        return np.squeeze(raw[index_slice])
 
-    return raw
+    return np.squeeze(raw)
 
 def _apply_template(subject, template_path, contrast=None):
     

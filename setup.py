@@ -12,11 +12,12 @@ setup(name='neurotools',
       package_data={'neurotools': ['data/*/*/*', 'data/*/*']},
       package_dir={'neurotools': 'neurotools'},
       install_requires=[
-          'scikit-learn',
+          'scikit-learn>=0.24.0',
           'scipy',
           'numpy',
           'pandas',
-          'nibabel',
+          'nibabel>=3.2.1',
           'joblib',
-          'statsmodels'
+          'statsmodels',
+          'matplotlib>=3.3.4'
       ])
