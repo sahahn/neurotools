@@ -549,9 +549,22 @@ def load_resid_data(covars_df, contrast, template_path, mask=None,
 
     # Get print
     _print = _get_print(verbose=verbose)
+
+    # Check inputs
+    if not isinstance(covars_df, pd.DataFrame):
+        raise RuntimeError('covars_df must be a DataFrame.')
+
+    if data_df is not None:
+        if not isinstance(data_df, pd.DataFrame):
+            raise RuntimeError('data_df must be a DataFrame.')
+
+    if template_path is not None:
+        if not isinstance(template_path, str):
+            raise RuntimeError('template_path must be a str.')
     
     # Get overlapping subjects
-    all_subjects = get_overlap_subjects(df=covars_df, template_path=template_path,
+    all_subjects = get_overlap_subjects(df=covars_df,
+                                        template_path=template_path,
                                         contrast=contrast,
                                         _print=_print)
 

@@ -2,6 +2,7 @@ import nibabel as nib
 import numpy as np
 import os
 import time
+import warnings
 
 from joblib import Parallel, delayed
 from nibabel import freesurfer as fs
@@ -19,6 +20,16 @@ def _get_print(verbose, _print=None):
             level = kwargs.pop('level')
         else:
             level = 1
+
+        # Use warnings for level = 0
+        if level == 0:
+
+            # Conv print to str - then warn
+            sep = ' '
+            if 'sep' in kwargs:
+                sep = kwargs.pop('sep')
+            as_str = sep.join(str(arg) for arg in args)
+            warnings.warn(as_str)
 
         if verbose >= level:
             print(*args, **kwargs, flush=True)
@@ -434,8 +445,8 @@ def get_overlap_subjects(df, template_path=None, contrast=None,
     if template_path is not None:
         all_subjects = [s for s in df.index if 
                         os.path.exists(_apply_template(subject=s,
-                                                    template_path=template_path,
-                                                    contrast=contrast))]
+                                                       template_path=template_path,
+                                                       contrast=contrast))]
 
     # Unless computing overlap with data df
     else:
