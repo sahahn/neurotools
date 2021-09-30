@@ -52,8 +52,8 @@ def test_test_split_groups():
 
     for split in range(50):
 
-        g1, g2 = _test_split(all_subjects, stratify,
-                             groups, split_random_state=split)
+        g1, g2 = _test_split(all_subjects, stratify=stratify,
+                             groups=groups, split_random_state=split)
 
         if 's1' in g1:
             assert 's2' in g1

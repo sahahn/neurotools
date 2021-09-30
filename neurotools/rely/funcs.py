@@ -171,7 +171,8 @@ def _test_split(all_subjects, stratify, groups, split_random_state):
         
         splitter = GroupShuffleSplit(n_splits=1, test_size=.5,
                                      random_state=split_random_state)
-        [*inds] = splitter.split(sorted_subjects, groups=groups_vals)
+        inds = splitter.split(sorted_subjects, groups=groups_vals)
+        inds = [*inds]
 
         g1_subjects, g2_subjects = sorted_subjects[inds[0][0]], sorted_subjects[inds[0][1]]
     
