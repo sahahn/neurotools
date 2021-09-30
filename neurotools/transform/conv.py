@@ -5,6 +5,9 @@ from ..loading import load
 
 
 def remove_medial_wall(fill_cifti, parcel, index_map):
+    '''Remove the medial wall from a parcel / surface. For
+    now assumes that the passed index map is for a cifti file with medial
+    wall included.'''
 
     for index in index_map:
         if isinstance(index, Cifti2BrainModel):
