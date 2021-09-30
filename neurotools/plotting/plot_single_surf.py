@@ -365,9 +365,9 @@ def add_collage_colorbar(figure, ax, smfs, vmin, vmax,
         pad = .5
 
     if 'anchor' in colorbar_params:
-        anchor=colorbar_params['anchor']
+        anchor = colorbar_params['anchor']
     else:
-        anchor = 'C'
+        anchor = (0.0, 0.5)
 
     if 'format' in colorbar_params:
         c_format = colorbar_params['format']

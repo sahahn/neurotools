@@ -6,17 +6,17 @@ from ..funcs import run_rely, _test_split
 
 file_dr = os.path.dirname(os.path.realpath(__file__))
 
-def setup_fake_data():
+def setup_test_data():
 
-    fake_dr = os.path.join(file_dr, 'fake_data')
+    fake_dr = os.path.join(file_dr, 'test_data')
     
     # Only save if doesnt exist
     if not os.path.exists(fake_dr):
         os.makedirs(fake_dr, exist_ok=True)
 
         for i in range(100):
-            fake_data = np.random.random(10)
-            np.save(os.path.join(fake_dr, str(i) + '.npy'), fake_data)
+            test_data = np.random.random(10)
+            np.save(os.path.join(fake_dr, str(i) + '.npy'), test_data)
     
     # Gen covars df
     covars_df = pd.DataFrame(np.random.random((100, 2)))
@@ -27,7 +27,7 @@ def setup_fake_data():
 def test_rely_basic():
     
     # Setup fake data
-    fake_dr, covars_df = setup_fake_data()
+    fake_dr, covars_df = setup_test_data()
 
     # Just shouldn't fail
     run_rely(covars_df,
