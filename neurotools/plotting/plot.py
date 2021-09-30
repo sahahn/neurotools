@@ -425,7 +425,7 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
               cmap='cold_hot', bg_on_data=True, darkness=None,
               avg_method='mean', wspace=-.35, hspace=-.1, alpha=1,
               symmetric_cbar=False, threshold=None,
-              colorbar=False, **kwargs):
+              colorbar=True, **kwargs):
 
     data, ref = _load_data_and_ref(data, space=space, hemi=hemi)
 
