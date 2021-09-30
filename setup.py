@@ -20,5 +20,5 @@ setup(name='neurotools',
           'joblib',
           'statsmodels>=0.12',
           'matplotlib>=3.3.4',
-          'nilearn?=0.8.1'
+          'nilearn>=0.8.1'
       ])
