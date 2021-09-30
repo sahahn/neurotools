@@ -143,3 +143,20 @@ def add_surface_medial_walls(data):
     to_fill[rh_inds + n_vert_per_hemi] = np_data[len(lh_inds):]
     
     return to_fill
+
+
+
+'''
+Desired future functionality.
+
+- Should be able to add / remove medial wall.
+    - Input should be cifti, gifti, or array (i.e., need to have saved data references)
+    - Input should be either just lh, just rh, concat surfaces, or full cifti w/ subcortical
+
+- Parcellations should be able to be converted from lh + rh seperate or concat,
+  to full cifti, note that this isn't possible for normal surfaces. Functionality
+  already exists, except should handle some extra cases.
+
+- Would be cool to be able to provide re-sampling between different surfaces
+
+'''

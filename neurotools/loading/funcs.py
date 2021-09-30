@@ -87,6 +87,10 @@ def load(f, index_slice=None):
     # Keep as None if None
     elif f is None:
         return None
+
+    # TODO add case for loading .mat files
+    # from scipy.io import loadmat
+    # ex: lh_d = loadmat(lh_loc)['parcels'].squeeze()
     
     # If loading from file
     elif isinstance(f, str):
