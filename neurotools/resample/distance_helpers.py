@@ -24,7 +24,7 @@ class SignedDistanceHelperBase():
         self.root_oct = Oct(self.min_coord, self.max_coord)
         
         # Also keep track of not flatten for conv.
-        self.myCoordData = surf.coords.copy()
+        self.coords = surf.coords.copy()
         
         # Keep track of un-flattened
         self.m_tris = surf.tris.copy()
@@ -38,7 +38,7 @@ class SignedDistanceHelperBase():
             # Computing min_coord and max_coord
             # as 3D coords, just min across all three
             # vertex in triangle for each x,y,z and max
-            tri_coords = self.myCoordData[thisTri]
+            tri_coords = self.coords[thisTri]
             
             min_coord = tri_coords.min(axis=0)
             max_coord = tri_coords.max(axis=0)
@@ -71,7 +71,7 @@ class SignedDistanceHelperBase():
                     
                     # Get triangle, then coords of triangle
                     tempTri = self.m_tris[temp_tri_indx]
-                    tri_coords = self.myCoordData[tempTri]
+                    tri_coords = self.coords[tempTri]
                     
                     # Get min and max
                     tempmin_coord = tri_coords.min(axis=0)
@@ -115,7 +115,7 @@ class SignedDistanceHelperBase():
                 
                         # Get triangle, then coords of triangle
                         tempTri = self.m_tris[temp_tri_indx]
-                        tri_coords = self.myCoordData[tempTri]
+                        tri_coords = self.coords[tempTri]
 
                         # Get min and max
                         tempmin_coord = tri_coords.min(axis=0)
@@ -139,8 +139,8 @@ class SignedDistanceHelper():
     
     def __init__(self, myBase):
         
-        self.m_base = myBase
-        self.numTris = self.m_base.m_numTris
+        self.base = myBase
+        self.numTris = self.base.m_numTris
         self.m_triMarked = np.zeros(self.numTris)
         
     def barycentricWeights(self, coord):
@@ -149,7 +149,7 @@ class SignedDistanceHelper():
         myHeap = []
         
         # Store the dist first, then index Oct, push to heap
-        i_oct = self.m_base.root_oct
+        i_oct = self.base.root_oct
         heappush(myHeap, (i_oct.distToPoint(coord), i_oct))
         
         # Init starter vars
@@ -203,12 +203,12 @@ class SignedDistanceHelper():
         baryWeights = np.empty((3))
         
         # Get tri nodes
-        triNodes = self.m_base.m_tris[bestInfo.tri_indx]
+        triNodes = self.base.m_tris[bestInfo.tri_indx]
         
         # Handle by case
         if bestInfo.p_type == 2 or bestInfo.p_type == 'TRIANGLE':
             
-            verts = self.m_base.myCoordData[triNodes]
+            verts = self.base.coords[triNodes]
             vp = verts - bestInfo.tempPoint
 
             weight1 = get_coord_vec_length(np.cross(vp[1], vp[2]))
@@ -223,8 +223,8 @@ class SignedDistanceHelper():
 
         elif bestInfo.p_type == 1 or bestInfo.p_type == 'EDGE':
             
-            vert1 = self.m_base.myCoordData[bestInfo.node1]
-            vert2 = self.m_base.myCoordData[bestInfo.node2]
+            vert1 = self.base.coords[bestInfo.node1]
+            vert2 = self.base.coords[bestInfo.node2]
             v21hat = vert2 - vert1
             
             v21hat, origLength =\
@@ -266,7 +266,7 @@ class SignedDistanceHelper():
     def unsignedDistToTri(self, coord, tri_indx):
         
         # Get nodes of triangle
-        triNodes = self.m_base.m_tris[tri_indx]
+        triNodes = self.base.m_tris[tri_indx]
         
         # Inits
         point = np.array(coord)
@@ -281,7 +281,7 @@ class SignedDistanceHelper():
         bestPoint = np.empty(3)
         
         # Verts contains coordinates for each node of the triangle
-        verts = self.m_base.myCoordData[triNodes]
+        verts = self.base.coords[triNodes]
         
         v10 = verts[1] - verts[0]
         xhat = normalize_vector(v10)
