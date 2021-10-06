@@ -14,24 +14,20 @@ class SignedDistanceHelperBase():
     NUM_TRIS_TO_TEST = 50
     NUM_TRIS_TEST_INCR = 50
     
-    def __init__(self, mySurf):
-        
-        # Not yet filled in
-        self.m_topoHelp = mySurf.getTopologyHelper()
+    def __init__(self, surf):
         
         # Get min max coords
-        self.minCoord = mySurf.coords.min(axis=0)
-        self.maxCoord = mySurf.coords.max(axis=0)
+        self.min_coord = surf.coords.min(axis=0)
+        self.max_coord = surf.coords.max(axis=0)
         
-        # Init Oct - though in original code this
-        # is just pointer to Oct I think... 
-        self.m_indexRoot = Oct(self.minCoord, self.maxCoord)
+        # Init Oct
+        self.root_oct = Oct(self.min_coord, self.max_coord)
         
         # Also keep track of not flatten for conv.
-        self.myCoordData = mySurf.coords.copy()
+        self.myCoordData = surf.coords.copy()
         
         # Keep track of un-flattened
-        self.m_tris = mySurf.tris.copy()
+        self.m_tris = surf.tris.copy()
         
         # Keep track of number of triangles
         self.m_numTris = len(self.m_tris)
@@ -39,19 +35,19 @@ class SignedDistanceHelperBase():
         # For each triangle
         for tri_indx, thisTri in enumerate(self.m_tris):
             
-            # Computing minCoord and maxCoord
+            # Computing min_coord and max_coord
             # as 3D coords, just min across all three
             # vertex in triangle for each x,y,z and max
             tri_coords = self.myCoordData[thisTri]
             
-            minCoord = tri_coords.min(axis=0)
-            maxCoord = tri_coords.max(axis=0)
+            min_coord = tri_coords.min(axis=0)
+            max_coord = tri_coords.max(axis=0)
             
             # Add triangle -use bounding box for now as an easy
             # test to capture any chance of the triangle intersecting the Oct
-            self.addTriangle(self.m_indexRoot, tri_indx, minCoord, maxCoord)
+            self.addTriangle(self.root_oct, tri_indx, min_coord, max_coord)
                
-    def addTriangle(self, thisOct, tri_indx, minCoord, maxCoord):
+    def addTriangle(self, thisOct, tri_indx, min_coord, max_coord):
         
         # If leaf
         if thisOct.m_leaf:
@@ -78,14 +74,14 @@ class SignedDistanceHelperBase():
                     tri_coords = self.myCoordData[tempTri]
                     
                     # Get min and max
-                    tempMinCoord = tri_coords.min(axis=0)
-                    tempMaxCoord = tri_coords.max(axis=0)
+                    tempmin_coord = tri_coords.min(axis=0)
+                    tempmax_coord = tri_coords.max(axis=0)
                     
                     # Basically sets to 0 for each point if
                     # less than midpoint or 1 if greater than
                     minOct, maxOct = np.zeros(3), np.zeros(3)
-                    thisOct.containingChild(tempMinCoord, minOct)
-                    thisOct.containingChild(tempMaxCoord, maxOct)
+                    thisOct.containingChild(tempmin_coord, minOct)
+                    thisOct.containingChild(tempmax_coord, maxOct)
                     
                     # If any are the same, that is to say
                     # the minimum of the point and the maximum of
@@ -122,22 +118,22 @@ class SignedDistanceHelperBase():
                         tri_coords = self.myCoordData[tempTri]
 
                         # Get min and max
-                        tempMinCoord = tri_coords.min(axis=0)
-                        tempMaxCoord = tri_coords.max(axis=0)
+                        tempmin_coord = tri_coords.min(axis=0)
+                        tempmax_coord = tri_coords.max(axis=0)
                         
                         # Iterate through each child
                         # Check if bounds overlap, if overlap add triangle
                         for child in flatten(thisOct.m_children):
-                            if child.boundsOverlaps(tempMinCoord, tempMaxCoord):
-                                self.addTriangle(child, temp_tri_indx, tempMinCoord, tempMaxCoord)
+                            if child.boundsOverlaps(tempmin_coord, tempmax_coord):
+                                self.addTriangle(child, temp_tri_indx, tempmin_coord, tempmax_coord)
                                         
                                         
         # If not leaf - add tri to child Oct's only if overlaps
         else:
 
             for child in flatten(thisOct.m_children):
-                if child.boundsOverlaps(minCoord, maxCoord):
-                    self.addTriangle(child, tri_indx, minCoord, maxCoord)
+                if child.boundsOverlaps(min_coord, max_coord):
+                    self.addTriangle(child, tri_indx, min_coord, max_coord)
                             
 class SignedDistanceHelper():
     
@@ -153,7 +149,7 @@ class SignedDistanceHelper():
         myHeap = []
         
         # Store the dist first, then index Oct, push to heap
-        i_oct = self.m_base.m_indexRoot
+        i_oct = self.m_base.root_oct
         heappush(myHeap, (i_oct.distToPoint(coord), i_oct))
         
         # Init starter vars
@@ -514,11 +510,11 @@ class SignedDistanceHelper():
 
 class Oct():
     
-    def __init__(self, minCoords=None, maxCoords=None):
+    def __init__(self, min_coords=None, max_coords=None):
         
         # Save args
-        self.minCoords = minCoords
-        self.maxCoords = maxCoords
+        self.min_coords = min_coords
+        self.max_coords = max_coords
         
         # Init children pointers
         self.m_children = [[[None for k in range(2)] for j in range(2)]
@@ -539,10 +535,10 @@ class Oct():
         self.m_bounds = np.zeros((3, 3))
         
         # Setup bounds
-        if minCoords is not None and maxCoords is not None:
-            self.m_bounds[:,0] = self.minCoords
-            self.m_bounds[:,1] = (self.minCoords + self.maxCoords) / 2
-            self.m_bounds[:,2] = self.maxCoords
+        if min_coords is not None and max_coords is not None:
+            self.m_bounds[:,0] = self.min_coords
+            self.m_bounds[:,1] = (self.min_coords + self.max_coords) / 2
+            self.m_bounds[:,2] = self.max_coords
         
     def containingChild(self, point, whichOct=None):
         
@@ -588,10 +584,10 @@ class Oct():
                     # Add to children array
                     self.m_children[i][j][k] = temp
                     
-    def boundsOverlaps(self, minCoords, maxCoords):
+    def boundsOverlaps(self, min_coords, max_coords):
         
         for i in range(3):
-            if (maxCoords[i] < self.m_bounds[i][0]) or (minCoords[i] > self.m_bounds[i][2]):
+            if (max_coords[i] < self.m_bounds[i][0]) or (min_coords[i] > self.m_bounds[i][2]):
                 return False
 
         return True

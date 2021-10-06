@@ -3,7 +3,7 @@ import nibabel as nib
 from .distance_helpers import get_signed_distance_helper
 from .surface_file import SurfaceFile
 
-def makeBarycentricWeights(from_s, to_s):
+def make_barycentric_weights(from_s, to_s):
     
     # Init weights as list of mappings
     weights = [dict() for _ in range(len(to_s.coords))]
@@ -23,65 +23,65 @@ def makeBarycentricWeights(from_s, to_s):
 
     return weights
 
-def gen_weights_adap_bary_area(curSphere, newSphere, curAreas, newAreas):
+def gen_weights_adap_bary_area(cur_sphere, new_sphere, curAreas, newAreas):
     
     # Make forward and reverse weights
-    forward = makeBarycentricWeights(curSphere, newSphere)
-    reverse = makeBarycentricWeights(newSphere, curSphere)
+    forward = make_barycentric_weights(cur_sphere, new_sphere)
+    reverse = make_barycentric_weights(new_sphere, cur_sphere)
     
-    numNewNodes, numOldNodes = len(forward), len(reverse)
+    n_new_nodes, n_old_nodes = len(forward), len(reverse)
 
     # Init reverse gather
-    reverse_gather = [dict() for i in range(numNewNodes)]
+    reverse_gather = [dict() for _ in range(n_new_nodes)]
 
     # Convert scattering weights to gathering weights
-    for oldNode in range(numOldNodes):
-        for key in reverse[oldNode]:
-            reverse_gather[key][oldNode] = reverse[oldNode][key]
+    for old_node in range(n_old_nodes):
+        for key in reverse[old_node]:
+            reverse_gather[key][old_node] = reverse[old_node][key]
 
     # Fill in adap gather
-    adap_gather = [dict() for i in range(numNewNodes)]
-    for newNode in range(numNewNodes):
+    adap_gather = [dict() for i in range(n_new_nodes)]
+    for new_node in range(n_new_nodes):
 
         # Build set of all nodes used by forward weights
-        forwardused = set(forward[newNode])
+        forward_used = set(forward[new_node])
 
         # If key from reverse gather not in forward used set
         # the reverse scatter weights include something
         # the forward gather weights don't, so use reverse scatter    
-        useforward = True
-        if len(set(reverse_gather[newNode]) - forwardused) > 0:
-            useforward = False
+        use_forward = True
+        if len(set(reverse_gather[new_node]) - forward_used) > 0:
+            use_forward = False
 
-        if useforward:
-            adap_gather[newNode] = forward[newNode]
+        if use_forward:
+            adap_gather[new_node] = forward[new_node]
         else:
-            adap_gather[newNode] = reverse_gather[newNode]
+            adap_gather[new_node] = reverse_gather[new_node]
 
         # Begin the process of area correction by multiplying by gathering node areas
-        for key in adap_gather[newNode]:
-            adap_gather[newNode][key] *= newAreas[newNode]
+        for key in adap_gather[new_node]:
+            adap_gather[new_node][key] *= newAreas[new_node]
 
     # Sum the scattering weights to prepare for first normalization
-    correctionSum = np.zeros(numOldNodes)
-    for newNode in range(numNewNodes):
-        for key in adap_gather[newNode]:
-             correctionSum[key] += adap_gather[newNode][key]
+    corr_sum = np.zeros(n_old_nodes)
+    for new_node in range(n_new_nodes):
+        for key in adap_gather[new_node]:
+             corr_sum[key] += adap_gather[new_node][key]
 
     # Normalize adap_gather so that each nodes weights
     # add up to 1.
-    for newNode in range(numNewNodes):
+    for new_node in range(n_new_nodes):
 
         # Divide by scatter scum and multiply by current area
         weightsum = np.float128(0)
-        for key in adap_gather[newNode]:
-            adap_gather[newNode][key] *= curAreas[key] / correctionSum[key]
-            weightsum += adap_gather[newNode][key]
+        for key in adap_gather[new_node]:
+            adap_gather[new_node][key] *= curAreas[key] / corr_sum[key]
+            weightsum += adap_gather[new_node][key]
 
         # Normalize by weightsum
         if weightsum != 0:
-            for key in adap_gather[newNode]:
-                adap_gather[newNode][key] /= weightsum
+            for key in adap_gather[new_node]:
+                adap_gather[new_node][key] /= weightsum
                 
     return adap_gather
 
@@ -104,31 +104,22 @@ def resample_surface_by_weights(input_surf, weights):
     return output_surf
 
 
-def resample_surface():
-
-    # Define args
-    input_surf = np.random.random((163842,))
-
-    cur_sphere = 'fsaverage_std_sphere.L.164k_fsavg_L.surf.gii'
-    new_sphere = 'fs_LR-deformed_to-fsaverage.L.sphere.32k_fs_LR.surf.gii'
-
-    cur_area = 'fsaverage.L.midthickness_va_avg.164k_fsavg_L.shape.gii'
-    new_area = 'fs_LR.L.midthickness_va_avg.32k_fs_LR.shape.gii'
+def resample_surface(input_surf, cur_sphere, new_sphere, cur_area, new_area):
 
     # Load spheres
-    curSphere = SurfaceFile(cur_sphere)
-    newSphere = SurfaceFile(new_sphere)
+    cur_sphere = SurfaceFile(cur_sphere)
+    new_sphere = SurfaceFile(new_sphere)
 
-   # Change coords to matched radius
-    curSphere.change_radius(100)
-    newSphere.change_radius(100)
+    # Change coords to matched radius
+    cur_sphere.change_radius(100)
+    new_sphere.change_radius(100)
 
     # Load areas as np array
     curAreas = nib.load(cur_area).agg_data()
     newAreas = nib.load(new_area).agg_data()
 
     # Generate weights with area adaption
-    weights = gen_weights_adap_bary_area(curSphere, newSphere, curAreas, newAreas)
+    weights = gen_weights_adap_bary_area(cur_sphere, new_sphere, curAreas, newAreas)
 
     # Resample according to calculated weights
     new_surf = resample_surface_by_weights(input_surf, weights)
