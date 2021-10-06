@@ -1,3 +1,6 @@
 __pycache__
 Job_Logs/
 .cache
+.ipynb_checkpoints*
+resample/ref
+settings.json
