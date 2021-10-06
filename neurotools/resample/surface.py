@@ -15,7 +15,7 @@ def make_barycentric_weights(from_s, to_s):
     for i, coord in enumerate(to_s.coords):
         
         # Get nodes + weights and fill into weights
-        nodes, baryWeights = mySignedHelp.barycentricWeights(coord)
+        nodes, baryWeights = mySignedHelp.barycentric_weights(coord)
 
         for node, weight in zip(nodes, baryWeights):
             if weight != 0:

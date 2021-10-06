@@ -27,51 +27,48 @@ class SignedDistanceHelperBase():
         self.coords = surf.coords.copy()
         
         # Keep track of un-flattened
-        self.m_tris = surf.tris.copy()
-        
-        # Keep track of number of triangles
-        self.m_numTris = len(self.m_tris)
+        self.tris = surf.tris.copy()
         
         # For each triangle
-        for tri_indx, thisTri in enumerate(self.m_tris):
+        for tri_indx, tri in enumerate(self.tris):
             
             # Computing min_coord and max_coord
             # as 3D coords, just min across all three
             # vertex in triangle for each x,y,z and max
-            tri_coords = self.coords[thisTri]
+            tri_coords = self.coords[tri]
             
             min_coord = tri_coords.min(axis=0)
             max_coord = tri_coords.max(axis=0)
             
             # Add triangle -use bounding box for now as an easy
             # test to capture any chance of the triangle intersecting the Oct
-            self.addTriangle(self.root_oct, tri_indx, min_coord, max_coord)
+            self.add_triangle(self.root_oct, tri_indx, min_coord, max_coord)
                
-    def addTriangle(self, thisOct, tri_indx, min_coord, max_coord):
+    def add_triangle(self, c_oct, tri_indx, min_coord, max_coord):
         
         # If leaf
-        if thisOct.m_leaf:
+        if c_oct.m_leaf:
             
             # Add triangle to list - where triangle is just
             # integer index of triangle
-            thisOct.m_tri_indx_list.append(tri_indx)
+            c_oct.m_tri_indx_list.append(tri_indx)
             
             # Get current number of triangles in list
-            numTris = len(thisOct.m_tri_indx_list)
+            n_tris = len(c_oct.m_tri_indx_list)
             
             # Set by heuristics
-            if (numTris >= self.NUM_TRIS_TO_TEST) and (
-                (numTris % self.NUM_TRIS_TEST_INCR) == (self.NUM_TRIS_TO_TEST % self.NUM_TRIS_TEST_INCR)):
+            if (n_tris >= self.NUM_TRIS_TO_TEST) and (
+                (n_tris % self.NUM_TRIS_TEST_INCR) == (self.NUM_TRIS_TO_TEST % self.NUM_TRIS_TEST_INCR)):
                 
-                totalSize = 0
-                numSplit = 0
+                total_size = 0
+                n_split = 0
                 
                 # For each triangle
-                for temp_tri_indx in thisOct.m_tri_indx_list:
+                for temp_tri_indx in c_oct.m_tri_indx_list:
                     
                     # Get triangle, then coords of triangle
-                    tempTri = self.m_tris[temp_tri_indx]
-                    tri_coords = self.coords[tempTri]
+                    temp_tri = self.tris[temp_tri_indx]
+                    tri_coords = self.coords[temp_tri]
                     
                     # Get min and max
                     tempmin_coord = tri_coords.min(axis=0)
@@ -79,43 +76,43 @@ class SignedDistanceHelperBase():
                     
                     # Basically sets to 0 for each point if
                     # less than midpoint or 1 if greater than
-                    minOct, maxOct = np.zeros(3), np.zeros(3)
-                    thisOct.containingChild(tempmin_coord, minOct)
-                    thisOct.containingChild(tempmax_coord, maxOct)
+                    min_oct, max_oct = np.zeros(3), np.zeros(3)
+                    c_oct.containing_child(tempmin_coord, min_oct)
+                    c_oct.containing_child(tempmax_coord, max_oct)
                     
                     # If any are the same, that is to say
                     # the minimum of the point and the maximum of
                     # the point are both less than or both greater
                     # than the midpoint of the Oct, reduce the split size.
-                    splitSize = 8
-                    if (minOct[0] == maxOct[0]):
-                        splitSize >>= 1
-                    if (minOct[1] == maxOct[1]):
-                        splitSize >>= 1
-                    if (minOct[2] == maxOct[2]):
-                        splitSize >>= 1
+                    split_sz = 8
+                    if (min_oct[0] == max_oct[0]):
+                        split_sz >>= 1
+                    if (min_oct[1] == max_oct[1]):
+                        split_sz >>= 1
+                    if (min_oct[2] == max_oct[2]):
+                        split_sz >>= 1
                         
-                    totalSize += splitSize
+                    total_size += split_sz
                     
                     # So only in the case that one of the coordinates
                     # are both greater or less than the midpoint do
-                    # we increment numSplit, not sure why... 
-                    if (splitSize != 8):
-                        numSplit += 1
+                    # we increment n_split, not sure why... 
+                    if (split_sz != 8):
+                        n_split += 1
                         
                 # Don't split if all triangles end up in all child oct's
                 # and try to balance speedup with memory usage.
-                if numSplit > 0 and totalSize < (3 * numTris):
+                if n_split > 0 and total_size < (3 * n_tris):
                     
                     # Do the split
-                    thisOct.makeChildren()
+                    c_oct.make_children()
                     
                     # For each triangle
-                    for temp_tri_indx in thisOct.m_tri_indx_list:
+                    for temp_tri_indx in c_oct.m_tri_indx_list:
                 
                         # Get triangle, then coords of triangle
-                        tempTri = self.m_tris[temp_tri_indx]
-                        tri_coords = self.coords[tempTri]
+                        temp_tri = self.tris[temp_tri_indx]
+                        tri_coords = self.coords[temp_tri]
 
                         # Get min and max
                         tempmin_coord = tri_coords.min(axis=0)
@@ -123,46 +120,44 @@ class SignedDistanceHelperBase():
                         
                         # Iterate through each child
                         # Check if bounds overlap, if overlap add triangle
-                        for child in flatten(thisOct.m_children):
-                            if child.boundsOverlaps(tempmin_coord, tempmax_coord):
-                                self.addTriangle(child, temp_tri_indx, tempmin_coord, tempmax_coord)
+                        for child in flatten(c_oct.m_children):
+                            if child.bounds_overlaps(tempmin_coord, tempmax_coord):
+                                self.add_triangle(child, temp_tri_indx, tempmin_coord, tempmax_coord)
                                         
                                         
         # If not leaf - add tri to child Oct's only if overlaps
         else:
 
-            for child in flatten(thisOct.m_children):
-                if child.boundsOverlaps(min_coord, max_coord):
-                    self.addTriangle(child, tri_indx, min_coord, max_coord)
+            for child in flatten(c_oct.m_children):
+                if child.bounds_overlaps(min_coord, max_coord):
+                    self.add_triangle(child, tri_indx, min_coord, max_coord)
                             
 class SignedDistanceHelper():
     
-    def __init__(self, myBase):
+    def __init__(self, base):
         
-        self.base = myBase
-        self.numTris = self.base.m_numTris
-        self.m_triMarked = np.zeros(self.numTris)
+        self.base = base
+        self.tri_markers = np.zeros(self.base.n_tris)
         
-    def barycentricWeights(self, coord):
+    def barycentric_weights(self, coord):
         
         # Init heap, will store Oct's w/ associated float
-        myHeap = []
+        heap = []
         
         # Store the dist first, then index Oct, push to heap
-        i_oct = self.base.root_oct
-        heappush(myHeap, (i_oct.distToPoint(coord), i_oct))
+        r_oct = self.base.root_oct
+        heappush(heap, (r_oct.dist_to_point(coord), r_oct))
         
         # Init starter vars
-        bestInfo = None
-        tempf, bestTriDist = -1, -1
-        first = True
+        tempf, best_tri_dist = -1, -1
+        best_info, first = None, True
         
         # Until heap is empty
-        while len(myHeap) > 0:
+        while len(heap) > 0:
             
-            tempf, curOct = heappop(myHeap)
+            tempf, curOct = heappop(heap)
 
-            if first or tempf < bestTriDist:
+            if first or tempf < best_tri_dist:
                 
                 # Oct is leaf case
                 if curOct.m_leaf:
@@ -171,16 +166,16 @@ class SignedDistanceHelper():
                     for tri_indx in curOct.m_tri_indx_list:
                         
                         # Only proceed if un-marked / unseen
-                        if self.m_triMarked[tri_indx] != 1:
-                            self.m_triMarked[tri_indx] = 1
+                        if self.tri_markers[tri_indx] != 1:
+                            self.tri_markers[tri_indx] = 1
                             
-                            # Get unsignedDistToTri from coordinate to triangle
-                            tempf, tempInfo = self.unsignedDistToTri(coord, tri_indx)
+                            # Get unsigned_dist_to_tri from coordinate to triangle
+                            tempf, temp_info = self.unsigned_dist_to_tri(coord, tri_indx)
                             
                             # Check if new best
-                            if first or tempf < bestTriDist:
-                                bestInfo = tempInfo
-                                bestTriDist = tempf
+                            if first or tempf < best_tri_dist:
+                                best_info = temp_info
+                                best_tri_dist = tempf
                                 first = False     
 
                 # Parent Oct case
@@ -191,25 +186,25 @@ class SignedDistanceHelper():
                         
                         # Get distance from child to coord
                         # and add to heap if less than best seen
-                        tempf = child_oct.distToPoint(coord)
+                        tempf = child_oct.dist_to_point(coord)
                         
-                        if first or tempf < bestTriDist:
-                            heappush(myHeap, (tempf, child_oct))
+                        if first or tempf < best_tri_dist:
+                            heappush(heap, (tempf, child_oct))
         
         # Clean marked
-        self.m_triMarked[:] = 0
+        self.tri_markers[:] = 0
         
         # Init bary weights
-        baryWeights = np.empty((3))
+        bary_weights = np.empty((3))
         
         # Get tri nodes
-        triNodes = self.base.m_tris[bestInfo.tri_indx]
+        tri_nodes = self.base.tris[best_info.tri_indx]
         
         # Handle by case
-        if bestInfo.p_type == 2 or bestInfo.p_type == 'TRIANGLE':
+        if best_info.p_type == 2 or best_info.p_type == 'TRIANGLE':
             
-            verts = self.base.coords[triNodes]
-            vp = verts - bestInfo.tempPoint
+            verts = self.base.coords[tri_nodes]
+            vp = verts - best_info.temp_point
 
             weight1 = get_coord_vec_length(np.cross(vp[1], vp[2]))
             weight2 = get_coord_vec_length(np.cross(vp[0], vp[2]))
@@ -217,56 +212,56 @@ class SignedDistanceHelper():
             weight_sum = weight1 + weight2 + weight3
                 
             # Set weights
-            baryWeights[0] = weight1 / weight_sum
-            baryWeights[1] = weight2 / weight_sum
-            baryWeights[2] = weight3 / weight_sum
+            bary_weights[0] = weight1 / weight_sum
+            bary_weights[1] = weight2 / weight_sum
+            bary_weights[2] = weight3 / weight_sum
 
-        elif bestInfo.p_type == 1 or bestInfo.p_type == 'EDGE':
+        elif best_info.p_type == 1 or best_info.p_type == 'EDGE':
             
-            vert1 = self.base.coords[bestInfo.node1]
-            vert2 = self.base.coords[bestInfo.node2]
+            vert1 = self.base.coords[best_info.node1]
+            vert2 = self.base.coords[best_info.node2]
             v21hat = vert2 - vert1
             
-            v21hat, origLength =\
+            v21hat, orig_len =\
                 normalize_vector(v21hat, return_norm=True)
             
-            tempf = v21hat.dot(bestInfo.tempPoint - vert1)
-            weight2 = tempf / origLength
+            tempf = v21hat.dot(best_info.temp_point - vert1)
+            weight2 = tempf / orig_len
             weight1 = 1 - weight2
             
             # Assign to correct spots
             for i in range(3):
                 
-                if triNodes[i] == bestInfo.node1:
-                    baryWeights[i] = weight1
-                elif triNodes[i] == bestInfo.node2:
-                    baryWeights[i] = weight2
+                if tri_nodes[i] == best_info.node1:
+                    bary_weights[i] = weight1
+                elif tri_nodes[i] == best_info.node2:
+                    bary_weights[i] = weight2
                 else:
-                    baryWeights[i] = 0
+                    bary_weights[i] = 0
             
-        elif bestInfo.p_type == 0 or bestInfo.p_type == 'NODE':
+        elif best_info.p_type == 0 or best_info.p_type == 'NODE':
             
             # Put weight as 1 in correct spot, other weights=0
             # if just one node
             for i in range(3):
-                if triNodes[i] == bestInfo.node1:
-                    baryWeights[i] = 1
+                if tri_nodes[i] == best_info.node1:
+                    bary_weights[i] = 1
                 else:
-                    baryWeights[i] = 0
+                    bary_weights[i] = 0
 
         else:
-            raise RuntimeError(f'unknown p_type: {bestInfo.p_type}')
+            raise RuntimeError(f'unknown p_type: {best_info.p_type}')
             
         # Make sure weights are not negative
-        baryWeights[baryWeights<0] = 0
+        bary_weights[bary_weights<0] = 0
         
-        # Just need nodes and baryWeights
-        return triNodes, baryWeights
+        # Just need nodes and bary_weights
+        return tri_nodes, bary_weights
             
-    def unsignedDistToTri(self, coord, tri_indx):
+    def unsigned_dist_to_tri(self, coord, tri_indx):
         
         # Get nodes of triangle
-        triNodes = self.base.m_tris[tri_indx]
+        tri_nodes = self.base.tris[tri_indx]
         
         # Inits
         point = np.array(coord)
@@ -278,10 +273,10 @@ class SignedDistanceHelper():
         node1, node2 = -1, -1
         
         # Keep track of best point found
-        bestPoint = np.empty(3)
+        best_point = np.empty(3)
         
         # Verts contains coordinates for each node of the triangle
-        verts = self.base.coords[triNodes]
+        verts = self.base.coords[tri_nodes]
         
         v10 = verts[1] - verts[0]
         xhat = normalize_vector(v10)
@@ -299,7 +294,7 @@ class SignedDistanceHelper():
             first = True
             
             # Track best squared length from edge to original point
-            bestLengthSqr = -1
+            best_len_sqr = -1
             
             # Consecutive vertices, does 2,0 then 0,1 then 1,2
             j = 2
@@ -310,7 +305,7 @@ class SignedDistanceHelper():
                 
                 mypoint = np.empty((3))
                 temptype = 0
-                tempnode1, tempnode2 = -1, -1
+                temp_node1, tempnode2 = -1, -1
                 
                 if length > 0:
                     diff = point - verts[i]
@@ -318,31 +313,31 @@ class SignedDistanceHelper():
                     
                     if dot <= 0:
                         mypoint = verts[i]
-                        tempnode1 = triNodes[i]
+                        temp_node1 = tri_nodes[i]
                     elif dot >= length:
                         mypoint = verts[j]
-                        tempnode1 = triNodes[j]
+                        temp_node1 = tri_nodes[j]
                     else:
                         mypoint = verts[i] + dot * norm
-                        tempnode1 = triNodes[i]
-                        tempnode2 = triNodes[j]
+                        temp_node1 = tri_nodes[i]
+                        tempnode2 = tri_nodes[j]
                         temptype = 1
         
                 else:
                     temptype = 0
-                    tempnode1 = triNodes[i]
+                    temp_node1 = tri_nodes[i]
                     mypoint = verts[i]
                     
                 # Get distance squared
                 td = (point - mypoint)
-                tempdistsqr = np.sum(td*td)
+                temp_dist_sqr = np.sum(td*td)
                 
-                if first or tempdistsqr < bestLengthSqr:
+                if first or temp_dist_sqr < best_len_sqr:
                     first = False
                     p_type = temptype
-                    bestLengthSqr = tempdistsqr
-                    bestPoint = mypoint
-                    node1 = tempnode1
+                    best_len_sqr = temp_dist_sqr
+                    best_point = mypoint
+                    node1 = temp_node1
                     node2 = tempnode2
                     
                 # Consecutive vertices, does 2,0 then 0,1 then 1,2
@@ -351,35 +346,35 @@ class SignedDistanceHelper():
         else:
             
             # Project everything to the new plane with basis vectors xhat, yhat
-            vertxy = np.empty((3, 2))
+            vert_xy = np.empty((3, 2))
             for i in range(3):
-                vertxy[i][0] = xhat.dot(verts[i] - verts[0])
-                vertxy[i][1] = yhat.dot(verts[i] - verts[0])
+                vert_xy[i][0] = xhat.dot(verts[i] - verts[0])
+                vert_xy[i][1] = yhat.dot(verts[i] - verts[0])
                 
             inside = True
             
             p = [xhat.dot(point - verts[0]),
-                    yhat.dot(point - verts[0])]
-            bestxy = np.empty((2))
-            bestDist = -1
+                 yhat.dot(point - verts[0])]
+            best_xy = np.empty((2))
+            best_dist = -1
             
             # Go through cases
             j, k = 2, 1
             for i in range(3):
                 
-                norm = [vertxy[j][0] - vertxy[i][0],
-                        vertxy[j][1] - vertxy[i][1]]
-                diff = [p[0] - vertxy[i][0],
-                        p[1] - vertxy[i][1]]
-                direction = [vertxy[k][0] - vertxy[i][0],
-                                vertxy[k][1] - vertxy[i][1]]
-                edgelen = np.sqrt((norm[0] * norm[0]) + (norm[1] * norm[1]))
+                norm = [vert_xy[j][0] - vert_xy[i][0],
+                        vert_xy[j][1] - vert_xy[i][1]]
+                diff = [p[0] - vert_xy[i][0],
+                        p[1] - vert_xy[i][1]]
+                direction = [vert_xy[k][0] - vert_xy[i][0],
+                             vert_xy[k][1] - vert_xy[i][1]]
+                edge_len = np.sqrt((norm[0] * norm[0]) + (norm[1] * norm[1]))
                 
                 # Non-Zero case
-                if edgelen != 0:
+                if edge_len != 0:
                     
-                    norm[0] /= edgelen
-                    norm[1] /= edgelen
+                    norm[0] /= edge_len
+                    norm[1] /= edge_len
                     
                     dot = (direction[0] * norm[0]) + (direction[1] * norm[1])
                     
@@ -395,79 +390,66 @@ class SignedDistanceHelper():
                         inside = False
                         dot = (diff[0] * norm[0]) + (diff[1] * norm[1])
                         
-                        if bestDist < 0:
+                        if best_dist < 0:
                             
                             # If closest point on this edge is an endpoint,
                             # it is possible for another edge that we count as outside
                             # of to have a closer point
                             if dot <= 0:
-                                p_type = 0
-                                node1 = triNodes[i]
-                                bestPoint = verts[i]
-                                bestxy[0] = vertxy[i][0]
-                                bestxy[1] = vertxy[i][1]
+                                node1, best_point = tri_nodes[i], verts[i]
+                                best_xy[0], best_xy[1] = vert_xy[i][0], vert_xy[i][1]
                             
-                            elif dot >= edgelen:
-                                p_type = 0
-                                node1 = triNodes[j]
-                                bestPoint = verts[j]
-                                bestxy[0] = vertxy[j][0]
-                                bestxy[1] = vertxy[j][1]
+                            elif dot >= edge_len:
+                                node1, best_point = tri_nodes[j], verts[j]
+                                best_xy[0], best_xy[1] = vert_xy[j][0], vert_xy[j][1]
                             
                             # If closest point on the edge is in the middle of the edge,
                             # nothing can be closer, break
                             else:
                                 p_type = 1
-                                node1 = triNodes[i]
-                                node2 = triNodes[j]
-                                bestxy[0] = vertxy[i][0] + dot * norm[0]
-                                bestxy[1] = vertxy[i][1] + dot * norm[1]
+                                node1, node2 = tri_nodes[i], tri_nodes[j]
+                                best_xy[0] = vert_xy[i][0] + dot * norm[0]
+                                best_xy[1] = vert_xy[i][1] + dot * norm[1]
                                 break
                                 
-                            diff[0] = p[0] - bestxy[0]
-                            diff[1] = p[1] - bestxy[1]
-                            bestDist = (diff[0] * diff[0]) + (diff[1] * diff[1])
+                            diff[0], diff[1] = p[0] - best_xy[0], p[1] - best_xy[1]
+                            best_dist = (diff[0] * diff[0]) + (diff[1] * diff[1])
                             
                         else:
-                            tempnode1 = None
-                            tempbestPoint = np.empty((3))
-                            tempxy = np.empty((2))
+
+                            temp_node1 = None
+                            temp_best_point = np.empty((3))
+                            temp_xy = np.empty((2))
                             
                             if dot <= 0:
-                                tempnode1 = triNodes[i]
-                                tempbestPoint = verts[i]
-                                tempxy[0] = vertxy[i][0]
-                                tempxy[1] = vertxy[i][1]
+                                temp_node1, temp_best_point = tri_nodes[i], verts[i]
+                                temp_xy[0], temp_xy[1] = vert_xy[i][0], vert_xy[i][1]
 
-                            elif dot >= edgelen:
-                                tempnode1 = triNodes[j]
-                                tempbestPoint = verts[j]
-                                tempxy[0] = vertxy[j][0]
-                                tempxy[1] = vertxy[j][1]
+                            elif dot >= edge_len:
+                                temp_node1 = tri_nodes[j]
+                                temp_best_point = verts[j]
+                                temp_xy[0], temp_xy[1] = vert_xy[j][0], vert_xy[j][1]
                                 
                             # Again, middle of edge always wins, don't bother with the extra test
                             else:
                                 p_type = 1
-                                node1 = triNodes[i]
-                                node2 = triNodes[j]
-                                bestxy[0] = vertxy[i][0] + dot * norm[0]
-                                bestxy[1] = vertxy[i][1] + dot * norm[1]
+                                node1, node2 = tri_nodes[i], tri_nodes[j]
+                                best_xy[0] = vert_xy[i][0] + dot * norm[0]
+                                best_xy[1] = vert_xy[i][1] + dot * norm[1]
                                 break
                             
                             # Compute diffs
-                            diff[0] = p[0] - tempxy[0]
-                            diff[1] = p[1] - tempxy[1]
+                            diff[0] = p[0] - temp_xy[0]
+                            diff[1] = p[1] - temp_xy[1]
                             
-                            tempdist = (diff[0] * diff[0]) + (diff[1] * diff[1])
+                            temp_dist = (diff[0] * diff[0]) + (diff[1] * diff[1])
                             
-                            if tempdist < bestDist:
+                            if temp_dist < best_dist:
                                 
                                 # If it were in the middle of the edge, we wouldn't be here
                                 p_type = 0
-                                node1 = tempnode1
-                                bestPoint = tempbestPoint
-                                bestxy[0] = tempxy[0]
-                                bestxy[1] = tempxy[1]
+                                node1, best_point = temp_node1, temp_best_point
+                                best_xy[0], best_xy[1] = temp_xy[0], temp_xy[1]
                             
                             # This is our second time outside an edge,
                             # we have now covered all 3 possible endpoints, so break
@@ -480,8 +462,8 @@ class SignedDistanceHelper():
                     if (diff[0] * direction[0]) + (diff[1] * direction[1]) < 0:
                         inside = False
                         p_type = 0
-                        node1 = triNodes[i]
-                        bestPoint = verts[i]
+                        node1 = tri_nodes[i]
+                        best_point = verts[i]
                         break
                     
                 # Consecutive vertices, does 2,0 then 0,1 then 1,2
@@ -490,21 +472,21 @@ class SignedDistanceHelper():
                 
             # Now outside of loop
             if inside:
-                bestxy[0] = p[0]
-                bestxy[1] = p[1]
+                best_xy[0] = p[0]
+                best_xy[1] = p[1]
                 p_type = 2
             
             if p_type != 0:
-                bestPoint = (bestxy[0] * xhat) + (bestxy[1] * yhat) + verts[0]
+                best_point = (best_xy[0] * xhat) + (best_xy[1] * yhat) + verts[0]
             
-        # result is then just point - bestPoint
-        result = point - bestPoint
+        # result is then just point - best_point
+        result = point - best_point
 
         myInfo = ClosestPointInfo(p_type=p_type,
-                                    node1=node1,
-                                    node2=node2,
-                                    tri_indx=tri_indx,
-                                    tempPoint=bestPoint)
+                                  node1=node1,
+                                  node2=node2,
+                                  tri_indx=tri_indx,
+                                  temp_point=best_point)
 
         return get_coord_vec_length(result), myInfo
 
@@ -517,18 +499,16 @@ class Oct():
         self.max_coords = max_coords
         
         # Init children pointers
-        self.m_children = [[[None for k in range(2)] for j in range(2)]
-                           for i in range(2)]
+        self.m_children = [[[None for _ in range(2)] for _ in range(2)] for _ in range(2)]
 
         # Parent pointer
-        self.m_parent = np.NaN
+        self.m_parent = np.nan
         
         # Boolean indicate if leaf
         self.m_leaf = True
         
-        # Stores list of triangle index's
-        # in reference to index of triangle in master
-        # list
+        # Stores list of triangle index's in
+        # reference to index of triangle in master list
         self.m_tri_indx_list = []
         
         # Init
@@ -540,27 +520,27 @@ class Oct():
             self.m_bounds[:,1] = (self.min_coords + self.max_coords) / 2
             self.m_bounds[:,2] = self.max_coords
         
-    def containingChild(self, point, whichOct=None):
+    def containing_child(self, point, w_oct=None):
         
         # Init
-        myOct = np.zeros((3)).astype('int')
+        m_oct = np.zeros((3)).astype('int')
                 
         for i in range(3):
             
             # If strictly less than, using only the midpoint is how traversal works
             # even if the point isn't inside the Oct
             if point[i] < self.m_bounds[i][1]:
-                myOct[i] = 0
+                m_oct[i] = 0
             else:
-                myOct[i] = 1
+                m_oct[i] = 1
             
             # Modify passed array if passed
-            if whichOct is not None:
-                whichOct[i] = myOct[i]
+            if w_oct is not None:
+                w_oct[i] = m_oct[i]
 
-        return self.m_children[myOct[0]][myOct[1]][myOct[2]]
+        return self.m_children[m_oct[0]][m_oct[1]][m_oct[2]]
     
-    def makeChildren(self):
+    def make_children(self):
         
         self.m_leaf = False
         
@@ -584,7 +564,7 @@ class Oct():
                     # Add to children array
                     self.m_children[i][j][k] = temp
                     
-    def boundsOverlaps(self, min_coords, max_coords):
+    def bounds_overlaps(self, min_coords, max_coords):
         
         for i in range(3):
             if (max_coords[i] < self.m_bounds[i][0]) or (min_coords[i] > self.m_bounds[i][2]):
@@ -592,7 +572,7 @@ class Oct():
 
         return True
     
-    def distToPoint(self, point):
+    def dist_to_point(self, point):
         
         temp = np.empty(3)
         
@@ -629,14 +609,14 @@ class Oct():
 class ClosestPointInfo():
     '''Struc used by SignedDistanceHelper in passing around info'''
     
-    def __init__(self, p_type, node1, node2, tri_indx, tempPoint):
+    def __init__(self, p_type, node1, node2, tri_indx, temp_point):
         
         self.p_type = p_type
         self.node1 = node1
         self.node2 = node2
         self.tri_indx = tri_indx
-        self.tempPoint = tempPoint
+        self.temp_point = temp_point
         
     def __repr__(self):
         
-        return f'p_type={self.p_type} node1={self.node1} node2={self.node2} tri_indx={self.tri_indx} tempPoint={self.tempPoint}'
+        return f'p_type={self.p_type} node1={self.node1} node2={self.node2} tri_indx={self.tri_indx} temp_point={self.temp_point}'
