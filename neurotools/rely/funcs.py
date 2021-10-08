@@ -2,10 +2,8 @@
 
 import numpy as np
 import random
-from pandas.core.frame import DataFrame
 from sklearn.model_selection import train_test_split
 from joblib import Parallel, delayed
-import os
 from sklearn.model_selection import GroupShuffleSplit
 from scipy.stats import pearsonr, ttest_1samp
 from statsmodels.stats.multitest import fdrcorrection
@@ -41,7 +39,7 @@ def get_corr_size_n(covars=None, data=None, resid=None,
             ps = perf_series.iloc[choices].copy()
         
         compare_map = get_proc_map(covars.iloc[choices].copy(), data[choices],
-                              proc_covars_func, perf_series=ps)
+                                   proc_covars_func, perf_series=ps)
 
     # Otherwise, just calculate based on subset of passed resid
     else:
@@ -394,7 +392,11 @@ def run_rely(covars_df, data_df=None,
            'random_state =', split_random_state)
 
     # Apply split
-    g1_subjects, g2_subjects = _test_split(all_subjects, stratify, groups, split_random_state)
+    g1_subjects, g2_subjects = _test_split(all_subjects=all_subjects,
+                                           stratify=stratify,
+                                           groups=groups,
+                                           split_random_state=split_random_state)
+    assert len(set(g1_subjects).intersection(set(g2_subjects))) == 0, "Issue Splitting Groups!"
     _print('len(group1) =', len(g1_subjects), 'len(group2) =', len(g2_subjects))
 
     if data_df is None:
