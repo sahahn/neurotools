@@ -1,4 +1,4 @@
-.. currentmodule:: neurotools.misc
+.. currentmodule:: neurotools.random
 
-misc
+random
 ###########
