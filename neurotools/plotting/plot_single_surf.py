@@ -245,7 +245,7 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
 
     if surf_map is not None:
         surf_map_data = load_surf_data(surf_map)
-        if len(surf_map_data.shape) is not 1:
+        if len(surf_map_data.shape) != 1:
             raise ValueError('surf_map can only have one dimension but has'
                              '%i dimensions' % len(surf_map_data.shape))
         if surf_map_data.shape[0] != coords.shape[0]:

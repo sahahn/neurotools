@@ -2,6 +2,7 @@
 
 import numpy as np
 import random
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from joblib import Parallel, delayed
 from sklearn.model_selection import GroupShuffleSplit
@@ -556,10 +557,6 @@ def load_resid_data(covars_df, contrast, template_path, mask=None,
     # Check inputs
     if not isinstance(covars_df, pd.DataFrame):
         raise RuntimeError('covars_df must be a DataFrame.')
-
-    if data_df is not None:
-        if not isinstance(data_df, pd.DataFrame):
-            raise RuntimeError('data_df must be a DataFrame.')
 
     if template_path is not None:
         if not isinstance(template_path, str):
