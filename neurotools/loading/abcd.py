@@ -144,7 +144,8 @@ def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year
     ----------
     rds_loc : str / file path
         The location of the csv saved version of the DEAP release
-        RDS file for the ABCD Study.
+        RDS file for the ABCD Study. This can also just be any
+        other csv as long as it has columns: 'rel_family_id', 'rel_relationship', 'genetic_zygosity_status_1'
 
     subjects : None or array-like, optional
         Can optionally specify that the block structure be created on a subset of subjects,
@@ -184,7 +185,7 @@ def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year
                                    'rel_family_id']]).any(axis=1)].index
     data = data.drop(to_drop)
 
-    # Treat twins if dyzy as normal siblings, basically if not labelled mono, then normal sib
+    # Treat twins if dy zy as normal siblings, basically if not labelled mono, then normal sib
     treat_as_siblings = data[((data['rel_relationship'] == 'twin') | (data['rel_relationship'] == 'triplet')) &\
                               (data['genetic_zygosity_status_1'] != 'monozygotic')].index
     data.loc[treat_as_siblings, 'rel_relationship'] = 'sibling'
