@@ -2,39 +2,11 @@ import nibabel as nib
 import numpy as np
 import os
 import time
-import warnings
-
 from joblib import Parallel, delayed
 from nibabel import freesurfer as fs
 from nibabel import GiftiImage
 
-def _get_print(verbose, _print=None):
-    
-    # If already set
-    if not _print is None:
-        return _print
-
-    def _print(*args, **kwargs):
-
-        if 'level' in kwargs:
-            level = kwargs.pop('level')
-        else:
-            level = 1
-
-        # Use warnings for level = 0
-        if level == 0:
-
-            # Conv print to str - then warn
-            sep = ' '
-            if 'sep' in kwargs:
-                sep = kwargs.pop('sep')
-            as_str = sep.join(str(arg) for arg in args)
-            warnings.warn(as_str)
-
-        if verbose >= level:
-            print(*args, **kwargs, flush=True)
-
-    return _print
+from ..misc.print import _get_print
 
 def _gifti_to_np(data):
     return np.asarray([arr.data for arr in data.darrays]).T.squeeze()
@@ -47,6 +19,10 @@ def load(f, index_slice=None):
     f : file path
         The location / file path of the data to load.
 
+        Note: This function can also accept non-file path's
+        e.g., can accept directly numpy arrays or objects from
+        nibabel.
+
     index_slice : slices, tuple of slices, or None
         You may optional pass index slicing here.
         The typical benefit of index_slicing over masking in a later
@@ -58,18 +34,19 @@ def load(f, index_slice=None):
         the disk, but you only need the data in the first 20, e.g.,
         so with traditional slicing that is [0], in this case by using the
         mask you have to load the full data from the disk, then slice it.
-        But if you pass `slice(0)` here, then this accomplishes the same thing,
+        But if you pass :python:`slice(0)` here, then this accomplishes the same thing,
         but only loads the requested slice from the disk.
-
+        
         You must use python keyword `slice` for complex slicing. For example
-        in the example above you may pass either `(0)` or `slice(0)`,
+        in the example above you may pass either :python:`(0)` or :python:`slice(0)`,
         but if you wanted something more complex, e.g. passing
-        something like my_array[1:5:2, ::3] you should pass
-        (slice(1,5,2), slice(None,None,3)) here.
+        something like :python:`my_array[1:5:2, ::3]` you should pass
+        :python:`(slice(1,5,2), slice(None,None,3))` here.
 
         ::
 
             default = None
+
     '''
     
     # If already numpy array, return of as is
@@ -180,13 +157,12 @@ def _load_subject(subject, contrast, template_path, mask=None,
 
     return flat_data
  
-def get_data(subjects, template_path, contrast=None, mask=None,
-             index_slice=None, zero_as_nan=False,
-             n_jobs=1, verbose=1, _print=None):
+def load_data(subjects, template_path, contrast=None, mask=None,
+              index_slice=None, zero_as_nan=False,
+              n_jobs=1, verbose=1, _print=None):
     '''This method is designed to load data saved in a particular way,
     specifically where each subject / participants data is saved seperately.
-
-    This method of loading uses a template path.
+    Note: This method of loading uses a template path.
 
     Parameters
     ----------
@@ -205,12 +181,11 @@ def get_data(subjects, template_path, contrast=None, mask=None,
         'some_loc/X_Y.nii.gz'
         the template_path would be: 'some_loc/SUBJECT_CONTRAST.nii.gz'.
 
-        Note that the use of a CONTRAST argument is optional.
+        Note: The use of CONTRAST within the template path is optional.
 
     contrast : str, optional
         The name of the contrast, used along with the template
         path to define where to load data.
-
         If passed None, then it is assumed that CONTRAST
         is not present in the template_path and will be ignored.
 
@@ -280,10 +255,10 @@ def get_data(subjects, template_path, contrast=None, mask=None,
         By default this value is 1. This parameter
         controls the verbosity of this function.
 
-        If -1, then no message at all will be printed.
-        If 0, only warnings will be printed.
-        If 1, general status updates will be printed.
-        If >= 2, full verbosity will be enabled.
+        - If -1, then no message at all will be printed.
+        - If 0, only warnings will be printed.
+        - If 1, general status updates will be printed.
+        - If >= 2, full verbosity will be enabled.
     '''
     
     # Keep track of loading time

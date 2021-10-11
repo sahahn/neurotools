@@ -5,3 +5,5 @@ Job_Logs/
 resample/ref
 settings.json
 doc_src/_build
+.pytest_cache
+.vscode

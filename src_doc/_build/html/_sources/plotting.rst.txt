@@ -1,0 +1,4 @@
+.. currentmodule:: neurotools.plotting
+
+plotting
+###########

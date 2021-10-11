@@ -9,7 +9,8 @@ from sklearn.model_selection import GroupShuffleSplit
 from scipy.stats import pearsonr, ttest_1samp
 from statsmodels.stats.multitest import fdrcorrection
 from ..stats.basic import get_cohens, get_resid, fast_corr
-from ..loading.funcs import get_data, reverse_mask_data, get_overlap_subjects, _get_print
+from ..loading.funcs import load_data, reverse_mask_data, get_overlap_subjects
+from ..misc.print import _get_print
 
 
 def get_non_nan_overlap_mask(c1, c2):
@@ -404,7 +405,7 @@ def run_rely(covars_df, data_df=None,
 
         # Load the data from files
         _print('Loading Group 1 Data')
-        d1 = get_data(subjects=g1_subjects,
+        d1 = load_data(subjects=g1_subjects,
                       contrast=contrast,
                       template_path=template_path,
                       mask=mask,
@@ -413,7 +414,7 @@ def run_rely(covars_df, data_df=None,
                       _print=_print)
 
         _print('Loading Group 2 Data')
-        d2  = get_data(subjects=g2_subjects,
+        d2  = load_data(subjects=g2_subjects,
                        contrast=contrast,
                        template_path=template_path,
                        mask=mask,
@@ -573,7 +574,7 @@ def load_resid_data(covars_df, contrast, template_path, mask=None,
 
     # Load all data
     _print('Loading Data', level=1)
-    data = get_data(subjects=all_subjects,
+    data = load_data(subjects=all_subjects,
                     contrast=contrast,
                     template_path=template_path,
                     mask=mask,

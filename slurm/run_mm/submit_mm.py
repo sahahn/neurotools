@@ -1,5 +1,5 @@
 from funcs import run_slurm_mm
-from neurotools.loading import get_overlap_subjects, get_data
+from neurotools.loading import get_overlap_subjects, load_data
 from neurotools.loading.abcd import load_from_csv
 from neurotools.misc.text import name_replace
 import pandas as pd
@@ -81,7 +81,7 @@ subjects = get_overlap_subjects(df=df, template_path=template_path,
 df = df.loc[subjects]
 
 # Load in the imaging data
-data = get_data(subjects=subjects, template_path=template_path,
+data = load_data(subjects=subjects, template_path=template_path,
                 contrast=contrast, mask=None, index_slice=None,
                 zero_as_nan=True,
                 n_jobs=1, verbose=1)
