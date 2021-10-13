@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.utils import check_random_state
 
 
@@ -14,7 +15,7 @@ def _within_grp_permute(blocks, rng):
     col = blocks[:, 0]
     unique_grps = np.unique(col)
     
-    # Process each group seperate
+    # Process each group separate
     for grp in unique_grps:
         
         # Get index of members of this group
@@ -95,6 +96,10 @@ def block_permutation(x, blocks, random_state=None):
     Performs permutations according to passed blocks, where blocks
     are specified with PALM style Exchangeability Blocks.
     '''
+    
+    # Make sure blocks are np array
+    if isinstance(blocks, pd.DataFrame):
+        blocks = np.array(blocks)
     
     # Proc. random state
     rng = check_random_state(random_state)
