@@ -240,7 +240,7 @@ data to be loaded is saved.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -272,20 +272,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.23896861, 0.36176179],</span>
-<span class="go">       [0.89168176, 0.73023219],</span>
-<span class="go">       [0.02559482, 0.44052339],</span>
-<span class="go">       [0.89003114, 0.26750628],</span>
-<span class="go">       [0.19705086, 0.77732507]])</span>
+<span class="go">array([[0.96955026, 0.27938165],</span>
+<span class="go">       [0.51273439, 0.44448575],</span>
+<span class="go">       [0.40491025, 0.28199599],</span>
+<span class="go">       [0.55854544, 0.37459673],</span>
+<span class="go">       [0.05813243, 0.88939566]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.23896861, 0.36176179],</span>
-<span class="go">       [0.89168176, 0.73023219],</span>
-<span class="go">       [0.02559482, 0.44052339],</span>
-<span class="go">       [0.89003114, 0.26750628],</span>
-<span class="go">       [0.19705086, 0.77732507]])</span>
+<span class="go">array([[0.96955026, 0.27938165],</span>
+<span class="go">       [0.51273439, 0.44448575],</span>
+<span class="go">       [0.40491025, 0.28199599],</span>
+<span class="go">       [0.55854544, 0.37459673],</span>
+<span class="go">       [0.05813243, 0.88939566]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -339,7 +339,7 @@ back into it’s pre-masked state.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
+<li><p><strong>index_slice</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">python.slice</span></code>, tuple of <code class="xref py py-class docutils literal notranslate"><span class="pre">python.slice</span></code>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
 The typical benefit of index_slicing over masking
 is where data to load will be read with nibabel
 (e.g., saved as .nii or .mgz) and can therefore use an index_slice
@@ -398,7 +398,7 @@ dimension is subject and the second is a single dimension representation
 of that subjects data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">&lt;numpy.ndarray&gt;</span></code></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -423,7 +423,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0029392242431640625 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0023272037506103516 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -441,7 +441,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0041577816009521484 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0030684471130371094 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -500,10 +500,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.43289034, 0.        , 0.        , 0.33668603]),</span>
-<span class="go"> array([0.53610313, 0.        , 0.        , 0.83978305]),</span>
-<span class="go"> array([0.2596534, 0.       , 0.       , 0.6016829]),</span>
-<span class="go"> array([0.73802593, 0.        , 0.        , 0.09274142])]</span>
+<span class="go">[array([0.00914582, 0.        , 0.        , 0.3655952 ]),</span>
+<span class="go"> array([0.80731594, 0.        , 0.        , 0.38016465]),</span>
+<span class="go"> array([0.47220895, 0.        , 0.        , 0.26163184]),</span>
+<span class="go"> array([0.7927689 , 0.        , 0.        , 0.66813521])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -519,14 +519,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66fa0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66460&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66c10&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66e50&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f6702e99fd0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e32130&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e321c0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e322b0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.43289034, 0.        , 0.        , 0.33668603])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.00914582, 0.        , 0.        , 0.3655952 ])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>

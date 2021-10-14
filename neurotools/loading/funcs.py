@@ -370,7 +370,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
 
     Returns
     --------
-    data : :class:`<numpy.ndarray>`
+    data : :class:`array<numpy.ndarray>`
         Loaded data across all specified subjects is returned
         as a 2D numpy :func:`array<numpy.array>` (shape= subj x data) where the first
         dimension is subject and the second is a single dimension representation
