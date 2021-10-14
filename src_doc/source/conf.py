@@ -33,7 +33,8 @@ release = '0.1'
 extensions = ["sphinx.ext.napoleon",
               'IPython.sphinxext.ipython_console_highlighting',
               "IPython.sphinxext.ipython_directive",
-              "nbsphinx"]
+              "nbsphinx",
+              "sphinx.ext.intersphinx"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -61,3 +62,16 @@ rst_prolog = """
     :language: python
     :class: highlight
 """
+
+intersphinx_mapping = {
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "nilearn": ("https://nilearn.github.io/", None),
+    "nibabel": ("https://nipy.org/nibabel/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "python": ("https://docs.python.org/3/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
+    "statsmodels": ("https://www.statsmodels.org/devel/", None),
+    'sklearn': ('http://scikit-learn.org/stable', None),
+    'networkx': ('https://networkx.org/documentation/stable/', None),
+}
