@@ -205,7 +205,7 @@
 e.g., can accept directly numpy func:<cite>arrays&lt;numpy.array&gt;</cite> or objects from
 nibabel.</p>
 </p></li>
-<li><p><strong>index_slice</strong> (<em>slices</em><em>, </em><em>tuple of slices</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – <p>You may optional pass index slicing here.
+<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
 The typical benefit of index_slicing over masking in a later
 step is where data to load will be read with nibabel
 (e.g., saved as .nii or .mgz) and can therefore use an index_slice
@@ -229,7 +229,7 @@ something like <code class="code highlight python docutils literal notranslate">
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p><strong>data</strong> – Returned is the requested data as a func:<cite>numpy array&lt;numpy.array&gt;</cite>,
-or if passed None, then None will be returned. The shape
+or if passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, then <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> will be returned. The shape
 of the returned data will be the shape of the data array portion of
 whatever data is passed with extra singular dimensions removed
 (i.e., np.squeeze is applied). If passed an index slice, only
@@ -240,7 +240,7 @@ data to be loaded is saved.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a>, or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -272,20 +272,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.47716445, 0.14011638],</span>
-<span class="go">       [0.17408703, 0.37323013],</span>
-<span class="go">       [0.22458536, 0.75572533],</span>
-<span class="go">       [0.7921099 , 0.88349492],</span>
-<span class="go">       [0.31002006, 0.53756742]])</span>
+<span class="go">array([[0.25666948, 0.78494773],</span>
+<span class="go">       [0.21110503, 0.31556016],</span>
+<span class="go">       [0.93860241, 0.07882912],</span>
+<span class="go">       [0.41604503, 0.52242324],</span>
+<span class="go">       [0.54877316, 0.34897176]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.47716445, 0.14011638],</span>
-<span class="go">       [0.17408703, 0.37323013],</span>
-<span class="go">       [0.22458536, 0.75572533],</span>
-<span class="go">       [0.7921099 , 0.88349492],</span>
-<span class="go">       [0.31002006, 0.53756742]])</span>
+<span class="go">array([[0.25666948, 0.78494773],</span>
+<span class="go">       [0.21110503, 0.31556016],</span>
+<span class="go">       [0.93860241, 0.07882912],</span>
+<span class="go">       [0.41604503, 0.52242324],</span>
+<span class="go">       [0.54877316, 0.34897176]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -310,19 +310,20 @@ be replaced with the contrast name.</p>
 <p>For example, to load subject X’s contrast Y saved under
 ‘some_loc/X_Y.nii.gz’
 the template_path would be: ‘some_loc/SUBJECT_CONTRAST.nii.gz’.</p>
-<p>Note: The use of CONTRAST within the template path is optional.</p>
+<p>Note: The use of CONTRAST within the template path is optional, but
+this parameter is not.</p>
 </p></li>
-<li><p><strong>contrast</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the contrast, used along with the template
+<li><p><strong>contrast</strong> (str or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>The name of the contrast, used along with the template
 path to define where to load data.
-If passed None, then it is assumed that CONTRAST
+If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, then it is assumed that CONTRAST
 is not present in the template_path and will be ignored.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>mask</strong> (str, func:<cite>array&lt;numpy.array&gt;</cite> or None) – <p>After data is loaded, it can optionally be
+<li><p><strong>mask</strong> (str, func:<cite>array&lt;numpy.array&gt;</cite> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>After data is loaded, it can optionally be
 masked according to a specific func:<cite>array&lt;numpy.array&gt;</cite>.</p>
-<p>If None, and the data to be loaded is multi-dimensional,
+<p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, and the data to be loaded is multi-dimensional,
 then the data will be flattened by default, e.g., if each data
 point originally has shape 10 x 2, the flattened shape will be 20.</p>
 <p>If passed a str, it will be assumed to be the location of a mask
@@ -338,7 +339,7 @@ back into it’s pre-masked state.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>index_slice</strong> (<em>slices</em><em>, </em><em>tuple of slices</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – <p>You may optional pass index slicing here.
+<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
 The typical benefit of index_slicing over masking
 is where data to load will be read with nibabel
 (e.g., saved as .nii or .mgz) and can therefore use an index_slice
@@ -355,7 +356,7 @@ in the example above you may pass either <code class="code highlight python docu
 but if you wanted something more complex, e.g. passing
 something like <code class="code highlight python docutils literal notranslate"><span class="name"><span class="pre">my_array</span></span><span class="punctuation"><span class="pre">[</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">,</span></span> <span class="punctuation"><span class="pre">::</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">]</span></span></code> you should pass
 <code class="code highlight python docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">),</span></span> <span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">))</span></span></code> here.</p>
-<p>If passed None (the default), this option is
+<p>If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> (the default), this option is
 ignored and the full data avaliable is loaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
@@ -369,19 +370,24 @@ found in the loaded data will be replaced with NaN.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>The number of threads to use when loading data.</p>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>The number of threads to use when loading data.</p>
 <p>Note: Often n_jobs will refer to number of separate processors,
 but in this case it refers to threads,
 which are not limited by the number of cores avaliable.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
 </p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>By default this value is 1. This parameter
-controls the verbosity of this function.</p>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>This parameter controls the verbosity of this function.</p>
 <ul>
 <li><p>If -1, then no message at all will be printed.</p></li>
 <li><p>If 0, only warnings will be printed.</p></li>
 <li><p>If 1, general status updates will be printed.</p></li>
 <li><p>If &gt;= 2, full verbosity will be enabled.</p></li>
 </ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
 </p></li>
 </ul>
 </dd>
@@ -417,7 +423,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0028672218322753906 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.002553701400756836 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -435,7 +441,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="go">Loaded data with shape: (3, 2) in 0.003438711166381836 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0026519298553466797 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -493,10 +499,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.98266427, 0.        , 0.        , 0.12860988]),</span>
-<span class="go"> array([0.89254798, 0.        , 0.        , 0.54874416]),</span>
-<span class="go"> array([0.87002151, 0.        , 0.        , 0.55286271]),</span>
-<span class="go"> array([0.1769924 , 0.        , 0.        , 0.74243968])]</span>
+<span class="go">[array([0.13245184, 0.        , 0.        , 0.79809229]),</span>
+<span class="go"> array([0.26216531, 0.        , 0.        , 0.42823767]),</span>
+<span class="go"> array([0.58755707, 0.        , 0.        , 0.97824216]),</span>
+<span class="go"> array([0.00459315, 0.        , 0.        , 0.11915082])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -512,14 +518,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fbca4cc1850&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fbca4cc15b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fbca4cc12e0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fbca4cc16d0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa280&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa7f0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa2b0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa760&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.98266427, 0.        , 0.        , 0.12860988])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.13245184, 0.        , 0.        , 0.79809229])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -562,7 +568,7 @@ be ignored!</p>
 </p></li>
 <li><p><strong>contrast</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the contrast, used along with the template
 path to define where to load data.</p>
-<p>If passed <code class="xref py py-data docutils literal notranslate"><span class="pre">python.None</span></code>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> <code class="xref py py-data docutils literal notranslate"><span class="pre">python.None</span></code> then it is assumed that CONTRAST
+<p>If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> then it is assumed that CONTRAST
 is not present in the template_path and will be ignored.</p>
 <p>Note that if this parameter is passed, then data_df will
 be ignored! This parameter is used only with the template_path option.</p>
@@ -570,19 +576,22 @@ be ignored! This parameter is used only with the template_path option.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or None, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
+<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
 to overlap with <cite>df</cite>, INSTEAD of a template_path and / or contrast set of arguments.
 Explicitly, if specifying a data_df, a template_path should not be passed!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – <p>By default this value is 1. This parameter
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>By default this value is 1. This parameter
 controls the verbosity of this function.</p>
 <p>If -1, then no message at all will be printed.
 If 0, only warnings will be printed.
 If 1, general status updates will be printed.
 If &gt;= 2, full verbosity will be enabled.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
 </p></li>
 </ul>
 </dd>
