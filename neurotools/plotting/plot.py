@@ -8,7 +8,7 @@ from .ref import SurfRef
 
 # @TODO figure out what to do with sym cbar?
 
-def _proc_vs(data, vmin, vmax):
+def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     if vmin is None and vmax is None:
         vmin = np.nanmin(np.nanmin(data))
@@ -16,7 +16,11 @@ def _proc_vs(data, vmin, vmax):
 
         if np.abs(vmin) > vmax:
             vmax = np.abs(vmin)
-        else:
+
+            if symmetric_cbar:
+                vmin = -vmax
+        
+        elif symmetric_cbar:
             vmin = -vmax
             
     if vmin is None:
@@ -147,10 +151,12 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
     If axes is passed, it should be a flat list with 4 axes,
     and if colorbar is True, then the 5th axes passed should be
     the spot for the color bar.
-    
     '''
+
+    if 'symmetric_cbar' in kwargs:
+        symmetric_cbar = kwargs.pop('symmetric_cbar')
     
-    vmin, vmax = _proc_vs(data, vmin, vmax)
+    vmin, vmax = _proc_vs(data, vmin, vmax, symmetric_cbar)
     smfs = []
 
     if view in ['standard', 'default']:
@@ -229,6 +235,7 @@ def plot_surf_vol_collage(surf, vol,
                           figsize=(20, 20),
                           title=None, title_sz=18,
                           colorbar=False,
+                          symmetric_cbar=False,
                           hspace=0, wspace=0,
                           colorbar_params={},
                           surf_params={}, vol_params={}):
@@ -236,9 +243,8 @@ def plot_surf_vol_collage(surf, vol,
 
     # Right now, basically have it be that you cant plot the subcort and surf with
     # dif colorbars, but could have this be more flexible later...
-
     # Prep vmin, vmax
-    vmin, vmax = _proc_vs([surf[0], surf[1], vol.get_fdata()], vmin, vmax)
+    vmin, vmax = _proc_vs([surf[0], surf[1], vol.get_fdata()], vmin, vmax, symmetric_cbar)
 
     # Init smfs with min and max of vol data, as these values won't change in
     # in the same way plotting surf vals can.
