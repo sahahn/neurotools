@@ -272,20 +272,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.96955026, 0.27938165],</span>
-<span class="go">       [0.51273439, 0.44448575],</span>
-<span class="go">       [0.40491025, 0.28199599],</span>
-<span class="go">       [0.55854544, 0.37459673],</span>
-<span class="go">       [0.05813243, 0.88939566]])</span>
+<span class="go">array([[0.48313631, 0.7037346 ],</span>
+<span class="go">       [0.67926679, 0.84119804],</span>
+<span class="go">       [0.37558783, 0.39072626],</span>
+<span class="go">       [0.4184439 , 0.33836107],</span>
+<span class="go">       [0.07446779, 0.93442503]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.96955026, 0.27938165],</span>
-<span class="go">       [0.51273439, 0.44448575],</span>
-<span class="go">       [0.40491025, 0.28199599],</span>
-<span class="go">       [0.55854544, 0.37459673],</span>
-<span class="go">       [0.05813243, 0.88939566]])</span>
+<span class="go">array([[0.48313631, 0.7037346 ],</span>
+<span class="go">       [0.67926679, 0.84119804],</span>
+<span class="go">       [0.37558783, 0.39072626],</span>
+<span class="go">       [0.4184439 , 0.33836107],</span>
+<span class="go">       [0.07446779, 0.93442503]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -339,7 +339,7 @@ back into it’s pre-masked state.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>index_slice</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">python.slice</span></code>, tuple of <code class="xref py py-class docutils literal notranslate"><span class="pre">python.slice</span></code>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
+<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
 The typical benefit of index_slicing over masking
 is where data to load will be read with nibabel
 (e.g., saved as .nii or .mgz) and can therefore use an index_slice
@@ -423,7 +423,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0023272037506103516 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0023293495178222656 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -441,7 +441,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0030684471130371094 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0024306774139404297 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -500,10 +500,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.00914582, 0.        , 0.        , 0.3655952 ]),</span>
-<span class="go"> array([0.80731594, 0.        , 0.        , 0.38016465]),</span>
-<span class="go"> array([0.47220895, 0.        , 0.        , 0.26163184]),</span>
-<span class="go"> array([0.7927689 , 0.        , 0.        , 0.66813521])]</span>
+<span class="go">[array([0.43757698, 0.        , 0.        , 0.40327146]),</span>
+<span class="go"> array([0.28203329, 0.        , 0.        , 0.49644916]),</span>
+<span class="go"> array([0.63561542, 0.        , 0.        , 0.64579006]),</span>
+<span class="go"> array([0.48899394, 0.        , 0.        , 0.05070223])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -519,14 +519,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f6702e99fd0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e32130&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e321c0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6702e322b0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61f70&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61400&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61820&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c615e0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.00914582, 0.        , 0.        , 0.3655952 ])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.43757698, 0.        , 0.        , 0.40327146])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -599,6 +599,133 @@ If &gt;= 2, full verbosity will be enabled.</p>
 </dl>
 </dd></dl>
 </div>
+<div class="section" id="abcd-load-from-csv">
+<h2>abcd.load_from_csv<a class="headerlink" href="#abcd-load-from-csv" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.abcd.load_from_csv">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_cat_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ordinal'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special ABCD Study specific helper utility to load specific
+columns from a csv saved version of the DEAP release RDS
+file or simmilar ABCD specific csv dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em>) – <p>Either a single str with the column name to load,
+or a list / array-like with the names of multiple columns to
+load.</p>
+<p>If any variable passed is wrapped in ‘C(variable_name)’
+that variable will be ordinalized (or whatever option is specified
+with the encode_cat_as option) and saved under the base variable name
+(i.e., with C() wrapper removed).</p>
+</p></li>
+<li><p><strong>csv_loc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The str location of the csv saved version of the DEAP release
+RDS file for the ABCD Study - or any other comma seperated dataset
+with an eventname column.</p></li>
+<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>array-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The single eventname as a str, or multiple eventnames
+in which to include results by. If passed as None then
+all avaliable data will be kept.</p>
+<p>If a single eventname is specified then the eventname
+column will be dropped, otherwise it will be kept.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'baseline_year_1_arm_1'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>drop_nan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, then drop any rows / subjects data with
+missing values in any of the requested columns.</p>
+<p>Note: Any values encoded as [‘777’, 999, ‘999’, 777]
+will be treated as NaN. This is a special ABCD specific consideration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>encode_cat_as</strong> (<em>{'ordinal'</em><em>, </em><em>'one hot'</em><em>, </em><em>'dummy'}</em><em>, </em><em>optional</em>) – <p>The way in which categorical vars, any wrapped in C(),
+should be categorically encoded.</p>
+<ul>
+<li><dl class="simple">
+<dt>’ordinal’:</dt><dd><p>The variables in encoded sequentially in one
+column with the original name, with values 0 to k-1
+where k is the number of unique categorical values.
+This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’one hot’:</dt><dd><p>The variables is one hot encoded, adding columns
+for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.3.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’dummy’:</dt><dd><p>Same as ‘one hot’, except one of the columns is then dropped.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
+column <cite>src_subject_id</cite> within the original csv.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+</div>
+<div class="section" id="abcd-load-family-block-structure">
+<h2>abcd.load_family_block_structure<a class="headerlink" href="#abcd-load-family-block-structure" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.abcd.load_family_block_structure">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_family_block_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_family_block_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>This helper utility loads PALM-style exchanability blocks for ABCD study specific data
+according to right now a fixed set of rules:</p>
+<ul class="simple">
+<li><p>Families of the same type can be shuffled (i.e., same number of members + of same status)</p></li>
+<li><p>Siblings of the same type can be shuffled</p></li>
+<li><p>Treat DZ as ordinary sibs (i.e., just treat MZ seperately)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_loc</strong> (<em>str / file path</em>) – The location of the csv saved version of the DEAP release
+RDS file for the ABCD Study. This can also just be any
+other csv as long as it has columns:
+‘rel_family_id’, ‘rel_relationship’, ‘genetic_zygosity_status_1’</p></li>
+<li><p><strong>subjects</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <dl>
+<dt>Can optionally specify that the block structure be created on a subset of subjects,</dt><dd><p>though if any missing values are present in rel_relationship or rel_family_id
+within this subset, then those will be further dropped.</p>
+<p>If passed as non-null, this should be a valid array-like
+or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</dd>
+<dt>eventname<span class="classifier">str, array-like or None, optional</span></dt><dd><p>A single eventname as a str in which to specify data by.</p>
+<p>For now, this method only supports loading data at a single
+time point across subjects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'baseline_year_1_arm_1'</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>block_structure</strong> – The loaded block structure as indexed by src_subject_id with
+columns: ‘neg_ones’, ‘family_type’, ‘rel_family_id’ and ‘rel_relationship’.</p>
+<p>Any subjects with missing values in a key column have been dropped from
+this returned structure.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+</div>
 </div>
 
         </article>
@@ -659,6 +786,8 @@ If &gt;= 2, full verbosity will be enabled.</p>
 <li><a class="reference internal" href="#load-data">load_data</a></li>
 <li><a class="reference internal" href="#reverse-mask-data">reverse_mask_data</a></li>
 <li><a class="reference internal" href="#get-overlap-subjects">get_overlap_subjects</a></li>
+<li><a class="reference internal" href="#abcd-load-from-csv">abcd.load_from_csv</a></li>
+<li><a class="reference internal" href="#abcd-load-family-block-structure">abcd.load_family_block_structure</a></li>
 </ul>
 </li>
 </ul>

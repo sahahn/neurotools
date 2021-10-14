@@ -3,14 +3,12 @@ from sklearn.preprocessing import OrdinalEncoder
 from joblib.hashing import hash as joblib_hash
 from sklearn.preprocessing import LabelEncoder
 
-def load_from_csv(cols, rds_loc,
+def load_from_csv(cols, csv_loc,
                   eventname='baseline_year_1_arm_1',
                   drop_nan=False, encode_cat_as='ordinal'):
-    '''Special function to load specific columns from a csv saved
-    version of the DEAP release RDS file for the ABCD Study.
-
-    Note: special ABCD NaN indicators ['777', 999, '999', 777] will
-    be treated as NaN.
+    '''Special ABCD Study specific helper utility to load specific
+    columns from a csv saved version of the DEAP release RDS
+    file or simmilar ABCD specific csv dataset.
 
     Parameters
     ----------
@@ -20,11 +18,14 @@ def load_from_csv(cols, rds_loc,
         load.
 
         If any variable passed is wrapped in 'C(variable_name)'
-        that variable will be ordinalized and saved under variable name.
+        that variable will be ordinalized (or whatever option is specified
+        with the encode_cat_as option) and saved under the base variable name
+        (i.e., with C() wrapper removed).
 
-    rds_loc : str / file path
-        The location of the csv saved version of the DEAP release
-        RDS file for the ABCD Study.
+    csv_loc : str
+        The str location of the csv saved version of the DEAP release
+        RDS file for the ABCD Study - or any other comma seperated dataset
+        with an eventname column.
 
     eventname : str, array-like or None, optional
         The single eventname as a str, or multiple eventnames
@@ -42,6 +43,9 @@ def load_from_csv(cols, rds_loc,
         If True, then drop any rows / subjects data with
         missing values in any of the requested columns.
 
+        Note: Any values encoded as ['777', 999, '999', 777]
+        will be treated as NaN. This is a special ABCD specific consideration.
+
         ::
 
             default = False
@@ -50,26 +54,24 @@ def load_from_csv(cols, rds_loc,
         The way in which categorical vars, any wrapped in C(),
         should be categorically encoded.
 
-        - 'ordindal':
+        - 'ordinal':
             The variables in encoded sequentially in one
             column with the original name, with values 0 to k-1
             where k is the number of unique categorical values.
-            This method uses the OrdinalEncoder from sklearn.
+            This method uses :class:`OrdinalEncoder<sklearn.preprocessing.OrdinalEncoder>`.
 
         - 'one hot':
             The variables is one hot encoded, adding columns
-            for each unique value. This method uses
-            the get_dummies function from pandas.
+            for each unique value. This method uses function :func:`pandas.get_dummies`.
 
         - 'dummy':
-            Same as 'one hot', except one of the columns is then dropped,
-            dummy coding.
+            Same as 'one hot', except one of the columns is then dropped.
 
     Returns
     -------
-    df : pandas DataFrame
-        Will return a pandas DataFrame as index'ed by src_subject_id, with
-        the requested cols as columns.
+    df : :class:`pandas.DataFrame`
+        Will return a :class:`pandas.DataFrame` as indexed by
+        column `src_subject_id` within the original csv.
 
     '''
     
@@ -90,7 +92,7 @@ def load_from_csv(cols, rds_loc,
             cat_vars.append(var_name)
     
     # Load from csv
-    data = pd.read_csv(rds_loc,
+    data = pd.read_csv(csv_loc,
                        usecols=['src_subject_id', 'eventname'] + cols,
                        na_values=['777', 999, '999', 777])
     
@@ -127,22 +129,17 @@ def load_from_csv(cols, rds_loc,
     return data
 
 
-def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year_1_arm_1'):
-    '''This method is still very much a first draft, still needs some tweaking.
+def load_family_block_structure(csv_loc, subjects=None, eventname='baseline_year_1_arm_1'):
+    '''This helper utility loads PALM-style exchanability blocks for ABCD study specific data
+    according to right now a fixed set of rules:
 
-    Should be able to select from some different options, like treat twins
-    in some way x or add site as an outer layer, etc...
-
-    Base / current rules
-
-    - Families of the same type can be shuffled (Same number of members + of same status)
-    - Siblings of the same type can be shuffled - does that mean within families??????
-    - Treat DZ as ordinary sibs
-    - Treat MZ seperately
+    - Families of the same type can be shuffled (i.e., same number of members + of same status)
+    - Siblings of the same type can be shuffled 
+    - Treat DZ as ordinary sibs (i.e., just treat MZ seperately)
 
     Parameters
     ----------
-    rds_loc : str / file path
+    csv_loc : str / file path
         The location of the csv saved version of the DEAP release
         RDS file for the ABCD Study. This can also just be any
         other csv as long as it has columns:
@@ -150,10 +147,11 @@ def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year
 
     subjects : None or array-like, optional
         Can optionally specify that the block structure be created on a subset of subjects,
-        though note if any missing values are present in rel_relationship or rel_family_id
+        though if any missing values are present in rel_relationship or rel_family_id
         within this subset, then those will be further dropped.
-        If passed, should be passed as valid array-like or pandas Index style
-        set of subjects.
+
+        If passed as non-null, this should be a valid array-like
+        or :class:`pandas.Index` style set of subjects.
 
         ::
 
@@ -162,18 +160,30 @@ def load_family_block_structure(rds_loc, subjects=None, eventname='baseline_year
      eventname : str, array-like or None, optional
         A single eventname as a str in which to specify data by.
 
-        TODO: Add in support for what a block structure with
-        multiple eventnames, i.e., longitudinal data, and what
-        that would look like.
+        For now, this method only supports loading data at a single
+        time point across subjects.
 
         ::
 
             default = 'baseline_year_1_arm_1'
+
+    Returns
+    --------
+    block_structure : :class:`pandas.DataFrame`
+        The loaded block structure as indexed by src_subject_id with
+        columns: 'neg_ones', 'family_type', 'rel_family_id' and 'rel_relationship'.
+        
+        Any subjects with missing values in a key column have been dropped from
+        this returned structure.
     '''
+
+    # TODO: Add in support for what a block structure with
+    # multiple eventnames, i.e., longitudinal data, and what
+    #  that would look like.
 
     # Load in needed columns, w/o NaNs
     rel_cols = ['rel_family_id', 'rel_relationship', 'genetic_zygosity_status_1']
-    data = load_from_csv(rel_cols, rds_loc,
+    data = load_from_csv(rel_cols, csv_loc,
                          eventname=eventname,
                          drop_nan=False)
 
