@@ -6,6 +6,8 @@ from nilearn.plotting import plot_glass_brain, plot_stat_map
 from ..loading import load
 from .ref import SurfRef
 
+# @TODO figure out what to do with sym cbar?
+
 def _proc_vs(data, vmin, vmax):
 
     if vmin is None and vmax is None:

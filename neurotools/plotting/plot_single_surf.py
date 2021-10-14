@@ -9,29 +9,7 @@ from matplotlib.colors import Normalize, LinearSegmentedColormap
 
 from nilearn.surface import load_surf_data, load_surf_mesh
 from matplotlib.colors import Normalize, LinearSegmentedColormap
-
-
-def _crop_colorbar(cbar, cbar_vmin, cbar_vmax):
-    """
-    crop a colorbar to show from cbar_vmin to cbar_vmax
-    Used when symmetric_cbar=False is used.
-    """
-    if (cbar_vmin is None) and (cbar_vmax is None):
-        return
-    cbar_tick_locs = cbar.locator.locs
-    if cbar_vmax is None:
-        cbar_vmax = cbar_tick_locs.max()
-    if cbar_vmin is None:
-        cbar_vmin = cbar_tick_locs.min()
-    new_tick_locs = np.linspace(cbar_vmin, cbar_vmax,
-                                len(cbar_tick_locs))
-    cbar.ax.set_ylim(cbar.norm(cbar_vmin), cbar.norm(cbar_vmax))
-    outline = cbar.outline.get_xy()
-    outline[:2, 1] += cbar.norm(cbar_vmin)
-    outline[2:6, 1] -= (1. - cbar.norm(cbar_vmax))
-    outline[6:, 1] += cbar.norm(cbar_vmin)
-    cbar.outline.set_xy(outline)
-    cbar.set_ticks(new_tick_locs, update_ticks=True)
+from nilearn.plotting.img_plotting import _crop_colorbar
 
 
 def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
