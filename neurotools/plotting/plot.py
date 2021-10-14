@@ -6,8 +6,6 @@ from nilearn.plotting import plot_glass_brain, plot_stat_map
 from ..loading import load
 from .ref import SurfRef
 
-# @TODO figure out what to do with sym cbar?
-
 def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     if vmin is None and vmax is None:
@@ -113,7 +111,13 @@ def _setup_fig_axes(figure, axes, subplot_spec,
 
 def plot_surf_hemi(data, ref, hemi,
                    surf_mesh='inflated',
-                   bg_map='sulc', **kwargs):
+                   bg_map='sulc',
+                   symmetric_cbar=False,
+                   vmin=None, vmax=None,
+                    **kwargs):
+    
+    # Proc if sym colorbar
+    vmin, vmax = _proc_vs(data, vmin, vmax, symmetric_cbar)
 
     if hemi == 'lh':
         hemi = 'left'
@@ -127,6 +131,8 @@ def plot_surf_hemi(data, ref, hemi,
                             surf_map=data,
                             bg_map=bg_map,
                             hemi=hemi,
+                            vmin=vmin,
+                            vmax=vmax,
                             **kwargs)
 
 def plot_surf_collage(data, ref=None, surf_mesh='inflated',
