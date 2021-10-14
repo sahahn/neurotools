@@ -20,7 +20,7 @@ def load(f, index_slice=None):
         The location / file path of the data to load.
 
         Note: This function can also accept non-file path's
-        e.g., can accept directly numpy func:`arrays<numpy.array>` or objects from
+        e.g., can accept directly numpy :func:`arrays<numpy.array>` or objects from
         nibabel.
 
     index_slice : slices, tuple of slices, or :data:`None`, optional
@@ -49,8 +49,8 @@ def load(f, index_slice=None):
 
     Returns
     ---------
-    data : :class:`array<numpy.ndarray>`, or :data:`None`
-        Returned is the requested data as a func:`numpy array<numpy.array>`,
+    data : :class:`array<numpy.ndarray>` or :data:`None`
+        Returned is the requested data as a :func:`numpy array<numpy.array>`,
         or if passed :data:`None`, then :data:`None` will be returned. The shape
         of the returned data will be the shape of the data array portion of
         whatever data is passed with extra singular dimensions removed
@@ -64,7 +64,7 @@ def load(f, index_slice=None):
     Examples
     ---------
     Data can be loaded by simply passing a file location
-    to load. For example, we can load just an func:`array<numpy.array>` of ones:
+    to load. For example, we can load just an :func:`array<numpy.array>` of ones:
 
     .. ipython:: python
 
@@ -73,7 +73,7 @@ def load(f, index_slice=None):
         data.shape
 
     This function is likewise robust to being passed non-file paths, for
-    example passing an already defined func:`array<numpy.array>` to load:
+    example passing an already defined :func:`array<numpy.array>` to load:
 
     .. ipython:: python
 
@@ -283,9 +283,9 @@ def load_data(subjects, template_path, contrast=None, mask=None,
 
             default = None
 
-    mask : str, func:`array<numpy.array>` or :data:`None`, optional
+    mask : str, :func:`array<numpy.array>` or :data:`None`, optional
         After data is loaded, it can optionally be
-        masked according to a specific func:`array<numpy.array>`.
+        masked according to a specific :func:`array<numpy.array>`.
 
         If :data:`None`, and the data to be loaded is multi-dimensional,
         then the data will be flattened by default, e.g., if each data 
@@ -294,7 +294,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
         If passed a str, it will be assumed to be the location of a mask
         in which to load, where the shape of the mask should match the data.
 
-        When passing a mask, either by location or by func:`array<numpy.array>` directly,
+        When passing a mask, either by location or by :func:`array<numpy.array>` directly,
         values set to either 1 or True indicate the value should be kept,
         whereas values of 0 or False indicate the values at that location should
         be discarded.
@@ -372,7 +372,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
     --------
     data : :class:`<numpy.ndarray>`
         Loaded data across all specified subjects is returned
-        as a 2D numpy func:`array<numpy.array>` (shape= subj x data) where the first
+        as a 2D numpy :func:`array<numpy.array>` (shape= subj x data) where the first
         dimension is subject and the second is a single dimension representation
         of that subjects data.
 
@@ -467,10 +467,11 @@ def reverse_mask_data(data, mask):
     ------------
     data : :class:`numpy.ndarray` or list of
         Some data in which to transform from either
-        a single dimensional func:`array<numpy.array>` of data, or a 2d func:`array<numpy.array>`
+        a single dimensional :func:`array<numpy.array>` of data,
+        or a 2D :func:`array<numpy.array>`
         of data with shape = subjs x data, back to the original shape
-        of the data pre-masking. Instead of a 2d func:`array<numpy.array>`, a list
-        of single func:`arrays<numpy.array>` can be passed as well.
+        of the data pre-masking. Instead of a 2D :func:`array<numpy.array>`, a list
+        of single :func:`arrays<numpy.array>` can be passed as well.
 
     mask : loc or :class:`numpy.ndarray`
         The location of, or a :func:`array<numpy.array>` mask, where
@@ -485,12 +486,12 @@ def reverse_mask_data(data, mask):
     reversed_data : :class:`numpy.ndarray`, :class:`Nifti1Image<nibabel.nifti1.Nifti1Image>` or list of
         In the case that the mask is passed in a format that
         provides an affine, data will be returned in :class:`Nifti1Image<nibabel.nifti1.Nifti1Image>`
-        format. If instead the mask is passed as a func:`array<numpy.array>` or
+        format. If instead the mask is passed as a :func:`array<numpy.array>` or
         location of a saved data array without affine information,
-        then the data will be returned as a func:`numpy array<numpy.array>`.
+        then the data will be returned as a :func:`numpy array<numpy.array>`.
 
-        If either a list of data func:`arrays<numpy.array>` is passed, or data is passed
-        as a 2d func:`array<numpy.array>` with shape = subjs x data, then the returned
+        If either a list of data :func:`arrays<numpy.array>` is passed, or data is passed
+        as a 2D :func:`array<numpy.array>` with shape = subjs x data, then the returned
         reversed data will be a list with each element corresponding
         to each passed subject's reversed data.
 

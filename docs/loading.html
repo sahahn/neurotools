@@ -202,7 +202,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f</strong> (<em>file path</em>) – <p>The location / file path of the data to load.</p>
 <p>Note: This function can also accept non-file path’s
-e.g., can accept directly numpy func:<cite>arrays&lt;numpy.array&gt;</cite> or objects from
+e.g., can accept directly numpy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> or objects from
 nibabel.</p>
 </p></li>
 <li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
@@ -228,7 +228,7 @@ something like <code class="code highlight python docutils literal notranslate">
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>data</strong> – Returned is the requested data as a func:<cite>numpy array&lt;numpy.array&gt;</cite>,
+<dd class="field-even"><p><p><strong>data</strong> – Returned is the requested data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code></a>,
 or if passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, then <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> will be returned. The shape
 of the returned data will be the shape of the data array portion of
 whatever data is passed with extra singular dimensions removed
@@ -245,7 +245,7 @@ data to be loaded is saved.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>Data can be loaded by simply passing a file location
-to load. For example, we can load just an func:<cite>array&lt;numpy.array&gt;</cite> of ones:</p>
+to load. For example, we can load just an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> of ones:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">neurotools.loading</span> <span class="kn">import</span> <span class="n">load</span>
 
 <span class="gp">In [2]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">'data/ones.nii.gz'</span><span class="p">)</span>
@@ -255,7 +255,7 @@ to load. For example, we can load just an func:<cite>array&lt;numpy.array&gt;</c
 </pre></div>
 </div>
 <p>This function is likewise robust to being passed non-file paths, for
-example passing an already defined func:<cite>array&lt;numpy.array&gt;</cite> to load:</p>
+example passing an already defined <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> to load:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="gp">In [5]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -272,20 +272,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.25666948, 0.78494773],</span>
-<span class="go">       [0.21110503, 0.31556016],</span>
-<span class="go">       [0.93860241, 0.07882912],</span>
-<span class="go">       [0.41604503, 0.52242324],</span>
-<span class="go">       [0.54877316, 0.34897176]])</span>
+<span class="go">array([[0.23896861, 0.36176179],</span>
+<span class="go">       [0.89168176, 0.73023219],</span>
+<span class="go">       [0.02559482, 0.44052339],</span>
+<span class="go">       [0.89003114, 0.26750628],</span>
+<span class="go">       [0.19705086, 0.77732507]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.25666948, 0.78494773],</span>
-<span class="go">       [0.21110503, 0.31556016],</span>
-<span class="go">       [0.93860241, 0.07882912],</span>
-<span class="go">       [0.41604503, 0.52242324],</span>
-<span class="go">       [0.54877316, 0.34897176]])</span>
+<span class="go">array([[0.23896861, 0.36176179],</span>
+<span class="go">       [0.89168176, 0.73023219],</span>
+<span class="go">       [0.02559482, 0.44052339],</span>
+<span class="go">       [0.89003114, 0.26750628],</span>
+<span class="go">       [0.19705086, 0.77732507]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -321,14 +321,14 @@ is not present in the template_path and will be ignored.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>mask</strong> (str, func:<cite>array&lt;numpy.array&gt;</cite> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>After data is loaded, it can optionally be
-masked according to a specific func:<cite>array&lt;numpy.array&gt;</cite>.</p>
+<li><p><strong>mask</strong> (str, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>After data is loaded, it can optionally be
+masked according to a specific <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>.</p>
 <p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, and the data to be loaded is multi-dimensional,
 then the data will be flattened by default, e.g., if each data
 point originally has shape 10 x 2, the flattened shape will be 20.</p>
 <p>If passed a str, it will be assumed to be the location of a mask
 in which to load, where the shape of the mask should match the data.</p>
-<p>When passing a mask, either by location or by func:<cite>array&lt;numpy.array&gt;</cite> directly,
+<p>When passing a mask, either by location or by <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> directly,
 values set to either 1 or True indicate the value should be kept,
 whereas values of 0 or False indicate the values at that location should
 be discarded.</p>
@@ -393,7 +393,7 @@ which are not limited by the number of cores avaliable.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>data</strong> – Loaded data across all specified subjects is returned
-as a 2D numpy func:<cite>array&lt;numpy.array&gt;</cite> (shape= subj x data) where the first
+as a 2D numpy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> (shape= subj x data) where the first
 dimension is subject and the second is a single dimension representation
 of that subjects data.</p>
 </dd>
@@ -423,7 +423,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
-<span class="go">Loaded data with shape: (3, 10) in 0.002553701400756836 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0029392242431640625 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -441,7 +441,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0026519298553466797 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0041577816009521484 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -457,10 +457,11 @@ to a data array.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> or list of) – Some data in which to transform from either
-a single dimensional func:<cite>array&lt;numpy.array&gt;</cite> of data, or a 2d func:<cite>array&lt;numpy.array&gt;</cite>
+a single dimensional <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> of data,
+or a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>
 of data with shape = subjs x data, back to the original shape
-of the data pre-masking. Instead of a 2d func:<cite>array&lt;numpy.array&gt;</cite>, a list
-of single func:<cite>arrays&lt;numpy.array&gt;</cite> can be passed as well.</p></li>
+of the data pre-masking. Instead of a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>, a list
+of single <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> can be passed as well.</p></li>
 <li><p><strong>mask</strong> (loc or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>) – The location of, or a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> mask, where
 (1/True=keep, 0/False=discard) in which to reverse the
 application of. If the passed mask is either
@@ -472,11 +473,11 @@ will be converted into a <a class="reference external" href="https://nipy.org/ni
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p><strong>reversed_data</strong> – In the case that the mask is passed in a format that
 provides an affine, data will be returned in <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>
-format. If instead the mask is passed as a func:<cite>array&lt;numpy.array&gt;</cite> or
+format. If instead the mask is passed as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> or
 location of a saved data array without affine information,
-then the data will be returned as a func:<cite>numpy array&lt;numpy.array&gt;</cite>.</p>
-<p>If either a list of data func:<cite>arrays&lt;numpy.array&gt;</cite> is passed, or data is passed
-as a 2d func:<cite>array&lt;numpy.array&gt;</cite> with shape = subjs x data, then the returned
+then the data will be returned as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code></a>.</p>
+<p>If either a list of data <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> is passed, or data is passed
+as a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.21)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> with shape = subjs x data, then the returned
 reversed data will be a list with each element corresponding
 to each passed subject’s reversed data.</p>
 </p>
@@ -499,10 +500,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.13245184, 0.        , 0.        , 0.79809229]),</span>
-<span class="go"> array([0.26216531, 0.        , 0.        , 0.42823767]),</span>
-<span class="go"> array([0.58755707, 0.        , 0.        , 0.97824216]),</span>
-<span class="go"> array([0.00459315, 0.        , 0.        , 0.11915082])]</span>
+<span class="go">[array([0.43289034, 0.        , 0.        , 0.33668603]),</span>
+<span class="go"> array([0.53610313, 0.        , 0.        , 0.83978305]),</span>
+<span class="go"> array([0.2596534, 0.       , 0.       , 0.6016829]),</span>
+<span class="go"> array([0.73802593, 0.        , 0.        , 0.09274142])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -518,14 +519,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa280&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa7f0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa2b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3c2f7aa760&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66fa0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66460&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66c10&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff7c5d66e50&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.13245184, 0.        , 0.        , 0.79809229])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.43289034, 0.        , 0.        , 0.33668603])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
