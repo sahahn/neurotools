@@ -131,7 +131,8 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       figsize=(15, 10),
                       figure=None, axes=None, subplot_spec=None,
                       wspace=-.35, hspace=-.1,
-                      midpoint=None, colorbar=False,
+                      colorbar=False,
+                      dist=6.5,
                       colorbar_params={},
                       **kwargs):
     '''
@@ -201,7 +202,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
             plot_surf_hemi(data=data[d], ref=ref, hemi=hemis[i],
                            surf_mesh=surf_mesh, bg_map=bg_map,
                            vmin=vmin, vmax=vmax, view=views[i],
-                           midpoint=midpoint, colorbar=False,
+                           colorbar=False, dist=dist,
                            figure=figure, axes=axes[i], **kwargs)
         smfs.append(smf)
     
@@ -212,7 +213,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
              figure=figure, ax=colorbar_ax, smfs=smfs,
              vmin=vmin, vmax=vmax,
              cbar_vmin=cbar_vmin, cbar_vmax=cbar_vmax,
-             midpoint=midpoint, multicollage=True,
+             multicollage=True,
              colorbar_params=colorbar_params, **kwargs)
 
     return figure, axes, smfs
@@ -230,11 +231,6 @@ def plot_surf_vol_collage(surf, vol,
                           colorbar_params={},
                           surf_params={}, vol_params={}):
 
-    if 'midpoint' in surf_params:
-        if surf_params['midpoint'] is not None:
-            print('Warning: midpoint is not supported for volumetric plotting',
-                  'so the passed midpoint param will only be applied to',
-                  'the surface data, which will be misleading...')
 
     # Right now, basically have it be that you cant plot the subcort and surf with
     # dif colorbars, but could have this be more flexible later...
@@ -292,7 +288,7 @@ def plot_surf_vol_collage(surf, vol,
              figure=figure, ax=colorbar_ax, smfs=smfs,
              vmin=vmin, vmax=vmax,
              cbar_vmin=cbar_vmin, cbar_vmax=cbar_vmax,
-             midpoint=None, multicollage=True,
+             multicollage=True,
              colorbar_params=colorbar_params, cmap=cmap,
              threshold=threshold)
 
@@ -317,7 +313,7 @@ def _get_space(hemi_data):
 
 def _load_data_and_ref(data, space=None, hemi=None):
     
-    # If length is exactly two, assume lh and rh are seperate
+    # If length is exactly two, assume lh and rh are separate
     if len(data) == 2:
         lh, rh = load(data[0]), load(data[1])
     
@@ -402,13 +398,15 @@ def plot_surf_parc(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
 
     # Just lh case
     if data[1] is None:
+        hemi_data = data[0]
         hemi = 'left'
     
     # Just rh case
     elif data[0] is None:
+        hemi_data = data[1]
         hemi = 'right'
 
-    plot_surf_hemi(data=data, ref=ref, hemi=hemi,
+    plot_surf_hemi(data=hemi_data, ref=ref, hemi=hemi,
                    surf_mesh=surf_mesh, bg_map=bg_map,
                    cmap=cmap, avg_method='median',
                    threshold=threshold,
@@ -454,13 +452,16 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
 
     # Just lh case
     if data[1] is None:
+        hemi_data = data[0]
         hemi = 'left'
+        
     
     # Just rh case
     elif data[0] is None:
+        hemi_data = data[1]
         hemi = 'right'
 
-    plot_surf_hemi(data=data, ref=ref,
+    plot_surf_hemi(data=hemi_data, ref=ref,
                    hemi=hemi,
                    surf_mesh=surf_mesh,
                    bg_map=bg_map,
@@ -476,7 +477,94 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
     return
 
 def plot(data, space=None, hemi=None, **kwargs):
-    '''Most automated.'''
+    '''The most automated magic plotting function avaliable,
+    used to plot arbitrary surface data (either statistical map or parcellation).
+
+    Parameters
+    -----------
+    data : loc or data array
+        The data in which to plot. This can be passed
+        as either a str representing a location saved to disk,
+        or as a numpy array, Nifti1Image, ect...
+
+        If data is passed as a list or array-like with
+        only 2 elements, it is assumed that the first element
+        stores data that is left hemisphere specific and that the
+        right element stores right hemisphere specific data.
+
+    space : None or str, optional
+        If left as default, the space in which
+        the data to plot is in will be automatically inferred,
+        otherwise this parameter can be manually set,
+        overriding the automatically detected choice.
+
+        Current supported options are:
+
+        - 'fsaverage'
+        - 'fsaverage5'
+        - '32k_fs_LR'
+        - '164k_fs_LR'
+
+        ::
+
+            default = None
+
+    hemi : None or str, optional
+        If left as default, then this option will
+        be automatically set (with if only one hemisphere of
+        data passed defaulting to left hemisphere).
+
+        Otherwise, you may override the automatically
+        detected hemisphere by passing either just 'lh' or 'rh'
+        when plotting only a single hemisphere's data.
+
+        ::
+
+            default = None
+
+    kwargs : kwargs style arguments
+        There are number of different plotting specific arguments
+        that can optionally be modified. The default values for these arguments
+        may change also depending on different auto-detected settings.
+
+        - surf_mesh : A str indicator specifying a valid surface mesh,
+            with respect to the current space,
+            in which to plot the data on. The default for
+            freesurfer spaces is 'inflated' and for fs_LR spaces
+            is 'very_inflated'.
+
+        - bg_map : A str indicator specifying a valid array of values,
+            with respect to the current space, in which to use as a
+            background map when plotting. This map is plotted in greyscale
+            underneath the data points, often used for realistic shading.
+            The default for freesurfer spaces is 'sulc' and for fs_LR spaces
+            is 'sulc_conte'.
+
+        - cmap : An instance of :class:`matplotlib.colors.Colormap` or str
+            representing the name of a matplotlib colormap. This will be the color map
+            in which the values are plotted according to. When plotting
+            surface parcellations the default cmap is 'prism', when
+            plotting statistical maps, the default cmap is 'col_hot'.
+
+        - bg_on_data : temp
+
+        - darkness : temp
+
+        - avg_method : temp
+
+        - wspace : temp
+
+        - hspace : temp
+
+        - alpha : temp
+
+        - colorbar : temp
+
+        - symmetric_cbar : temp
+
+        - threshold : temp
+
+    '''
 
     data, _ = _load_data_and_ref(data, space=space, hemi=hemi)
 
@@ -495,4 +583,11 @@ def plot(data, space=None, hemi=None, **kwargs):
 
 
 
+'''
 
+- lh, rh, both for [fsaverage, fsaverage5, 164k_fs_LR, 32k_fs_LR]
+- with and without medial wall
+- Plot full cifti w/ subcort
+- All for parcellation or stat map
+
+'''

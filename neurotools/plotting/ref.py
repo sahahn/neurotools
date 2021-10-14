@@ -39,7 +39,6 @@ def get_col_names(df):
     return name_col, value_col
 
 def get_roi_dict(data, i_keys=[], d_keys=[]):
-        
     '''If data is a df, with assume that the data is stored in two columns
     with name of ROI in one, and value in the other. Otherwise, if data is 
     a dictionary, assume that it is already in name of ROI, value form.

@@ -131,7 +131,7 @@ def add_surface_medial_walls(data):
     n_vert_per_hemi = lh_index.surface_number_of_vertices
     to_fill = np.zeros(int(n_vert_per_hemi * 2))
     
-    # Get seperate inds
+    # Get separate inds
     lh_inds = np.array(lh_index.vertex_indices._indices)
     rh_inds = np.array(rh_index.vertex_indices._indices)
     
