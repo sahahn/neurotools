@@ -9,8 +9,8 @@ from .ref import SurfRef
 def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     if vmin is None and vmax is None:
-        vmin = np.nanmin(np.nanmin(data))
-        vmax = np.nanmax(np.nanmax(data))
+        vmin = np.nanmin([np.nanmin(d) for d in data])
+        vmax = np.nanmax([np.nanmax(d) for d in data])
 
         if np.abs(vmin) > vmax:
             vmax = np.abs(vmin)
@@ -22,9 +22,9 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
             vmin = -vmax
             
     if vmin is None:
-        vmin = np.nanmin(np.nanmin(data))
+        vmin = np.nanmin([np.nanmin(d) for d in data])
     if vmax is None:
-        vmax = np.nanmax(np.nanmax(data))
+        vmax = np.nanmax([np.nanmax(d) for d in data])
 
     return vmin, vmax
 
@@ -140,7 +140,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       title=None, title_sz=18,
                       vmin=None, vmax=None,
                       cbar_vmin=None, cbar_vmax=None,
-                      figsize=(15, 10),
+                      figsize=(15, 10), symmetric_cbar=False,
                       figure=None, axes=None, subplot_spec=None,
                       wspace=-.35, hspace=-.1,
                       colorbar=False,
@@ -158,9 +158,6 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
     and if colorbar is True, then the 5th axes passed should be
     the spot for the color bar.
     '''
-
-    if 'symmetric_cbar' in kwargs:
-        symmetric_cbar = kwargs.pop('symmetric_cbar')
     
     vmin, vmax = _proc_vs(data, vmin, vmax, symmetric_cbar)
     smfs = []
