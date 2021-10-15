@@ -132,26 +132,7 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         self.strategy = strategy
         self.vectorize = vectorize
 
-    def fit(self, X, y=None):
-        '''Fit this object according
-        the passed subjects data, X.
-
-        Parameters
-        ----------
-        X : numpy.array
-            numpy.array as either a 1D array,
-            or a 2D array, where one dimension
-            is matches the shape of the past
-            labels and the other represents
-            different time-points or modalities.
-
-        y : numpy.array, optional
-            This parameter is skipped.
-
-            ::
-
-                default = None
-        '''
+    def _base_fit(self):
 
         # Load mask if any
         self.mask_ = load(self.mask)
@@ -172,16 +153,6 @@ class SurfLabels(BaseEstimator, TransformerMixin):
                                    'the same length / shape as '
                                    'the length of labels!')
             self.labels_[self.mask_.astype(bool)] = self.background_label
-
-        # X can either be a 1D surface, or a 2D surface
-        # (e.g. - for timeseries or stacked contrasts)
-        if len(X.shape) > 2:
-            raise RuntimeError('X can be at most 2D.')
-
-        if len(self.labels_) not in X.shape:
-            raise RuntimeError('Size of labels not found in X. '
-                               'Make sure your data is in the same '
-                               'space as the labels you are using!')
 
         # Proc self.background_label, if int turn to np array
         if isinstance(self.background_label, int):
@@ -212,6 +183,42 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             self.strategy_ = strats[self.strategy]
         else:
             self.strategy_ = self.strategy
+
+    def fit(self, X, y=None):
+        '''Fit this object according
+        the passed subjects data, X.
+
+        Parameters
+        ----------
+        X : numpy.array
+            numpy.array as either a 1D array,
+            or a 2D array, where one dimension
+            matches the shape of the passed
+            labels (if 1D, the shapes must match)
+            and the other, optionally, represents
+            different time-points or modalities.
+
+        y : numpy.array, optional
+            This parameter is skipped.
+
+            ::
+
+                default = None
+        '''
+
+        # X can either be a 1D surface, or a 2D surface
+        # (e.g. - for timeseries or stacked contrasts)
+        if len(X.shape) > 2:
+            raise RuntimeError('X can be at most 2D.')
+        
+        # Perform pieces of fit not based on passed data
+        self._base_fit()
+        
+        # Make sure labels matches X shape
+        if len(self.labels_) not in X.shape:
+            raise RuntimeError('Size of labels not found in X. '
+                               'Make sure your data is in the same '
+                               'space as the labels you are using!')
 
         return self
 
@@ -315,7 +322,7 @@ class SurfLabels(BaseEstimator, TransformerMixin):
 
         # Save original shape if vectorize called,
         # used for reverse transform
-        self.original_shape_ = X_trans.shape
+        self.original_transformed_shape_ = X_trans.shape
         return X_trans.flatten()
 
     def inverse_transform(self, X_trans):
@@ -337,10 +344,14 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             passed back in its original space.
 
         '''
+        
+        # Fit pieces not depended on X if just
+        # using object for inverse transform
+        self._check_inverse_transform_fitted(X_trans)
 
         # Reverse the vectorize
         if self.vectorize:
-            X_trans = X_trans.reshape(self.original_shape_)
+            X_trans = X_trans.reshape(self.original_transformed_shape_)
 
         X = np.zeros(self.X_shape_, dtype=X_trans.dtype, order='C')
 
@@ -355,6 +366,24 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             X = np.rollaxis(X, -1)
 
         return X
+
+    def _check_inverse_transform_fitted(self, X_trans):
+        '''There is a case where we just want to use the Transformer Object
+        to inverse transform, which means it has not been fitted yet.'''
+        
+        # If not fitted, fit based on reasonable values
+        if not hasattr(self, "labels_"):
+            self._base_fit()
+            
+            # Set just to whatever current shape is
+            self.original_transformed_shape_ = X_trans.shape
+
+            # Set to labels shape
+            self.X_shape_ = self.labels_.shape
+
+            # Data dim is 0 since the shapes match
+            self.data_dim_ = 0
+
 
 class SurfMaps(BaseEstimator, TransformerMixin):
     '''Extract signals from overlapping labels.
@@ -710,7 +739,7 @@ class SurfMaps(BaseEstimator, TransformerMixin):
             return X_trans
 
         # Save original transformed output shape if vectorize
-        self.original_shape_ = X_trans.shape
+        self.original_transformed_shape_ = X_trans.shape
         return X_trans.flatten()
 
     def _transform_ls(self, X):
@@ -756,7 +785,7 @@ class SurfMaps(BaseEstimator, TransformerMixin):
 
         # Reverse the vectorize, if needed
         if self.vectorize:
-            X_trans = X_trans.reshape(self.original_shape_)
+            X_trans = X_trans.reshape(self.original_transformed_shape_)
 
         if self.strategy_ == 'ls':
             return np.dot(X_trans, self.maps_.T)

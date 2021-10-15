@@ -219,15 +219,35 @@ class SurfRef(Ref):
 
 class VolRef(Ref):
     
-    def __init__(self, space='mni', parc='aparc', data_dr='default'):
+    def __init__(self, space='mni_1mm', parc='aseg', data_dr='default'):
         super().__init__(space, parc, data_dr)
+    
+    @property
+    def shape(self):
+        return self.ref_vol.shape
     
     def load_ref(self):
         
         ref_loc = os.path.join(self.data_dr, self.space)
-        ref_vol_raw = nib.load(os.path.join(ref_loc, self.parc + '.mgz'))
+        
+        # Get w/ flexible to different file extension
+        options = os.listdir(ref_loc)
+        options_no_ext = [o.split('.')[0] for o in options]
+
+        try:
+            ind = options_no_ext.index(self.parc)
+
+        # If doesn't exist, help user
+        except ValueError:
+            print(f'Note valid parc options for {self.space} are: ', options_no_ext)
+            raise RuntimeError(f'Space: {self.space} does not have parc {self.parc}.')
+
+        # Load with nibabel, since need affine
+        ref_vol_raw = nib.load(os.path.join(ref_loc, options[ind]))
+
+        # Save to class
         self.ref_vol_affine = ref_vol_raw.affine
-        self.ref_vol = ref_vol_raw.get_fdata()
+        self.ref_vol = np.array(ref_vol_raw.get_fdata())
         
     def get_ref_vals(self, hemi=None):
         return self.ref_vol
@@ -236,5 +256,29 @@ class VolRef(Ref):
         
         plot_vals = super().get_plot_vals(data, hemi, i_keys, d_keys)
         return nib.Nifti1Image(plot_vals, self.ref_vol_affine)
+
+
+def _get_vol_ref_from_guess(voxel_inds):
+
+    # Just these options for now - any others should add? TODO
+    # Note: Favors hcp_rois parc since those are cifti native
+
+    # MNI 2mm
+    if np.max(voxel_inds) == 76:
+        return VolRef(space='mni_2mm', parc='hcp_rois')
+   
+    # MNI 1.6mm
+    elif np.max(voxel_inds) == 95:
+        return VolRef(space='mni_1.6mm', parc='hcp_rois')
+
+    # MNI 1mm as base case
+    return VolRef(space='mni_1mm', parc='aseg')
+
+    
+    
+
+
+
+
 
 

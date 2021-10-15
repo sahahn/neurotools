@@ -1,6 +1,10 @@
+from re import sub
 import nibabel as nib
 import numpy as np
+import pickle as pkl
+import os
 from nibabel.cifti2 import Cifti2BrainModel
+from .. import data_dr
 from ..loading import load
 
 
@@ -144,6 +148,95 @@ def add_surface_medial_walls(data):
     
     return to_fill
 
+def _get_index_map(data):
+
+    if len(data.shape) == 1:
+        cifti_len = data.shape[0]
+    elif len(data.shape) == 2:
+        cifti_len = data.shape[1]
+    else:
+        raise RuntimeError('Passed data cannot exceed 2-dimensions!')
+
+    # Hacky solution for now - for when subcort already
+    # extracted.
+    sub_cifti_mapping = {31870: 91282, 62053: 170494}
+
+    if cifti_len in sub_cifti_mapping:
+        cifti_len = sub_cifti_mapping[cifti_len]
+
+    # Get loc if saved
+    index_map_loc = os.path.join(data_dr, 'index_maps',
+                                 str(int(cifti_len)) + '.pkl')
+
+    if not os.path.exists(index_map_loc):
+        raise RuntimeError(f'Cannot find saved cifti index map for cifti length = {cifti_len}!')
+
+    with open(index_map_loc, 'rb') as f:
+        index_map = pkl.load(f)
+
+    return index_map
+
+def extract_subcortical_from_cifti(data, index_map=None, space=None):
+    '''Given some cifti-data like array and an index_map, 
+    extract just the sub-cortical and return as a Nifti1Image
+    
+    If data is multi-dimensional, assume that the 2nd part of the shape
+    corresponds to the cifti-data.
+    '''
+
+    from ..plotting.ref import VolRef, _get_vol_ref_from_guess
+
+    # Make sure data has no hanging dimensions
+    data = np.squeeze(data)
+    
+    # Get index map from shape of data if not passed
+    if index_map is None:
+        index_map = _get_index_map(data)
+
+    # Go through each index map
+    sub_mapping, offsets = [], []
+    
+    for index in index_map:
+        if isinstance(index, Cifti2BrainModel):
+            if index.surface_number_of_vertices is None:
+
+                # Add ijk mapping
+                sub_mapping += index.voxel_indices_ijk._indices
+
+                # Add offsets
+                offsets.append(index.index_offset)
+    
+    # Concat mapping
+    sub_mapping = tuple(np.stack(sub_mapping, axis=1))
+                
+    # Assumes that subcortical are saved at end of cifti array
+    index_offset = min(offsets)
+    
+    # Get vol ref from guess, or if passed
+    if space is None:
+        vol_ref = _get_vol_ref_from_guess(sub_mapping)
+    else:
+        vol_ref = VolRef(space=space)
+    
+    # Fill empty with data based on extracted mapping
+    to_fill = np.zeros(vol_ref.shape)
+    
+    # If doesn't match then try case where no index offset
+    # since subcortical already is extracted.
+    if len(to_fill[sub_mapping]) != len(data[index_offset:]):
+        index_offset = 0
+
+    if len(data.shape) == 1:
+        to_fill[sub_mapping] = data[index_offset:]
+    elif len(data.shape) == 2:
+        to_fill[sub_mapping] = data[:, index_offset:]
+
+    else:
+        raise RuntimeError('Passed data cannot exceed 2-dimensions!')
+
+    # Return as Nifti1Image
+    return nib.Nifti1Image(to_fill, vol_ref.ref_vol_affine)
+
 
 
 '''
@@ -153,7 +246,7 @@ Desired future functionality.
     - Input should be cifti, gifti, or array (i.e., need to have saved data references)
     - Input should be either just lh, just rh, concat surfaces, or full cifti w/ subcortical
 
-- Parcellations should be able to be converted from lh + rh seperate or concat,
+- Parcellations should be able to be converted from lh + rh separate or concat,
   to full cifti, note that this isn't possible for normal surfaces. Functionality
   already exists, except should handle some extra cases.
 

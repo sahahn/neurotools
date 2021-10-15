@@ -133,7 +133,7 @@ def load(f, index_slice=None):
             raw = fs.io.read_annot(f)[0]
 
         elif f.endswith('label'):
-            f = fs.io.read_label(f)
+            raw = fs.io.read_label(f)
         
         # Numpy case
         elif f.endswith('.npy') or f.endswith('.npz'):

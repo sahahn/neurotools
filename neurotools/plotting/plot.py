@@ -566,10 +566,6 @@ def plot(data, space=None, hemi=None, **kwargs):
 
         - avg_method : temp
 
-        - wspace : temp
-
-        - hspace : temp
-
         - alpha : temp
 
         - colorbar : temp
@@ -577,6 +573,10 @@ def plot(data, space=None, hemi=None, **kwargs):
         - symmetric_cbar : temp
 
         - threshold : temp
+
+        - wspace : temp
+
+        - hspace : temp
 
     '''
 
