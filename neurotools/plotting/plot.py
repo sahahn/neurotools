@@ -1,10 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from numpy.lib.shape_base import tile
 from .plot_single_surf import plot_single_surf, add_collage_colorbar
-from nilearn.plotting import plot_glass_brain, plot_stat_map
-from ..loading import load
+from nilearn.plotting import plot_glass_brain, plot_stat_map, plot_roi
 from .ref import SurfRef
+from ..transform.space import process_space
+
+# Threshold auto fast_abs_percentile(data) - 1e-5 from .._utils.extmath import fast_abs_percentile
 
 def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
@@ -28,9 +31,11 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     return vmin, vmax
 
-def _setup_fig_axes(figure, axes, subplot_spec,
+def _setup_fig_axes(figure, axes,
+                    subplot_spec,
                     get_grid, figsize,
-                    n_rows, n_cols, widths, proj_3d,
+                    n_rows, n_cols, widths,
+                    heights, proj_3d,
                     title, title_sz,
                     colorbar, colorbar_params,
                     wspace, hspace):
@@ -44,8 +49,8 @@ def _setup_fig_axes(figure, axes, subplot_spec,
         
         if colorbar is True:
 
-            if 'fig_ratio' in colorbar_params:
-                widths += [colorbar_params['fig_ratio']]
+            if 'cbar_fig_ratio' in colorbar_params:
+                widths += [colorbar_params['cbar_fig_ratio']]
             else:
                 widths += [.5]
 
@@ -53,13 +58,15 @@ def _setup_fig_axes(figure, axes, subplot_spec,
             grid = gridspec.GridSpec(n_rows, len(widths),
                                      wspace=wspace,
                                      hspace=hspace,
-                                     width_ratios=widths)
+                                     width_ratios=widths,
+                                     height_ratios=heights)
         else:
             grid =\
                 gridspec.GridSpecFromSubplotSpec(n_rows, len(widths),
                                                  wspace=wspace,
                                                  hspace=hspace,
                                                  width_ratios=widths,
+                                                 height_ratios=heights,
                                                  subplot_spec=subplot_spec)
         
         if colorbar:
@@ -144,9 +151,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       figure=None, axes=None, subplot_spec=None,
                       wspace=-.35, hspace=-.1,
                       colorbar=False,
-                      dist=6.5,
-                      colorbar_params={},
-                      **kwargs):
+                      dist=6.5, colorbar_params={}, **kwargs):
     '''
     data should be list with two elements [lh, rh] data.
 
@@ -193,7 +198,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
     figure, axes, colorbar_ax =\
         _setup_fig_axes(figure, axes, subplot_spec, False,
                         figsize, n_rows, n_cols,
-                        widths, proj_3d, title, title_sz,
+                        widths, None, proj_3d, title, title_sz,
                         colorbar, colorbar_params,
                         wspace, hspace)
         
@@ -231,10 +236,13 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
 
 def plot_surf_vol_collage(surf, vol,
                           vol_plot_type='glass',
-                          cmap='cold_hot', threshold=None,
+                          cmap='cold_hot',
+                          threshold=None,
+                          surf_to_vol_ratio=1,
                           vmin=None, vmax=None,
                           cbar_vmin=None, cbar_vmax=None,
-                          figure=None, axes=None, subplot_spec=None,
+                          figure=None, axes=None,
+                          subplot_spec=None,
                           figsize=(20, 20),
                           title=None, title_sz=18,
                           colorbar=False,
@@ -255,13 +263,14 @@ def plot_surf_vol_collage(surf, vol,
 
     n_rows, n_cols = 2, 1
     widths = [1]
+    heights = [surf_to_vol_ratio] + [1]
     proj_3d = [['3d'], [None]]
 
     # Setup figures and axes
     figure, grid, colorbar_ax =\
         _setup_fig_axes(figure, axes, subplot_spec, True,
                         figsize, n_rows, n_cols,
-                        widths, proj_3d, title, title_sz,
+                        widths, heights, proj_3d, title, title_sz,
                         colorbar, colorbar_params,
                         wspace, hspace)
 
@@ -272,11 +281,16 @@ def plot_surf_vol_collage(surf, vol,
 
     # Plot surf collage in the top grid spot
     figure, axes, smfz = plot_surf_collage(surf, 
-                                           figure=figure, axes=None,
+                                           figure=figure,
+                                           axes=None,
                                            subplot_spec=surf_grid,
-                                           cmap=cmap, threshold=threshold,
-                                           vmin=vmin, vmax=vmax,
+                                           cmap=cmap,
+                                           threshold=threshold,
+                                           vmin=vmin,
+                                           vmax=vmax,
+                                           colorbar=False,
                                            **surf_params)
+
     smfs += smfz
 
     # Plot volume
@@ -286,10 +300,13 @@ def plot_surf_vol_collage(surf, vol,
         vol_plot_func = plot_glass_brain
     elif vol_plot_type == 'stat':
         vol_plot_func = plot_stat_map
+    elif vol_plot_type == 'roi':
+        vol_plot_func = plot_roi
 
     vol_plot_func(vol,
                   figure=figure, axes=vol_ax, 
-                  cmap=cmap, threshold=threshold, vmax=vmax,
+                  cmap=cmap, threshold=threshold,
+                  vmax=vmax, colorbar=False,
                   **vol_params)
 
     # Add color bar
@@ -307,93 +324,59 @@ def plot_surf_vol_collage(surf, vol,
 
 ## Smart Plot Functions ##
 
-def _get_space(hemi_data):
+def _proc_defaults(ref, surf_mesh, bg_map, darkness):
 
-    data_sz = len(hemi_data)
-
-    if data_sz == 32492:
-        space = '32k_fs_LR'
-    elif data_sz == 163842:
-        space = 'fsaverage'
-    elif data_sz == 10242:
-        space = 'fsaverage5'
-    else:
-        raise RuntimeError('No space detected')
-
-    return space
-
-def _load_data_and_ref(data, space=None, hemi=None):
-    
-    # If length is exactly two, assume lh and rh are separate
-    if len(data) == 2:
-        lh, rh = load(data[0]), load(data[1])
-    
-    # Otherwise assume either just lh or concat lh and rh
-    else:
-
-        # Load data
-        data = load(data)
-        
-        # If no hemi passed, assume lh if size matches
-        if hemi is None:
-            
-            # Hemi none, but size looks like one hemi case
-            if len(data) in [10242, 32492, 163842]:
-                lh, rh = data, None
-            
-            # Otherwise split passed data equally into lh, rh
-            else:
-                lh, rh = data[:len(data) // 2], data[len(data) // 2:]
-
-        elif hemi == 'lh' or hemi == 'left':
-            lh, rh = data, None
-
-        elif hemi == 'rh' or hemi == 'right':
-            lh, rh = None, data
-
-        else:
-            raise RuntimeError(f'Passed hemi={hemi} invalid choice.')
-        
-    # Get space if not passed
-    if space is None:
-
-        if lh is not None:
-            space = _get_space(lh)
-        else:
-            space = _get_space(rh)
-    
-    # Get SurfRef
-    ref = SurfRef(space=space)
-    
-    # Set defaults in ref
-    if 'fs_LR' in space:
-        ref.surf_mesh = 'very_inflated'
-        ref.bg_map = 'sulc_conte'
-        ref.darkness = .5
-    else:
-        ref.surf_mesh = 'inflated'
-        ref.bg_map = 'sulc'
-        ref.darkness = 1
-
-    return (lh, rh), ref
-
-def plot_surf_parc(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
-                   cmap='prism', bg_on_data=True, darkness=None,
-                   wspace=-.35, hspace=-.1, alpha=1,
-                   threshold=.1, colorbar=False, **kwargs):
-
-    data, ref = _load_data_and_ref(data, space=space, hemi=hemi)
-
+    # Allow any user passed args to override space ref defaults here
     if surf_mesh is None:
         surf_mesh = ref.surf_mesh
     if bg_map is None:
         bg_map = ref.bg_map
     if darkness is None:
         darkness = ref.darkness
+
+    return surf_mesh, bg_map, darkness
+
+def _load_data_and_ref(data, space=None, hemi=None):
+    
+    # Process the data + space - returns data as dict
+    data, space = process_space(data, space, hemi)
+    
+    # If no space, i.e., just sub, return no Ref
+    if space is None:
+        return data, None
+
+    # Otherwise generate SurfRef with defaults
+    ref = SurfRef(space=space)
+    
+    # fs_LR space defaults
+    if 'fs_LR' in space:
+        ref.surf_mesh = 'very_inflated'
+        ref.bg_map = 'sulc_conte'
+        ref.darkness = .5
+    
+    # Freesurfer spaces defaults
+    else:
+        ref.surf_mesh = 'inflated'
+        ref.bg_map = 'sulc'
+        ref.darkness = 1
+
+    return data, ref
+
+def _plot_surf_parc(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
+                    cmap='prism', bg_on_data=True, darkness=None,
+                    wspace=-.35, hspace=-.1, alpha=1,
+                    threshold=.1, colorbar=False, **kwargs):
+
+    # Fine passing already proc'ed whatever here
+    data, ref = _load_data_and_ref(data, space=space, hemi=hemi)
+    
+    # If user-passed
+    surf_mesh, bg_map, darkness = _proc_defaults(ref, surf_mesh, bg_map, darkness)
     
     # Both hemi's passed case.
-    if data[0] is not None and data[1] is not None:
-        plot_surf_collage(data=data, ref=ref,
+    if 'lh' in data and 'rh' in data:
+        plot_surf_collage(data=[data['lh'], data['rh']],
+                          ref=ref,
                           surf_mesh=surf_mesh,
                           bg_map=bg_map,
                           cmap=cmap,
@@ -407,16 +390,13 @@ def plot_surf_parc(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
                           colorbar=colorbar, **kwargs)
         return
 
-    # Just lh case
-    if data[1] is None:
-        hemi_data = data[0]
-        hemi = 'left'
-    
-    # Just rh case
-    elif data[0] is None:
-        hemi_data = data[1]
-        hemi = 'right'
+    # Just lh/ rh cases
+    if 'lh' in data:
+        hemi_data, hemi = data['lh'], 'left'
+    if 'rh' in data:
+        hemi_data, hemi = data['rh'], 'right'
 
+    # Plot
     plot_surf_hemi(data=hemi_data, ref=ref, hemi=hemi,
                    surf_mesh=surf_mesh, bg_map=bg_map,
                    cmap=cmap, avg_method='median',
@@ -430,24 +410,22 @@ def plot_surf_parc(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
 
     return
 
-def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
-              cmap='cold_hot', bg_on_data=True, darkness=None,
-              avg_method='mean', wspace=-.35, hspace=-.1, alpha=1,
-              symmetric_cbar=False, threshold=None,
-              colorbar=True, **kwargs):
-
+def _plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
+               cmap='cold_hot', bg_on_data=True, darkness=None,
+               avg_method='mean', wspace=-.35, hspace=-.1, alpha=1,
+               symmetric_cbar=False, threshold=None,
+               colorbar=True, **kwargs):
+    
+    # Fine passing already proc'ed whatever here
     data, ref = _load_data_and_ref(data, space=space, hemi=hemi)
-
-    if surf_mesh is None:
-        surf_mesh = ref.surf_mesh
-    if bg_map is None:
-        bg_map = ref.bg_map
-    if darkness is None:
-        darkness = ref.darkness
+    
+    # If user-passed
+    surf_mesh, bg_map, darkness = _proc_defaults(ref, surf_mesh, bg_map, darkness)
 
     # Both hemi's passed case.
-    if data[0] is not None and data[1] is not None:
-        plot_surf_collage(data=data, ref=ref,
+    if 'lh' in data and 'rh' in data:
+        plot_surf_collage(data=[data['lh'], data['rh']],
+                          ref=ref,
                           surf_mesh=surf_mesh,
                           bg_map=bg_map,
                           cmap=cmap,
@@ -461,18 +439,15 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
                           colorbar=colorbar, **kwargs)
         return
 
-    # Just lh case
-    if data[1] is None:
-        hemi_data = data[0]
-        hemi = 'left'
-        
+    # Just lh/ rh cases
+    if 'lh' in data:
+        hemi_data, hemi = data['lh'], 'left'
+    if 'rh' in data:
+        hemi_data, hemi = data['rh'], 'right'
     
-    # Just rh case
-    elif data[0] is None:
-        hemi_data = data[1]
-        hemi = 'right'
-
-    plot_surf_hemi(data=hemi_data, ref=ref,
+    # Plot
+    plot_surf_hemi(data=hemi_data,
+                   ref=ref,
                    hemi=hemi,
                    surf_mesh=surf_mesh,
                    bg_map=bg_map,
@@ -483,25 +458,111 @@ def plot_surf(data, space=None, hemi=None, surf_mesh=None, bg_map=None,
                    alpha=alpha,
                    bg_on_data=bg_on_data,
                    darkness=darkness,
-                   colorbar=colorbar, **kwargs)
+                   colorbar=colorbar,
+                   **kwargs)
 
     return
 
+def _sort_kwargs(kwargs):
+
+    surf_args = ['vol_alpha', 'bg_map', 'surf_mash',
+                 'darkness']
+    surf_params = {key: kwargs[key] for key in surf_args if key in kwargs}
+    
+    # Special cases
+    if 'surf_alpha' in kwargs:
+        surf_params['alpha'] = kwargs['surf_alpha']
+    if 'surf_hspace' in kwargs:
+        surf_params['hspace'] = kwargs['surf_hspace']
+    if 'surf_wspace' in kwargs:
+        surf_params['wspace'] = kwargs['surf_wspace']
+
+    vol_args = ['resampling_interpolation', 'plot_abs', 'black_bg',
+                'display_mode', 'annotate', 'cut_coords',
+                'bg_img', 'draw_cross',
+                'dim', 'view_type', 'linewidths']
+    vol_params = {key: kwargs[key] for key in vol_args if key in kwargs}
+    
+    # Special case
+    if 'vol_alpha' in kwargs:
+        vol_params['alpha'] = kwargs['vol_alpha']
+
+    colorbar_args = ['fraction', 'shrink', 'aspect',
+                     'pad', 'anchor', 'format', 'cbar_fig_ratio']
+    colorbar_params = {key: kwargs[key] for key in colorbar_args if key in kwargs}
+
+    return surf_params, vol_params, colorbar_params
+ 
+
+def _plot_surf_vol_parc(data, space=None, hemi=None,
+                        surf_mesh=None, bg_map=None,
+                        colorbar=False, symmetric_cbar=False,
+                        darkness=None, vmin=None, vmax=None,
+                        cbar_vmin=None, cbar_vmax=None,
+                        figure=None, axes=None, subplot_spec=None,
+                        figsize=(20, 20), title=None, title_sz=18,
+                        hspace=0, wspace=0, surf_alpha=1,
+                        threshold=.1, surf_to_vol_ratio=1, **kwargs):
+
+    # Fine passing already proc'ed whatever here
+    data, ref = _load_data_and_ref(data, space=space, hemi=hemi)
+    
+    # If user-passed
+    surf_mesh, bg_map, darkness = _proc_defaults(ref, surf_mesh, bg_map, darkness)
+    
+    # Sort kwargs
+    surf_params, vol_params, colorbar_params = _sort_kwargs(kwargs)
+
+    # Add surface specific
+    surf_params['surf_mesh'] = surf_mesh
+    surf_params['bg_map'] = bg_map
+    surf_params['darkness'] = darkness
+    surf_params['surf_alpha'] = surf_alpha
+    surf_params['ref'] = ref
+
+    plot_surf_vol_collage(surf=[data['lh'], data['rh']],
+                          vol=data['sub'],
+                          vol_plot_type='roi',
+                          cmap='prism',
+                          threshold=threshold,
+                          vmin=vmin, vmax=vmax,
+                          cbar_vmin=cbar_vmin,
+                          cbar_vmax=cbar_vmax,
+                          figure=figure, axes=axes,
+                          subplot_spec=subplot_spec,
+                          figsize=figsize,
+                          title=title, title_sz=title_sz,
+                          colorbar=colorbar,
+                          symmetric_cbar=symmetric_cbar,
+                          hspace=hspace, wspace=wspace,
+                          colorbar_params=colorbar_params,
+                          surf_params=surf_params,
+                          vol_params=vol_params,
+                          surf_to_vol_ratio=surf_to_vol_ratio)
+
+def _plot_surf_vol(data, space=None, hemi=None, **kwargs):
+    pass
+
+
 def plot(data, space=None, hemi=None, **kwargs):
     '''The most automated magic plotting function avaliable,
-    used to plot arbitrary surface data (either statistical map or parcellation).
+    used to plot a wide range of neuroimaging data (volumes / surfs).
 
     Parameters
     -----------
     data : loc or data array
-        The data in which to plot. This can be passed
-        as either a str representing a location saved to disk,
-        or as a numpy array, Nifti1Image, ect...
+        The data in which to plot, either statistical map or parcellaction,
+        as broadly either a single surface,
+        collage of surfaces, a single
+        volume, or collage with surfaces and volume.
+    
+        Data can be passed in many ways:
 
-        If data is passed as a list or array-like with
-        only 2 elements, it is assumed that the first element
-        stores data that is left hemisphere specific and that the
-        right element stores right hemisphere specific data.
+        1. A single data representing surf, surf+surf, surf+surf+sub or just sub
+        2. A single file location w/ a data array
+        3. A list / array-like of length either 2 or 3, if 2 then represents surf+surf
+        if 3 then surf+surf+sub
+        4. A list / array-like same as above, but with file-paths
 
     space : None or str, optional
         If left as default, the space in which
@@ -533,10 +594,13 @@ def plot(data, space=None, hemi=None, **kwargs):
 
             default = None
 
+
     kwargs : kwargs style arguments
         There are number of different plotting specific arguments
         that can optionally be modified. The default values for these arguments
-        may change also depending on different auto-detected settings.
+        may change also depending on different auto-detected settings, i.e.,
+        if plotting a single surface vs. surface collage, or if plotting
+        a volumetric image.
 
         - surf_mesh : A str indicator specifying a valid surface mesh,
             with respect to the current space,
@@ -563,6 +627,8 @@ def plot(data, space=None, hemi=None, **kwargs):
 
         - avg_method : temp
 
+        - vol_plot_type : {'glass', 'stat', 'roi'}
+
         - alpha : temp
 
         - colorbar : temp
@@ -575,30 +641,80 @@ def plot(data, space=None, hemi=None, **kwargs):
 
         - hspace : temp
 
-    '''
-
-    data, _ = _load_data_and_ref(data, space=space, hemi=hemi)
-
-    if data[0] is not None:
-        unique_hemi = np.unique(data[0])
-    else:
-        unique_hemi = np.unique(data[1])
-
-    if all([float(u).is_integer() for u in unique_hemi]):
-        plot_surf_parc(data, space=space, hemi=hemi, **kwargs)
-    else:
-        plot_surf(data, space=space, hemi=hemi, **kwargs)
     
 
+    For example, if plotting a multi-figure surface + volume collage,
+    then you can take full control on placement and size of sub-figures via the following parameters:
+    
+    - hspace
+    - wspace
+    - surf_hspace
+    - surf_wspace
+    - surf_to_vol_ratio
+    - cbar_fig_ratio
+
+    '''
+    
+    # Load / perform initial auto-detection of data
+    data, _ = _load_data_and_ref(data, space=space, hemi=hemi)
+
+    # If includes surface data -
+    # Get the unique values
+    if 'lh' in data:
+        unique_vals = np.unique(data['lh'])
+    elif 'rh' in data:
+        unique_vals = np.unique(data['rh'])
+    # If no surface data present, subcort case
+    else:
+        unique_vals = np.unique(data['sub'].get_fdata())
+
+    # If all of the data points are interger-like, assume
+    # we are plotting a parcellation and not stat data
+    if all([float(u).is_integer() for u in unique_vals]):
+        
+        # Just surface or surfaces case
+        if 'sub' not in data:
+            _plot_surf_parc(data, space=space, hemi=hemi, **kwargs)
+        
+        # Just volume case
+        elif 'lh' not in data and 'rh' not in data:
+
+            # Override vol_plot_type - force roi
+            plot_volume(data['sub'], vol_plot_type='roi', **kwargs)
+        
+        # Last case is vol / surf collage
+        else:
+            _plot_surf_vol_parc(data, space=None, hemi=None, **kwargs)
+
+    
+    # Otherwise - plot stat values
+    else:
+
+        # Just surface or surfaces case
+        if 'sub' not in data:
+            _plot_surf(data, space=space, hemi=hemi, **kwargs)
+
+        # Just volume case
+        elif 'lh' not in data and 'rh' not in data:
+            plot_volume(data['sub'], **kwargs)
+
+        # Last case is vol / surf collage
+        else:
+            _plot_surf_vol_parc(data, space=None, hemi=None, **kwargs)
 
 
+def plot_volume(vol, vol_plot_type='glass', cmap=None,
+                threshold=None, vmax=None,
+                figure=None, axes=None, **kwargs):
 
+    if vol_plot_type == 'glass':
+        vol_plot_func = plot_glass_brain
+    elif vol_plot_type == 'stat':
+        vol_plot_func = plot_stat_map
+    elif vol_plot_type == 'roi':
+        vol_plot_func = plot_roi
 
-'''
-
-- lh, rh, both for [fsaverage, fsaverage5, 164k_fs_LR, 32k_fs_LR]
-- with and without medial wall
-- Plot full cifti w/ subcort
-- All for parcellation or stat map
-
-'''
+    vol_plot_func(vol,
+                  figure=figure, axes=axes, 
+                  cmap=cmap, threshold=threshold, vmax=vmax,
+                  **kwargs)

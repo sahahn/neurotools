@@ -2,9 +2,41 @@ from .conv import extract_subcortical_from_cifti
 import nibabel as nib
 import os
 import numpy as np
+from ..loading import load
 from .. import data_dr
 
-def process_space(data, hemi=None):
+def _load(data):
+    '''Simple wrapper around load with
+    the added attribute that if a str location is passed
+    we want to only if the data is multi-dimensional - try to
+    load it as a Nifti1Image, i.e., with affine, otherwise
+    perform normal load as array.'''
+    
+    # If already nifti image, keep as is
+    if isinstance(data, nib.Nifti1Image):
+        return data
+    
+    # First, perform normal load
+    loaded_data = load(data)
+   
+    # If not str, i.e., already passed as obj
+    # return as is
+    if not isinstance(data, str):
+        return loaded_data
+    
+    # If loaded data is flat array, return as is
+    if len(loaded_data.shape) == 1:
+        return loaded_data
+
+    # Last case is try to load instead w/ nibabel load
+    # if fails, return flat array
+    try:
+        return nib.load(data)
+    except:
+        return loaded_data
+
+
+def process_space(data, space=None, hemi=None):
     '''
     If hemi=None, auto-detect. Or can pass as
     lh or rh, as this is the only case
@@ -15,7 +47,19 @@ def process_space(data, hemi=None):
 
     - Process passed sub-cortical to make sure in nifti
     - If surface data is missing medial wall, add it here
+
+    Space argument refers to the space of the surface
+    data. 
     
+
+    Data can be passed as
+    
+    1. A single data representing surf, surf+surf, surf+surf+sub or just sub
+    2. A single file location w/ a data array
+    3. A list / array-like of length either 2 or 3, if 2 then represents surf+surf
+       if 3 then surf+surf+sub
+    4. A list / array-like same as above, but with file-paths
+
     '''
     
     # Proc hemi input
@@ -68,17 +112,38 @@ def process_space(data, hemi=None):
     proc_data = {}
     lh_data, rh_data, sub_data = None, None, None
 
-    # First case is to see if data
+    # If data is passed as str - replace with loaded
+    # version here - before main loop with cases
+    if isinstance(data, str):
+        data = _load(data)
+        
+    # Otherwise, if data is already in dict form
+    # check from there
+    if isinstance(data, dict):
+
+        if 'lh' in data:
+            lh_data = _load(data['lh'])
+        if 'rh' in data:
+            rh_data = _load(data['rh'])
+        if 'sub' in data:
+            sub_data = _load(data['sub'])
+
+    # Check if
     # was passed as a list / array-like corresponding
     # to lh+rh data
-    if len(data) == 2:
-        lh_data, rh_data = data[0], data[1]
+    elif len(data) == 2:
+        lh_data, rh_data = _load(data[0]), _load(data[1])
 
     # Or lh+rh+sub case
     elif len(data) == 3:
-        lh_data, rh_data, sub_data = data[0], data[1], data[2]
+        lh_data, rh_data, sub_data = _load(data[0]), _load(data[1]), _load(data[2])
+    
+    # Passed just single subcort case
+    elif isinstance(data, nib.Nifti1Image):
+        sub_data = data
 
     # Single passed array case
+    # Since data is already array if here
     else:
 
         for lh_sz, rh_sz in hemi_sizes:
@@ -118,16 +183,36 @@ def process_space(data, hemi=None):
     # Make sure something found, if not error
     if lh_data is None and rh_data is None and sub_data is None:
         raise RuntimeError(f'Could not determine the space / hemi of passed data with len={len(data)}')
-
-    space = None
+    
+    # Process found data - don't need
+    # user specified space here as still need auto-detect info
+    # for if need proc medial walls.
+    lh_space, rh_space = None, None
     if lh_data is not None:
-        proc_data['lh'], space = proc_hemi_data(lh_data, 'lh', lh_space_mapping)
+        proc_data['lh'], lh_space = proc_hemi_data(lh_data, 'lh', lh_space_mapping)
     if rh_data is not None:
-        proc_data['rh'], space = proc_hemi_data(rh_data, 'rh', rh_space_mapping)
+        proc_data['rh'], rh_space = proc_hemi_data(rh_data, 'rh', rh_space_mapping)
     if sub_data is not None:
         proc_data['sub'] = proc_sub_data(sub_data)
 
-    return proc_data, space
+    # Process space combinations
+    detected_space = None
+    if lh_space is None and rh_space is None:
+        if 'sub' not in proc_data:
+            raise RuntimeError('No valid data found')
+    elif lh_space is not None and rh_space is None:
+        detected_space = lh_space
+    elif lh_space is None and rh_space is not None:
+        detected_space = rh_space
+    elif lh_space is not None and rh_space is not None:
+        assert lh_space == rh_space, 'Auto detected spaces do not match!'
+        detected_space = lh_space
+    
+    # If user passed space, use that instead
+    if space is not None:
+        detected_space = space
+
+    return proc_data, detected_space
 
 def proc_hemi_data(hemi_data, hemi, space_mapping):
 
@@ -139,7 +224,7 @@ def proc_hemi_data(hemi_data, hemi, space_mapping):
         to_fill = np.zeros(medial_wall_mask.shape)
 
         # Medial wall saved as 0 in mask so fill in hemi data like this
-        to_fill[medial_wall_mask] = hemi_data
+        to_fill[medial_wall_mask.astype('bool')] = hemi_data
 
         return to_fill, space
     
