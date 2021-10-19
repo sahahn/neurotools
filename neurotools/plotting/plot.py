@@ -17,13 +17,16 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
     
     # Get data as flat array
     flat_data = _collapse_data(data)
+
+    # Small percent of min / max to add to either end
+    s = np.nanmax(np.abs(flat_data)) / 25
     
     # Both not set case
     if vmin is None and vmax is None:
 
         # If not symmetric_cbar, then these value
         # stay fixed as this
-        vmin, vmax = np.nanmin(flat_data), np.nanmax(flat_data)
+        vmin, vmax = np.nanmin(flat_data) - s, np.nanmax(flat_data) + s
         
         # If symmetric need to override either
         # vmin or vmax to be the opposite of the larger
@@ -47,7 +50,7 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
         
         # Otherwise, vmin is just the min value in the data
         else:
-            np.nanmin(flat_data)
+            np.nanmin(flat_data) - s
 
     # If vmax not set, same cases as above but flipped
     if vmax is None:
@@ -55,7 +58,7 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
         if symmetric_cbar:
             vmax = -vmin
         else:
-            vmax = np.nanmax(flat_data)
+            vmax = np.nanmax(flat_data) + s
 
     return vmin, vmax
 
@@ -592,16 +595,12 @@ def _sort_kwargs(kwargs):
 
     # Surface specific
     surf_args = ['vol_alpha', 'bg_map',
-                 'surf_mash', 'darkness', 'view']
+                 'surf_mash', 'darkness', 'view', 'dist']
     surf_params = {key: kwargs[key] for key in surf_args if key in kwargs}
     
     # Special cases
-    if 'surf_alpha' in kwargs:
-        surf_params['alpha'] = kwargs['surf_alpha']
     if 'surf_hspace' in kwargs:
         surf_params['hspace'] = kwargs['surf_hspace']
-    if 'surf_wspace' in kwargs:
-        surf_params['wspace'] = kwargs['surf_wspace']
 
     # If also passed directly
     if 'surf_params' in kwargs:
@@ -658,19 +657,36 @@ def _plot_surfs_vol(data, space=None, hemi=None,
                    darkness=None, vmin=None, vmax=None,
                    cbar_vmin=None, cbar_vmax=None,
                    figure=None, axes=None, subplot_spec=None,
-                   figsize=(20, 20), title=None, title_sz=18,
-                   hspace=0, wspace=0, surf_alpha=1,
+                   figsize=(12, 12), title=None, title_sz=18,
+                   hspace='default', wspace=-.2, surf_alpha=1,
                    avg_method='mean', threshold='auto',
-                   surf_to_vol_ratio=1, _print=None, **kwargs):
+                   surf_to_vol_ratio='default', surf_wspace='default',
+                   _print=None, **kwargs):
 
     # Process default surface and plotting values
     data, ref, symmetric_cbar, threshold, cmap, colorbar =\
         _prep_auto_defaults(data, space, hemi, rois,
                             symmetric_cbar, threshold,
                             cmap, colorbar, _print=_print)
-
+    
     # If user-passed
     surf_mesh, bg_map, darkness = _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness)
+
+    # Set default anchor value
+    if 'anchor' not in kwargs:
+        kwargs['anchor'] = (0, .6)
+
+    # Set specific plot settings if glass or not
+    # due to differences in sizes
+    if vol_plot_type == 'glass':
+        surf_to_vol_ratio = 1.1
+        hspace = -.2
+        surf_wspace = -.125
+        
+    else:
+        surf_to_vol_ratio = .9
+        hspace = -.25
+        surf_wspace = -.2
 
     # Sort kwargs into categories
     surf_params, vol_params, colorbar_params = _sort_kwargs(kwargs)
@@ -683,6 +699,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     surf_params['surf_mesh'], surf_params['bg_map'] = surf_mesh, bg_map
     surf_params['darkness'], surf_params['alpha'] = darkness, surf_alpha
     surf_params['ref'], surf_params['avg_method'] = ref, avg_method
+    surf_params['wspace'] = surf_wspace
     
     # Pass arguments to plot surf vol collage
     plot_surf_vol_collage(surf=[data['lh'], data['rh']],
