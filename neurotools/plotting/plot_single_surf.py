@@ -225,11 +225,15 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
         surf_map_faces = surf_map_faces / (vmax - vmin)
 
         # multiply data with background if indicated
-        if bg_on_data:
-            face_colors[kept_indices] = cmap(surf_map_faces[kept_indices])\
-                * face_colors[kept_indices]
+        if isinstance(bg_on_data, bool):
+            if bg_on_data:
+                face_colors[kept_indices] = cmap(surf_map_faces[kept_indices])\
+                    * face_colors[kept_indices]
+            else:
+                face_colors[kept_indices] = cmap(surf_map_faces[kept_indices])
         else:
-            face_colors[kept_indices] = cmap(surf_map_faces[kept_indices])
+            face_colors[kept_indices] = cmap(surf_map_faces[kept_indices])\
+                    * plt.cm.gray_r(bg_faces * bg_on_data)[kept_indices]
 
         if colorbar:
             our_cmap = get_cmap(cmap)

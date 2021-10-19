@@ -505,18 +505,46 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
 
     return data, ref
 
+def _proc_avg_method(data, rois, avg_method):
+
+    # If rois force avg method to median
+    if rois:
+        return 'median'
+    
+    # Otherwise set based on if we think we are
+    # plotting roi values on a surface
+    if avg_method == 'default':
+        
+        flat_data = _collapse_data(data)
+
+        # Get flat non-zero
+        flat_non_zero = flat_data[flat_data != 0]
+        n_unique = len(np.unique(flat_non_zero))
+
+        # If more than 5% data points different
+        if n_unique / len(flat_non_zero) > 0.05:
+            avg_method = 'mean'
+        else:
+            avg_method = 'median'
+
+    return avg_method
+
 def _prep_auto_defaults(data, space, hemi, rois,
                         symmetric_cbar, threshold,
-                        cmap, colorbar, _print):
+                        cmap, colorbar, avg_method, _print):
 
     # Fine passing already proc'ed whatever here
     data, ref = _load_data_and_ref(data, space=space, hemi=hemi, _print=_print)
 
+    # A bunch of funcs use collapse data, so quicker to just
+    # do it once here and pass that to funcs
+    flat_data = _collapse_data(data)
+
     # Process automatic symmetric_cbar
-    symmetric_cbar = _get_if_sym_cbar(data, symmetric_cbar, rois=rois)
+    symmetric_cbar = _get_if_sym_cbar(flat_data, symmetric_cbar, rois=rois)
 
     # Proc threshold if auto
-    threshold = _proc_threshold(data, threshold, rois=rois)
+    threshold = _proc_threshold(flat_data, threshold, rois=rois)
 
     # Get cmap based on passed + if rois or not + if sym
     cmap = _proc_cmap(cmap, rois, symmetric_cbar)
@@ -526,29 +554,28 @@ def _prep_auto_defaults(data, space, hemi, rois,
         colorbar = True
         if rois:
             colorbar = False
+    
+    # Proc avg method default
+    avg_method= _proc_avg_method(data, rois, avg_method)
 
-    return data, ref, symmetric_cbar, threshold, cmap, colorbar
+    return data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method
 
 def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
                 bg_map=None, rois=False, cmap='default',
-                bg_on_data=True, darkness=None,  avg_method='mean',
+                bg_on_data=.25, darkness=None,  avg_method='default',
                 wspace=-.35, hspace=-.1, alpha=1,
                 threshold='auto', symmetric_cbar='auto', 
                 colorbar='default', _print=None, **kwargs):
 
     # Process default surface and plotting values
-    data, ref, symmetric_cbar, threshold, cmap, colorbar =\
+    data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method =\
         _prep_auto_defaults(data, space, hemi, rois,
                             symmetric_cbar, threshold,
-                            cmap, colorbar, _print=_print)
+                            cmap, colorbar, avg_method, _print=_print)
  
     # If user-passed - update params
     surf_mesh, bg_map, darkness =\
         _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness)
-
-    # If plotting rois, force values to plot roi specific
-    if rois:
-        avg_method = 'median'
 
     # Both hemi's passed case.
     if 'lh' in data and 'rh' in data:
@@ -657,17 +684,18 @@ def _plot_surfs_vol(data, space=None, hemi=None,
                    darkness=None, vmin=None, vmax=None,
                    cbar_vmin=None, cbar_vmax=None,
                    figure=None, axes=None, subplot_spec=None,
-                   figsize=(12, 12), title=None, title_sz=18,
+                   figsize='default', title=None, title_sz=18,
                    hspace='default', wspace=-.2, surf_alpha=1,
-                   avg_method='mean', threshold='auto',
+                   avg_method='default', threshold='auto',
                    surf_to_vol_ratio='default', surf_wspace='default',
+                   bg_on_data=.25,
                    _print=None, **kwargs):
 
     # Process default surface and plotting values
-    data, ref, symmetric_cbar, threshold, cmap, colorbar =\
+    data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method =\
         _prep_auto_defaults(data, space, hemi, rois,
                             symmetric_cbar, threshold,
-                            cmap, colorbar, _print=_print)
+                            cmap, colorbar, avg_method, _print=_print)
     
     # If user-passed
     surf_mesh, bg_map, darkness = _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness)
@@ -679,27 +707,43 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     # Set specific plot settings if glass or not
     # due to differences in sizes
     if vol_plot_type == 'glass':
-        surf_to_vol_ratio = 1.1
-        hspace = -.2
-        surf_wspace = -.125
-        
+
+        if surf_to_vol_ratio == 'default':
+            surf_to_vol_ratio = 1.1
+        if hspace == 'default':
+            hspace = -.2
+        if surf_wspace == 'default':
+            surf_wspace = -.125
+
+    # Roi's / plot stat volume case
     else:
-        surf_to_vol_ratio = .9
-        hspace = -.25
-        surf_wspace = -.2
+        if surf_to_vol_ratio == 'default':
+            surf_to_vol_ratio = .9
+        if hspace == 'default':
+            hspace = -.25
+        if surf_wspace == 'default':
+            surf_wspace = -.2
+    
+    # Set default figsize based on if colorbar
+    if figsize == 'default':
+
+        if colorbar:
+            figsize = (12, 12)
+        else:
+            figsize = (9, 12)
 
     # Sort kwargs into categories
     surf_params, vol_params, colorbar_params = _sort_kwargs(kwargs)
 
     # If plotting rois, force values to plot roi specific
     if rois:
-        vol_plot_type, avg_method = 'roi', 'median'
+        vol_plot_type = 'roi'
 
     # Add surface specific to surf_params dict
     surf_params['surf_mesh'], surf_params['bg_map'] = surf_mesh, bg_map
     surf_params['darkness'], surf_params['alpha'] = darkness, surf_alpha
     surf_params['ref'], surf_params['avg_method'] = ref, avg_method
-    surf_params['wspace'] = surf_wspace
+    surf_params['wspace'], surf_params['bg_on_data'] = surf_wspace, bg_on_data
     
     # Pass arguments to plot surf vol collage
     plot_surf_vol_collage(surf=[data['lh'], data['rh']],
