@@ -4,6 +4,7 @@ import os
 import numpy as np
 from ..loading import load
 from .. import data_dr
+from ..misc.print import _get_print
 
 def _load(data):
     '''Simple wrapper around load with
@@ -36,7 +37,7 @@ def _load(data):
         return loaded_data
 
 
-def process_space(data, space=None, hemi=None):
+def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     '''
     If hemi=None, auto-detect. Or can pass as
     lh or rh, as this is the only case
@@ -59,15 +60,17 @@ def process_space(data, space=None, hemi=None):
     3. A list / array-like of length either 2 or 3, if 2 then represents surf+surf
        if 3 then surf+surf+sub
     4. A list / array-like same as above, but with file-paths
-
     '''
+
+    _print = _get_print(verbose, _print)
+    _print('Calling function process_space on data.', level=2)
     
     # Proc hemi input
     if hemi == 'left':
         hemi = 'lh'
     if hemi == 'right':
         hemi = 'rh'
-    assert hemi in ['lh', 'rh', None], 'hemi must be lh, rh or None'
+    assert hemi in ['lh', 'rh', None], 'hemi must be lh, rh or None!'
     
     # Space info- sep by hemi
     lh_space_mapping = {578: ('fsaverage3', True),
@@ -115,6 +118,7 @@ def process_space(data, space=None, hemi=None):
     # If data is passed as str - replace with loaded
     # version here - before main loop with cases
     if isinstance(data, str):
+        _print(f'Loading data from location: {data}.', level=2)
         data = _load(data)
         
     # Otherwise, if data is already in dict form
@@ -132,10 +136,12 @@ def process_space(data, space=None, hemi=None):
     # was passed as a list / array-like corresponding
     # to lh+rh data
     elif len(data) == 2:
+        _print('Assumingdata passed as [lh, rh].', level=1)
         lh_data, rh_data = _load(data[0]), _load(data[1])
 
     # Or lh+rh+sub case
     elif len(data) == 3:
+        _print('Assuming data passed as [lh, rh, sub].', level=1)
         lh_data, rh_data, sub_data = _load(data[0]), _load(data[1]), _load(data[2])
     
     # Passed just single subcort case
@@ -145,6 +151,7 @@ def process_space(data, space=None, hemi=None):
     # Single passed array case
     # Since data is already array if here
     else:
+        _print('data was passed as single array, automatically inferring splits / space.', level=2)
 
         for lh_sz, rh_sz in hemi_sizes:
             
@@ -195,6 +202,8 @@ def process_space(data, space=None, hemi=None):
     if sub_data is not None:
         proc_data['sub'] = proc_sub_data(sub_data)
 
+    _print(f'Inferred passed data: {list(proc_data)}', level=1)
+
     # Process space combinations
     detected_space = None
     if lh_space is None and rh_space is None:
@@ -211,6 +220,8 @@ def process_space(data, space=None, hemi=None):
     # If user passed space, use that instead
     if space is not None:
         detected_space = space
+    else:
+        _print(f'Inferred surface space: {detected_space}', level=1)
 
     return proc_data, detected_space
 

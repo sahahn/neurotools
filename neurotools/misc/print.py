@@ -2,6 +2,10 @@ import warnings
 
 def _get_print(verbose, _print=None):
     
+    # Helper for muted print
+    if verbose is None:
+        return _get_print(verbose=-10)
+    
     # If already set
     if not _print is None:
         return _print
