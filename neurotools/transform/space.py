@@ -120,6 +120,12 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     if isinstance(data, str):
         _print(f'Loading data from location: {data}.', level=2)
         data = _load(data)
+
+    elif isinstance(data, nib.Cifti2Image):
+        # @TODO if cifti use this info directly as it contains
+        # space information and whatnot. For now, just treat as array
+        _print(f'Loading data from cifti as data array.', level=2)
+        data = _load(data)
         
     # Otherwise, if data is already in dict form
     # check from there
@@ -132,6 +138,10 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
         if 'sub' in data:
             sub_data = _load(data['sub'])
 
+    # Passed just single subcort case
+    elif isinstance(data, nib.Nifti1Image):
+        sub_data = data
+
     # Check if
     # was passed as a list / array-like corresponding
     # to lh+rh data
@@ -143,10 +153,6 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     elif len(data) == 3:
         _print('Assuming data passed as [lh, rh, sub].', level=1)
         lh_data, rh_data, sub_data = _load(data[0]), _load(data[1]), _load(data[2])
-    
-    # Passed just single subcort case
-    elif isinstance(data, nib.Nifti1Image):
-        sub_data = data
 
     # Single passed array case
     # Since data is already array if here
