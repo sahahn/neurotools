@@ -94,6 +94,7 @@ def freesurfer_resample_prep(fs_subj, hemi,
                              target_res='32k',
                              midthickness_loc=None,
                              temp_dr=None):
+    '''This method for now requires that the hcp workbench be installed.'''
     
     temp_dr = _proc_temp_dr(temp_dr)
     
