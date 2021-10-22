@@ -195,6 +195,10 @@ class SurfRef(Ref):
     
     def get_surf(self, name, hemi):
         
+        # If already surf mesh like
+        if not isinstance(name, str):
+            return name
+
         if name is None:
             return None
         

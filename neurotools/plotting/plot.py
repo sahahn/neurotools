@@ -491,8 +491,14 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
     # Otherwise generate SurfRef with defaults
     ref = SurfRef(space=space)
     
+    # If assumed native space, then assume user will pass mesh + bg_map
+    if space == 'native':
+        ref.surf_mesh = None
+        ref.bg_map = None
+        ref.darkness = 1
+    
     # fs_LR space defaults
-    if 'fs_LR' in space:
+    elif 'fs_LR' in space:
         ref.surf_mesh = 'very_inflated'
         ref.bg_map = 'sulc_conte'
         ref.darkness = .5

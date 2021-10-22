@@ -232,7 +232,12 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     return proc_data, detected_space
 
 def proc_hemi_data(hemi_data, hemi, space_mapping):
-
+    
+    # If doesn't match any, assume in native space
+    if len(hemi_data) not in space_mapping:
+        return hemi_data, 'native'
+    
+    # Check space mapping dict
     space, needs_medial_wall = space_mapping[len(hemi_data)]
     
     # Add medial wall if needs it
