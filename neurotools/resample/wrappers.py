@@ -104,6 +104,8 @@ def freesurfer_resample_prep(fs_subj, hemi,
                                                   hemi=hemi,
                                                   temp_dr=temp_dr)
     
+    # TODO process if midthickness is not already gifti
+    
     # Get cur + new_sphere locs
     current_gii_sphere_loc, new_sphere_loc =\
         _get_curr_new_sphere_locs(fs_subj=fs_subj, hemi=hemi, target_res=target_res, temp_dr=temp_dr)

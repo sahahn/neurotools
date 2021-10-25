@@ -28,7 +28,7 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         nilearn.surface.load_surf_data(), which you
         will need nilearn installed to use.)
 
-    background_labels : int, array-like of int, optional
+    background_label : int, array-like of int, optional
         This parameter determines which label, if any,
         in the corresponding
         passed labels, should be treated as 'background'
@@ -284,7 +284,8 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             vectorize=False and originally 2D data.
         '''
 
-        self._check_fitted()
+        if not hasattr(self, "labels_"):
+            self._base_fit()
 
         if len(X.shape) == 2 and (X.shape[0] == X.shape[1]):
             warnings.warn('X was passed with the same length' +
@@ -402,7 +403,7 @@ class SurfMaps(BaseEstimator, TransformerMixin):
     maps : str or array-like, optional
         This parameter represents the maps in which
         to apply to each surface, where the shape of
-        the passed maps should be (# of vertex, # of maps)
+        the passed maps should be (# of features, # of maps)
         or in other words, the size of the data array in the first
         dimension and the number of maps
         (i.e., the number of outputted ROIs from fit)
@@ -588,13 +589,9 @@ class SurfMaps(BaseEstimator, TransformerMixin):
                 default = None
         '''
 
-        # Load mask if any
-        self.mask_ = load(self.mask)
+        self._base_fit()
 
-        # Load maps
-        self.maps_ = load(self.maps)
-
-        # Save dtype
+        # Save in dtype
         self.dtype_ = X.dtype
 
         # Warn if non-float
@@ -603,17 +600,6 @@ class SurfMaps(BaseEstimator, TransformerMixin):
                           'this may lead to rounding errors! ' +
                           'Pass data as type float to ensure ' +
                           'the results of transform are not truncated.')
-
-        # Make the maps if passed mask set to 0 in those spots
-        if self.mask_ is not None:
-
-            # Raise error if wrong shapes
-            if len(self.mask_) != self.maps_.shape[0]:
-                raise RuntimeError('length of mask must have '
-                                   'the same length / shape as '
-                                   'the first dimension of passed '
-                                   'maps!')
-            self.maps_[self.mask_.astype(bool)] = 0
 
         # X can either be a 1D surface, or a 2D surface
         # (e.g. - for timeseries or stacked contrasts)
@@ -625,6 +611,27 @@ class SurfMaps(BaseEstimator, TransformerMixin):
             raise RuntimeError('Size of labels not found in X. '
                                'Make sure your data is in the same '
                                'space as the labels you are using!')
+
+        return self
+
+    def _base_fit(self):
+
+        # Load mask if any
+        self.mask_ = load(self.mask)
+
+        # Load maps
+        self.maps_ = load(self.maps)
+
+        # Make the maps if passed mask set to 0 in those spots
+        if self.mask_ is not None:
+
+            # Raise error if wrong shapes
+            if len(self.mask_) != self.maps_.shape[0]:
+                raise RuntimeError('length of mask must have '
+                                   'the same length / shape as '
+                                   'the first dimension of passed '
+                                   'maps!')
+            self.maps_[self.mask_.astype(bool)] = 0
 
         # Make sure strategy exists
         if self.strategy not in ['auto', 'ls', 'average']:
@@ -695,8 +702,13 @@ class SurfMaps(BaseEstimator, TransformerMixin):
             array is passed 1D data, or 2D if passed
             vectorize=False and originally 2D data.
         '''
+        
+        # If not fitted, do base fit
+        if not hasattr(self, "labels_"):
+            self._base_fit()
 
-        self._check_fitted()
+            # Default
+            self.dtype_ = 'float32'
 
         if len(X.shape) == 2 and (X.shape[0] == X.shape[1]):
             warnings.warn('X was passed with the same length',
