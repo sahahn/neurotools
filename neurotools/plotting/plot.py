@@ -780,52 +780,86 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
     Parameters
     -----------
-    data : loc or data array
+    data : str, array, dict, ect...
         The data in which to plot, either statistical map or parcellaction,
-        as broadly either a single surface,
-        collage of surfaces, a single
+        as broadly either a single surface, collage of surfaces, a single
         volume, or collage with surfaces and volume.
     
         Data can be passed in many ways:
 
-        1. A single data representing surf, surf+surf, surf+surf+sub or just sub
-        2. A single file location w/ a data array
-        3. A list / array-like of length either 2 or 3, if 2 then represents surf+surf
-        if 3 then surf+surf+sub
-        4. A list / array-like same as above, but with file-paths
+        - As array-like input representing a single surface hemisphere,
+          concatenated hemispheres, concatenated hemispheres + flattened sub-cortical
+          values, or just flattened volumetric values.
+
+        - As a str, representing the file location with saved values
+          for any of the above array options. A large number of different
+          file formats are accepted.
+
+        - As a dictionary. If passed as a dictionary, this
+          allows the user most control over how data is specified.
+          Dictionary keys must be one or more of 'lh', 'rh' and 'sub',
+          where values can be either array-like, file locations or nibabel
+          objects. Note that if you are trying to plot data in native
+          subject space, it must be passed in this dictionary style, along
+          with, if a surface, a proper value for surf_mesh.
+
+        - As a list or array-like of length 3, indicating internally
+          that the passed values represent in the first index the file location
+          or array values of a left hemisphere surface, and in the second index,
+          the right hemisphere surface.
+
+        - As a list or array-like of length 3, indicating internally
+          that the first two passed index are left and right hemisphere
+          surface data, and the last is subcortical data, all to
+          be plotted together in a collage.
+
+        - As a :class:`Nifti1Image<nibabel.nifti1.Nifti1Image>` to be plotted volumetrically.
 
     space : None or str, optional
-        If left as default, the space in which
-        the data to plot is in will be automatically inferred,
+        This argument defines the "space" in which
+        surface data is plotted. If left as default (None),
+        the space in which the data to plot is
+        in will be automatically inferred,
         otherwise this parameter can be manually set,
         overriding the automatically detected choice.
-
         Current supported options are:
 
-        - 'fsaverage'
-        - 'fsaverage5'
-        - '32k_fs_LR'
-        - '164k_fs_LR'
+        - 'fsaverage' : freesurfer average standard space.
+
+        - 'fsaverage5' : freesurfer5 downsampled average standard space.
+
+        - 'fsaverage4' : freesurfer3 downsampled average standard space.
+
+        - 'fsaverage3' : freesurfer3 downsampled average standard space.
+
+        - '32k_fs_LR' : HCP standard 32k vertex space. 
+
+        - '59k_fs_LR' : HCP standard 59k vertex space. 
+
+        - '164k_fs_LR' : HCP standard 164k vertex space. Note, while this space has the same number of vertex as fsaverage space, it is not the same.
+
+        - 'native' : This is set if the passed number of values don't correspond to any of the saved defaults, and refers to that the space to plot is in some non-standard space.
 
         ::
 
             default = None
 
-    hemi : None or str, optional
-        If left as default, then this option will
-        be automatically set (with if only one hemisphere of
-        data passed defaulting to left hemisphere).
-
-        Otherwise, you may override the automatically
-        detected hemisphere by passing either just 'lh' or 'rh'
-        when plotting only a single hemisphere's data.
+    hemi : None, 'lh' or 'rh', optional
+        This parameter is only used when plotting
+        any surface data. Further, this parameter
+        is only relevant the surface data being plotted represents
+        a single hemispheres data.
+        
+        If left as default, None,
+        then this option will be automatically set to plot
+        left hemisphere data.
 
         ::
 
             default = None
 
     verbose : int, optional
-        Plotting includes a whole boat load of parameters,
+        Plotting includes a many, many of parameters,
         which is why this function is helpful as it automates a
         large number of choices. That said, it can helpful
         to be aware of what choices are being made, which is
@@ -837,39 +871,100 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
         - 1 : Information on which steps are automatically decided are shown.
         - >1 : Automatic choices are shown as well as additional helper text.
 
-    kwargs : kwargs style arguments
+    kwargs : **kwargs
         There are number of different plotting specific arguments
         that can optionally be modified. The default values for these arguments
         may change also depending on different auto-detected settings, i.e.,
         if plotting a single surface vs. surface collage, or if plotting
         a volumetric image.
 
-        - surf_mesh : A str indicator specifying a valid surface mesh,
-            with respect to the current space,
+        - surf_mesh : str or 2D array
+            A str indicator specifying a valid surface mesh,
+            with respect to the current space, or a two dimensional array
+            with information about the coordinates and vertex-faces
             in which to plot the data on. The default for
             freesurfer spaces is 'inflated' and for fs_LR spaces
-            is 'very_inflated'.
+            is 'very_inflated'. If you wish to plot surface
+            data in native subject space, then this argument must be
+            supplied with a loaded 2D array / valid mesh, and data
+            must be passed in dictionary style.
 
-        - bg_map : A str indicator specifying a valid array of values,
-            with respect to the current space, in which to use as a
-            background map when plotting. This map is plotted in greyscale
+            This parameter is only used when plotting surfaces.
+
+        - bg_map : str or 2D array
+            This argument specifies
+            a background map to be used when plotting. This
+            should be passed as either a str indicator specifying a valid file
+            within the current surface space, or as a valid array of values,
+            again, with respect to the current space. This map is plotted in greyscale
             underneath the data points, often used for realistic shading.
-            The default for freesurfer spaces is 'sulc' and for fs_LR spaces
-            is 'sulc_conte'.
+            The default for when plotting freesurfer spaces is 'sulc'
+            and for fs_LR spaces is 'sulc_conte'.
 
-        - cmap : An instance of :class:`matplotlib.colors.Colormap` or str
+            This parameter is only used when plotting surfaces.
+
+        - cmap : str or :class:`matplotlib.colors.Colormap`
+            This should be pass as an instance
+            of :class:`matplotlib.colors.Colormap` or str
             representing the name of a matplotlib colormap. This will be the color map
-            in which the values are plotted according to. When plotting
-            surface parcellations the default cmap is 'prism', when
-            plotting statistical maps, the default cmap is 'col_hot'.
+            in which the values are plotted according to. When plotting surface
+            parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
+            if plotting not symmetric statistical maps, and 'cold_hot' if plotting
+            symmetric statistical maps (e.g., values above and below 0).
 
-        - bg_on_data : temp
+        - vol_plot_type : {'glass', 'stat', 'roi'}
+            This parameter control the type of volumetric plot in which to generate,
+            with valid values as one of 'glass', 'stat' and 'roi'. By default,
+            if detected to be plotting a parcellation, the value 'roi' is used.
+            Otherwise, the default volumetric plotting type is 'glass'.
+            The corresponding back-end nilearn functions used are:
+
+            - 'glass': :func:`nilearn.plotting.plot_glass_brain`
+            - 'stat': :func:`nilearn.plotting.plot_stat_map`
+            - 'roi': :func:`nilearn.plotting.plot_roi`
+
+            This parameter is only used when plotting volumetric data.
+
+        - bg_on_data : bool or float
+            If True, and a bg_map is specified,
+            the data to plot is multiplied by the background image, 
+            so that e.g. sulcal depth is visible beneath the surf_data.
+
+            If passed as a float value, then that will trigger multiplying
+            the data to plot by the background image times the passed bg_on_data
+            value. So for example passing True is equivalent to passing 1 and passing
+            False is the same as passing 0.
+            This allows for fine tuning how much the background image
+            is melded with the data shown. The default value is .25.
+
+            This parameter is only used when plotting surfaces.
+
+        - view : str
+            If plotting a single surface hemisphere, this
+            parameter must be one of:
+            {'lateral', 'medial', 'dorsal', 'ventral', 'anterior', 'posterior'}
+            Where 'lateral' is the default view if none is set.
+
+            If instead plotting a collage of surface views, then
+            valid view parameters are one of:
+            {'standard', 'front back', 'front', 'back'}
+            which correspond to different preset collections of surface views.
+            The default is 'standard'.
+            
+            Note: If plotting a collage of surface and volumetric views,
+            it is reccomended to keep the default collage 'standard' view,
+            as the other views have not yet been properly formatted yet.
+
+        - figsize : 'default' or (int, int)
+            This parameter is used when axes are not passed, and
+            a new figure is being generated. It represents
+            the size of the underlying matplotlib figure to plot on.
+            The default value for this function varies based on what type of
+            plot is being made (e.g., not the same for surface collage vs. single surface).
 
         - darkness : temp
 
         - avg_method : temp
-
-        - vol_plot_type : {'glass', 'stat', 'roi'}
 
         - alpha : temp
 
@@ -883,15 +978,23 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
         - hspace : temp
 
-    For example, if plotting a multi-figure surface + volume collage,
-    then you can take full control on placement and size of sub-figures via the following parameters:
-    
+
+    Notes
+    -----------
+    The creation of carefully constructed multi-figures can be a little tricky,
+    which is why it is helpful that so many of the default values have been set. That
+    said, it is likely the interested user could do better than the defaults with
+    say for example plotting a multi-figure surface + volume collage. In this instance,
+    if they wanted to tweak the positioning of the different sub figures relative to
+    each other, they could make use of the following parameters:
+
     - hspace
     - wspace
     - surf_hspace
     - surf_wspace
     - surf_to_vol_ratio
     - cbar_fig_ratio
+    - figsize
 
     '''
 
