@@ -40,7 +40,7 @@ def add_subcortical(fill_cifti, index_map):
 
     return fill_cifti
 
-def static_parc_to_cifti(parcel, index_map, add_subcortical=True):
+def static_parc_to_cifti(parcel, index_map, add_sub=True):
 
     # Init empty cifti with zeros
     if add_subcortical:
@@ -52,7 +52,7 @@ def static_parc_to_cifti(parcel, index_map, add_subcortical=True):
     fill_cifti = remove_medial_wall(fill_cifti, parcel, index_map)
     
     # Add subcortical structures as unique parcels next
-    if add_subcortical:
+    if add_sub:
         fill_cifti = add_subcortical(fill_cifti, index_map)
 
     return fill_cifti
@@ -99,7 +99,7 @@ def prob_parc_to_cifti(parcel, index_map):
     return np.stack(cort_slabs + subcort_slabs, axis=1)
 
 
-def surf_parc_to_cifti(cifti_file, parcel_file):
+def surf_parc_to_cifti(cifti_file, parcel):
     '''For now just works when parcel file is a parcellation
     in combined fs_LR_32k lh+rh space with medial wall included.
     Works for static or prob.'''
@@ -108,7 +108,7 @@ def surf_parc_to_cifti(cifti_file, parcel_file):
     index_map = nib.load(cifti_file).header.get_index_map(1)
 
     # Load parcel
-    parcel = load(parcel_file)
+    parcel = load(parcel)
     
     # Probabilistic case
     if len(parcel.shape) > 1:
