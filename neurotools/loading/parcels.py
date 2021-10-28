@@ -2,7 +2,7 @@ import os
 import numpy as np
 from .. import data_dr
 
-def load_32k_fs_LR_parcel(parcel_name):
+def load_32k_fs_LR_concat(parcel_name):
     '''Dedicated loaded function for saved parcels as generated in
     parc_scaling project.'''
     
