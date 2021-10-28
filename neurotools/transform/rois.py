@@ -704,10 +704,10 @@ class SurfMaps(BaseEstimator, TransformerMixin):
         '''
         
         # If not fitted, do base fit
-        if not hasattr(self, "labels_"):
+        if not hasattr(self, "maps_"):
             self._base_fit()
 
-            # Default
+            # Default if not set
             self.dtype_ = 'float32'
 
         if len(X.shape) == 2 and (X.shape[0] == X.shape[1]):
