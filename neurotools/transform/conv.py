@@ -32,7 +32,7 @@ def add_subcortical(fill_cifti, index_map):
             
             # If subcort volume
             if index.surface_number_of_vertices is None:
-                
+                print(index.brain_structure)
                 start = index.index_offset 
                 end = start + index.index_count
                 fill_cifti[start:end] = cnt
