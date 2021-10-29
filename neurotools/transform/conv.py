@@ -1,5 +1,5 @@
-from re import sub
 import nibabel as nib
+from ..misc.print import _get_print
 import numpy as np
 import pickle as pkl
 import os
@@ -21,18 +21,19 @@ def remove_medial_wall(fill_cifti, parcel, index_map):
 
     return fill_cifti
 
-def add_subcortical(fill_cifti, index_map):
+def _add_subcortical(fill_cifti, index_map, _print=None):
     '''Assumes base parcel already added'''
 
     # Start at 1 plus last
     cnt = np.max(np.unique(fill_cifti)) + 1
+    _print(f'Adding subcort ROIs starting at index {cnt}', level=1)
 
     for index in index_map:
         if isinstance(index, Cifti2BrainModel):
             
             # If subcort volume
             if index.surface_number_of_vertices is None:
-                print(index.brain_structure)
+                _print('Adding brain_structure =', index.brain_structure, level=1)
                 start = index.index_offset 
                 end = start + index.index_count
                 fill_cifti[start:end] = cnt
@@ -40,7 +41,7 @@ def add_subcortical(fill_cifti, index_map):
 
     return fill_cifti
 
-def static_parc_to_cifti(parcel, index_map, add_sub=True):
+def _static_parc_to_cifti(parcel, index_map, add_sub=True, _print=None):
 
     # Init empty cifti with zeros
     if add_sub:
@@ -48,12 +49,16 @@ def static_parc_to_cifti(parcel, index_map, add_sub=True):
     else:
         fill_cifti = np.zeros(59412)
 
+    _print(f'Init fill cifti with shape: {fill_cifti.shape}', level=1)
+
     # Apply cifti medial wall reduction to parcellation
     fill_cifti = remove_medial_wall(fill_cifti, parcel, index_map)
-    
+
+    _print(f'Removed medial wall, new cort unique regions = {len(np.unique(fill_cifti))}', level=1)
+
     # Add subcortical structures as unique parcels next
     if add_sub:
-        fill_cifti = add_subcortical(fill_cifti, index_map)
+        fill_cifti = _add_subcortical(fill_cifti, index_map, _print=_print)
 
     return fill_cifti
 
@@ -99,10 +104,12 @@ def prob_parc_to_cifti(parcel, index_map):
     return np.stack(cort_slabs + subcort_slabs, axis=1)
 
 
-def surf_parc_to_cifti(cifti_file, parcel, add_sub=True):
+def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, verbose=0):
     '''For now just works when parcel file is a parcellation
     in combined fs_LR_32k lh+rh space with medial wall included.
     Works for static or prob.'''
+
+    _print = _get_print(verbose=verbose)
 
     # Get index map from example cifti file
     index_map = nib.load(cifti_file).header.get_index_map(1)
@@ -115,7 +122,7 @@ def surf_parc_to_cifti(cifti_file, parcel, add_sub=True):
         return prob_parc_to_cifti(parcel, index_map)
 
     # Static case
-    return static_parc_to_cifti(parcel, index_map, add_sub=add_sub)
+    return _static_parc_to_cifti(parcel, index_map, add_sub=add_sub, _print=_print)
 
 def add_surface_medial_walls(data):
     '''Right now only works with just concat'ed surface level data'''
