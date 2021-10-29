@@ -146,7 +146,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     # was passed as a list / array-like corresponding
     # to lh+rh data
     elif len(data) == 2:
-        _print('Assumingdata passed as [lh, rh].', level=1)
+        _print('Assuming data passed as [lh, rh].', level=1)
         lh_data, rh_data = _load(data[0]), _load(data[1])
 
     # Or lh+rh+sub case
