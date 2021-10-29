@@ -8,16 +8,30 @@ from .. import data_dr
 from ..loading import load
 
 
-def remove_medial_wall(fill_cifti, parcel, index_map):
+def _remove_medial_wall(fill_cifti, parcel, index_map, _print=None):
     '''Remove the medial wall from a parcel / surface. For
     now assumes that the passed index map is for a cifti file with medial
     wall included.'''
 
+    # Keep track of current position
+    pos_offset = 0
+
     for index in index_map:
         if isinstance(index, Cifti2BrainModel):
             if index.surface_number_of_vertices is not None:
-                inds = index.index_offset + np.array(index.vertex_indices._indices)
+                _print('Remove medial wall brain structure =', index.brain_structure, level=1)
+
+                # Get index of this hemisphere within the passed parcel
+                inds = pos_offset + np.array(index.vertex_indices._indices)
+                _print(f'inds of len {len(inds)} with pos offset = {pos_offset}', level=2)
+                
+                # Fill in between index_offset and index.index_offset+index.index_count these
+                # vertex
                 fill_cifti[index.index_offset: index.index_offset+index.index_count] = parcel[inds]
+                _print(f'Filled in cifti file index [{index.index_offset}: {index.index_offset+index.index_count}]', level=2)
+
+                # Increment to pos_offset
+                pos_offset += index.surface_number_of_vertices
 
     return fill_cifti
 
@@ -50,9 +64,10 @@ def _static_parc_to_cifti(parcel, index_map, add_sub=True, _print=None):
         fill_cifti = np.zeros(59412)
 
     _print(f'Init fill cifti with shape: {fill_cifti.shape}', level=1)
+    _print(f'Init parcel has len = {len(parcel)}, unique regions = {len(np.unique(parcel))}', level=1)
 
     # Apply cifti medial wall reduction to parcellation
-    fill_cifti = remove_medial_wall(fill_cifti, parcel, index_map)
+    fill_cifti = _remove_medial_wall(fill_cifti, parcel, index_map, _print=_print)
 
     _print(f'Removed medial wall, new cort unique regions = {len(np.unique(fill_cifti))}', level=1)
 
@@ -63,13 +78,13 @@ def _static_parc_to_cifti(parcel, index_map, add_sub=True, _print=None):
     return fill_cifti
 
 
-def get_cort_slabs(parcel, index_map):
+def get_cort_slabs(parcel, index_map, _print=None):
     '''Prob. case'''
     
     cort_slabs = []
     for i in range(parcel.shape[1]):
         slab = np.zeros(91282)
-        slab = remove_medial_wall(slab, parcel[:, i], index_map)
+        slab = _remove_medial_wall(slab, parcel[:, i], index_map, _print=_print)
         cort_slabs.append(slab)
         
     return cort_slabs
@@ -95,10 +110,10 @@ def get_subcort_slabs(index_map):
     return subcort_slabs
 
 
-def prob_parc_to_cifti(parcel, index_map):
+def prob_parc_to_cifti(parcel, index_map, _print=None):
     'Prob. case'
 
-    cort_slabs = get_cort_slabs(parcel, index_map)
+    cort_slabs = get_cort_slabs(parcel, index_map, _print=_print)
     subcort_slabs = get_subcort_slabs(index_map)
     
     return np.stack(cort_slabs + subcort_slabs, axis=1)
@@ -107,7 +122,11 @@ def prob_parc_to_cifti(parcel, index_map):
 def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, verbose=0):
     '''For now just works when parcel file is a parcellation
     in combined fs_LR_32k lh+rh space with medial wall included.
-    Works for static or prob.'''
+    Works for static or prob.
+
+    Note: Assumes 0 is background for verbose statements, e.g.,
+    when printing info about number of unique regions.
+    '''
 
     _print = _get_print(verbose=verbose)
 
@@ -119,10 +138,11 @@ def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, verbose=0):
     
     # Probabilistic case
     if len(parcel.shape) > 1:
-        return prob_parc_to_cifti(parcel, index_map)
+        return prob_parc_to_cifti(parcel, index_map, _print=_print)
 
     # Static case
-    return _static_parc_to_cifti(parcel, index_map, add_sub=add_sub, _print=_print)
+    return _static_parc_to_cifti(parcel=parcel, index_map=index_map,
+                                 add_sub=add_sub, _print=_print)
 
 def add_surface_medial_walls(data):
     '''Right now only works with just concat'ed surface level data'''
