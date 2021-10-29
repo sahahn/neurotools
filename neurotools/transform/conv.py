@@ -43,7 +43,7 @@ def add_subcortical(fill_cifti, index_map):
 def static_parc_to_cifti(parcel, index_map, add_sub=True):
 
     # Init empty cifti with zeros
-    if add_subcortical:
+    if add_sub:
         fill_cifti = np.zeros(91282)
     else:
         fill_cifti = np.zeros(59412)
@@ -99,7 +99,7 @@ def prob_parc_to_cifti(parcel, index_map):
     return np.stack(cort_slabs + subcort_slabs, axis=1)
 
 
-def surf_parc_to_cifti(cifti_file, parcel):
+def surf_parc_to_cifti(cifti_file, parcel, add_sub=True):
     '''For now just works when parcel file is a parcellation
     in combined fs_LR_32k lh+rh space with medial wall included.
     Works for static or prob.'''
@@ -115,7 +115,7 @@ def surf_parc_to_cifti(cifti_file, parcel):
         return prob_parc_to_cifti(parcel, index_map)
 
     # Static case
-    return static_parc_to_cifti(parcel, index_map)
+    return static_parc_to_cifti(parcel, index_map, add_sub=add_sub)
 
 def add_surface_medial_walls(data):
     '''Right now only works with just concat'ed surface level data'''
