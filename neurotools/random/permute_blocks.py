@@ -60,7 +60,7 @@ def _between_grp_permute(blocks, rng):
     # Return the results of that operation
     return _within_grp_permute(new_blocks, rng)
 
-def permute_blocks(in_blocks, rng):
+def permute_blocks(in_blocks, rng, within_grp=True):
     '''Function to perform permutations according to a PALM style
     Exchangeability Block structure.
 
@@ -68,17 +68,31 @@ def permute_blocks(in_blocks, rng):
     to make sure inter block swaps are done in a valid way according
     to any subtypes
     '''
+
+    # Passed 1D array case - expand
+    if len(in_blocks.shape) == 1:
+        in_blocks = np.expand_dims(in_blocks, axis=1)
+
+    # Get outer col to add to left side
+    ones = np.ones((len(in_blocks), 1), dtype='int')
+    if within_grp:
+        ones *= -1
     
-    # Add index as column to blocks - keeping track of permutations
-    indx = np.expand_dims(np.arange(in_blocks.shape[0]), 1)
-    blocks = np.hstack([in_blocks, indx])
+    # Add index as column to blocks - to keep track of permutations
+    indx = np.expand_dims(np.arange(in_blocks.shape[0], dtype='int'), 1)
+
+    # Add index and ones cols
+    blocks = np.hstack([ones, in_blocks, indx])
 
     # Generate lexsort order from left to right,
-    # from in_blocks and apply
+    # from in_blocks and apply. Basically we need to apply this
+    # ordering in order to ensure that any whole-block shuffling that occurs,
+    # occurs such that the order is preserved.
     lex_sort_order = np.lexsort([in_blocks[:, -i] for i in range(in_blocks.shape[1])])
     blocks = blocks[lex_sort_order]
     
     # Start always as within grp on the outer layer of exchange blocks
+    # the within_grp arg controls the behavior here.
     permuted_blocks = _within_grp_permute(blocks, rng)
 
     # Reverse initial lex sort
@@ -89,7 +103,7 @@ def permute_blocks(in_blocks, rng):
     # Only need to return the new permuted index
     return permuted_blocks[:, -1]
 
-def block_permutation(x, blocks, random_state=None):
+def block_permutation(x, blocks, random_state=None, within_grp=True):
     '''
     Randomly permute a sequence, or return a permuted range.
     If x is a multi-dimensional array, it is only shuffled along its first index.
@@ -105,7 +119,7 @@ def block_permutation(x, blocks, random_state=None):
     rng = check_random_state(random_state)
 
     # Permute blocks one
-    permuted_indx = permute_blocks(blocks, rng)
+    permuted_indx = permute_blocks(blocks, rng, within_grp=within_grp)
     
     # Return original sequence in new permuted order
     return x[permuted_indx]

@@ -131,7 +131,8 @@ def load_from_csv(cols, csv_loc,
     return data
 
 
-def load_family_block_structure(csv_loc, subjects=None, eventname='baseline_year_1_arm_1'):
+def load_family_block_structure(csv_loc, subjects=None,
+                                eventname='baseline_year_1_arm_1', add_neg_ones=False):
     '''This helper utility loads PALM-style exchanability blocks for ABCD study specific data
     according to right now a fixed set of rules:
 
@@ -159,7 +160,7 @@ def load_family_block_structure(csv_loc, subjects=None, eventname='baseline_year
 
             default = None
 
-     eventname : str, array-like or None, optional
+    eventname : str, array-like or None, optional
         A single eventname as a str in which to specify data by.
 
         For now, this method only supports loading data at a single
@@ -168,6 +169,20 @@ def load_family_block_structure(csv_loc, subjects=None, eventname='baseline_year
         ::
 
             default = 'baseline_year_1_arm_1'
+
+    add_neg_ones : bool, optional
+        If True, add a left-most column
+        with all negative ones representing
+        that swaps should occur within group at
+        the outermost level. Note that if using
+        a permutation function through neurotools
+        that accepts this style of blocks,
+        this outer layer is assumed by default,
+        so this parameter can be left as False.
+
+        ::
+
+            default = False
 
     Returns
     --------
@@ -233,9 +248,12 @@ def load_family_block_structure(csv_loc, subjects=None, eventname='baseline_year
     # Ordinally encode cols
     data['rel_relationship'] = LabelEncoder().fit_transform(data['rel_relationship'])
     data['rel_family_id'] = LabelEncoder().fit_transform(data['rel_family_id'])
-    
-    # Add outer col with -1's
-    data['neg_ones'] = -1
 
-    # The blocks are in a specific order
-    return data[['neg_ones', 'family_type', 'rel_family_id', 'rel_relationship']]
+    # Add outer col with -1's if requested
+    if add_neg_ones:
+        data['neg_ones'] = -1
+
+        return data[['neg_ones', 'family_type', 'rel_family_id', 'rel_relationship']]
+
+    # Default order w/o neg ones
+    return data[['family_type', 'rel_family_id', 'rel_relationship']]
