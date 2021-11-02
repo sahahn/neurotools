@@ -244,18 +244,8 @@ Current supported options are:</p>
 <li><p>’fsaverage3’ : freesurfer3 downsampled average standard space.</p></li>
 <li><p>’32k_fs_LR’ : HCP standard 32k vertex space.</p></li>
 <li><p>’59k_fs_LR’ : HCP standard 59k vertex space.</p></li>
-<li><dl class="simple">
-<dt>’164k_fs_LR’<span class="classifier">HCP standard 164k vertex space. Note,</span></dt><dd><p>while this space has the same number of vertex as
-fsaverage space, it is not the same.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>’native’<span class="classifier">This is set if the passed</span></dt><dd><p>number of values don’t correspond to
-any of the saved defaults.</p>
-</dd>
-</dl>
-</li>
+<li><p>’164k_fs_LR’ : HCP standard 164k vertex space. Note, while this space has the same number of vertex as fsaverage space, it is not the same.</p></li>
+<li><p>’native’ : This is set if the passed number of values don’t correspond to any of the saved defaults, and refers to that the space to plot is in some non-standard space.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
@@ -355,6 +345,31 @@ False is the same as passing 0.
 This allows for fine tuning how much the background image
 is melded with the data shown. The default value is .25.</p>
 <p>This parameter is only used when plotting surfaces.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>view<span class="classifier">str</span></dt><dd><p>If plotting a single surface hemisphere, this
+parameter must be one of:
+{‘lateral’, ‘medial’, ‘dorsal’, ‘ventral’, ‘anterior’, ‘posterior’}
+Where ‘lateral’ is the default view if none is set.</p>
+<p>If instead plotting a collage of surface views, then
+valid view parameters are one of:
+{‘standard’, ‘front back’, ‘front’, ‘back’}
+which correspond to different preset collections of surface views.
+The default is ‘standard’.</p>
+<p>Note: If plotting a collage of surface and volumetric views,
+it is reccomended to keep the default collage ‘standard’ view,
+as the other views have not yet been properly formatted yet.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>figsize<span class="classifier">’default’ or (int, int)</span></dt><dd><p>This parameter is used when axes are not passed, and
+a new figure is being generated. It represents
+the size of the underlying matplotlib figure to plot on.
+The default value for this function varies based on what type of
+plot is being made (e.g., not the same for surface collage vs. single surface).</p>
 </dd>
 </dl>
 </li>

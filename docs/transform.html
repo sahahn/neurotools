@@ -133,7 +133,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -183,7 +183,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -191,6 +191,116 @@
         <article role="main">
           <div class="section" id="transform">
 <h1>transform<a class="headerlink" href="#transform" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="gen-ks-roi-network">
+<h2>gen_ks_roi_network<a class="headerlink" href="#gen-ks-roi-network" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.transform.network.gen_ks_roi_network">
+<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_ks_roi_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_ks_roi_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is designed to generate a network
+of 1 - Kolmogorov–Smirnov distances between groups of different ROIs.</p>
+<p>Specifically, this method calls the function <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/reference/generated/scipy.stats.ks_2samp.html#scipy.stats.ks_2samp" title="(in SciPy v1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.stats.ks_2samp()</span></code></a> between
+each collection of data points in each pair of ROIs, calculating the
+distance between the two distributions. Values are then subtracted from 1,
+such that exact distribution matches have value 1, i.e., these are the
+strongest connections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>1D numpy array</em>) – <p>Data at this stage must be a single dimensional
+numpy array representing the underlying data in which
+the labelled regions correspond to.</p>
+<p>For example, this is typically a subject’s neuroimaging
+data along with corresponding label file in some ROI space.</p>
+</p></li>
+<li><p><strong>labels</strong> (<em>1D numpy array</em>) – Labels in the form of a 1D numpy array with the same shape / len
+as data. This file should contain integer labels
+corresponding to which vertex or data elements belong
+to different ROIs.</p></li>
+<li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, matrices are reshaped into 1D arrays and only their
+flattened lower triangular parts are returned.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>discard_diagonal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, the diagonal elements of the calculated matrix are
+discarded.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>matrix</strong> – Two dimensional array containing the
+1 - Kolmogorov–Smirnov statistic / distances between
+every combination of ROI.</p>
+<p>If vectorize is True, then a 1D array is returned.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1/2D numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+</div>
+<div class="section" id="gen-fs-subj-vertex-network">
+<h2>gen_fs_subj_vertex_network<a class="headerlink" href="#gen-fs-subj-vertex-network" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.transform.network.gen_fs_subj_vertex_network">
+<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_fs_subj_vertex_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subj_dr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thickness'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aparc.a2009s.annot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_fs_subj_vertex_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is helper function for calling
+<a class="reference internal" href="#neurotools.transform.network.gen_ks_roi_network" title="neurotools.transform.network.gen_ks_roi_network"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_ks_roi_network()</span></code></a>, for data organized in
+freesurfer individual subject directory style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subj_dr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The str location of the subject’s freesurfer
+directory in which to generate the ks roi network.</p></li>
+<li><p><strong>modality</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the modality (e.g., thickness, sulc, area, …)
+in which to generate the network. Should
+be saved in subdirectory surf with names:
+<cite>lh.{modality}</cite> and <cite>rh.{modality}</cite></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'thickness'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>parc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the label / parcellation file in which
+to use, as found in subdirectory label with names:
+<cite>lh.{parc}</cite> and <cite>rh.{parc}</cite>.</p>
+<p>These are concatenated internally with function
+<code class="xref py py-func docutils literal notranslate"><span class="pre">merge_parc_hemis()</span></code>.</p>
+<p>The default value is to use the destr. parcellation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'aparc.a2009s.annot'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, matrices are reshaped into 1D arrays and only their
+flattened lower triangular parts are returned.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>discard_diagonal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, the diagonal elements of the calculated matrix are
+discarded.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>matrix</strong> – Two dimensional array containing the
+1 - Kolmogorov–Smirnov statistic / distances between
+every combination of ROI.</p>
+<p>If vectorize is True, then a 1D array is returned.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1/2D numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+</div>
 </div>
 
         </article>
@@ -226,8 +336,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">transform</a><ul>
+<li><a class="reference internal" href="#gen-ks-roi-network">gen_ks_roi_network</a></li>
+<li><a class="reference internal" href="#gen-fs-subj-vertex-network">gen_fs_subj_vertex_network</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

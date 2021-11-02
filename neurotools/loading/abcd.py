@@ -3,6 +3,8 @@ from sklearn.preprocessing import OrdinalEncoder
 from joblib.hashing import hash as joblib_hash
 from sklearn.preprocessing import LabelEncoder
 
+# @TODO add option for caching
+
 def load_from_csv(cols, csv_loc,
                   eventname='baseline_year_1_arm_1',
                   drop_nan=False, encode_cat_as='ordinal'):

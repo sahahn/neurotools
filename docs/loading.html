@@ -272,20 +272,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.48313631, 0.7037346 ],</span>
-<span class="go">       [0.67926679, 0.84119804],</span>
-<span class="go">       [0.37558783, 0.39072626],</span>
-<span class="go">       [0.4184439 , 0.33836107],</span>
-<span class="go">       [0.07446779, 0.93442503]])</span>
+<span class="go">array([[0.90784819, 0.87331148],</span>
+<span class="go">       [0.88934378, 0.55106863],</span>
+<span class="go">       [0.16333973, 0.98984088],</span>
+<span class="go">       [0.28063611, 0.11063653],</span>
+<span class="go">       [0.8223623 , 0.26443052]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.48313631, 0.7037346 ],</span>
-<span class="go">       [0.67926679, 0.84119804],</span>
-<span class="go">       [0.37558783, 0.39072626],</span>
-<span class="go">       [0.4184439 , 0.33836107],</span>
-<span class="go">       [0.07446779, 0.93442503]])</span>
+<span class="go">array([[0.90784819, 0.87331148],</span>
+<span class="go">       [0.88934378, 0.55106863],</span>
+<span class="go">       [0.16333973, 0.98984088],</span>
+<span class="go">       [0.28063611, 0.11063653],</span>
+<span class="go">       [0.8223623 , 0.26443052]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -423,7 +423,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0023293495178222656 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0016834735870361328 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -441,7 +441,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0024306774139404297 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0015990734100341797 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -500,10 +500,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.43757698, 0.        , 0.        , 0.40327146]),</span>
-<span class="go"> array([0.28203329, 0.        , 0.        , 0.49644916]),</span>
-<span class="go"> array([0.63561542, 0.        , 0.        , 0.64579006]),</span>
-<span class="go"> array([0.48899394, 0.        , 0.        , 0.05070223])]</span>
+<span class="go">[array([0.9816605 , 0.        , 0.        , 0.76438806]),</span>
+<span class="go"> array([0.95020092, 0.        , 0.        , 0.28313222]),</span>
+<span class="go"> array([0.51321222, 0.        , 0.        , 0.61385181]),</span>
+<span class="go"> array([0.29641597, 0.        , 0.        , 0.30618624])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -519,14 +519,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61f70&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61400&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c61820&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fefb0c615e0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fe542f0e880&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe542f0e5e0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe542f0e280&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe542f0e700&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.43757698, 0.        , 0.        , 0.40327146])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.9816605 , 0.        , 0.        , 0.76438806])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -549,7 +549,7 @@ and a template path, or alternatively between two dataframes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
+<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
 subjects in which to overlap.
 Where the names correspond in some way to the
 way the way the subject’s data is saved.</p></li>
@@ -577,7 +577,7 @@ be ignored! This parameter is used only with the template_path option.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
+<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
 to overlap with <cite>df</cite>, INSTEAD of a template_path and / or contrast set of arguments.
 Explicitly, if specifying a data_df, a template_path should not be passed!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
@@ -651,7 +651,7 @@ This method uses <a class="reference external" href="https://scikit-learn.org/st
 </li>
 <li><dl class="simple">
 <dt>’one hot’:</dt><dd><p>The variables is one hot encoded, adding columns
-for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.3.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
+for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.3.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
 </dd>
 </dl>
 </li>
@@ -665,11 +665,11 @@ for each unique value. This method uses function <a class="reference external" h
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
+<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
 column <cite>src_subject_id</cite> within the original csv.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -697,7 +697,7 @@ other csv as long as it has columns:
 <dt>Can optionally specify that the block structure be created on a subset of subjects,</dt><dd><p>though if any missing values are present in rel_relationship or rel_family_id
 within this subset, then those will be further dropped.</p>
 <p>If passed as non-null, this should be a valid array-like
-or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
+or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
@@ -721,7 +721,7 @@ this returned structure.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -2,3 +2,7 @@
 
 plotting
 ###########
+
+plot
+==========
+.. autofunction:: plot
