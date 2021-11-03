@@ -7,3 +7,4 @@ settings.json
 doc_src/_build
 .pytest_cache
 .vscode
+neurotools.egg-info
