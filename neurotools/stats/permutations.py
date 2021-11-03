@@ -215,7 +215,7 @@ def permuted_v(tested_vars, target_vars,
 
     # If we are going to use tensorflow
     if use_tf:
-        from _tf_run_permutation import run_permutation, cast_input_to_tensor
+        from ._tf_run_permutation import run_permutation, cast_input_to_tensor
 
         # Cast to tensor
         target_vars, rz, hz, input_matrix, drm, contrast =\
@@ -223,7 +223,7 @@ def permuted_v(tested_vars, target_vars,
                                  drm, contrast, dtype=dtype)
         
     else:
-        from _base_run_permutation import run_permutation
+        from ._base_run_permutation import run_permutation
 
     # Get original scores, pass permutation as None
     original_scores, z = run_permutation(p_set=np.eye(len(input_matrix)),
