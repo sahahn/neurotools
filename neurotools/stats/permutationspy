@@ -152,17 +152,17 @@ def _proc_n_perm_chunks(n_perm, n_jobs):
 
     return n_perm_chunks.astype('int'), int(n_perm)
 
-def permuted_vstats(tested_vars, target_vars,
-                    confounding_vars, n_perm=30,
-                    permutation_structure=None,
-                    variance_groups=None,
-                    within_grp=True,
-                    random_state=None,
-                    use_tf=False,
-                    n_jobs=1,
-                    verbose=0,
-                    dtype=None,
-                    calc_z=False):
+def permuted_v(tested_vars, target_vars,
+               confounding_vars, n_perm=30,
+               permutation_structure=None,
+               variance_groups=None,
+               within_grp=True,
+               random_state=None,
+               use_tf=False,
+               n_jobs=1,
+               verbose=0,
+               dtype=None,
+               calc_z=False):
 
     # Get rng instance from passed random_state
     rng = check_random_state(random_state)
