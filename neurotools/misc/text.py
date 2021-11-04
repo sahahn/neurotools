@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 def name_replace(in_obj, to_replace, replace_with):
     '''Helper function to perform simple text replacement but
@@ -96,3 +97,25 @@ def name_replace(in_obj, to_replace, replace_with):
         return in_obj.rename(col_name_replace, axis=1)
 
     raise RuntimeError(f'type of {in_obj} not supported.')
+
+
+
+def readable_size_to_bytes(size):
+    '''Based on https://stackoverflow.com/questions/42865724/parse-human-readable-filesizes-into-bytes'''
+    
+    # Assume already bytes if fails convert to float
+    try:
+        return float(size)
+    except ValueError:
+        pass
+
+    # Process as str
+    units = {"B": 1, "KB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40}
+    
+    size = size.upper()
+
+    if not re.match(r' ', size):
+        size = re.sub(r'([KMGT]?B)', r' \1', size)
+
+    number, unit = [string.strip() for string in size.split()]
+    return int(float(number)*units[unit])
