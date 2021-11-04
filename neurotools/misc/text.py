@@ -109,13 +109,22 @@ def readable_size_to_bytes(size):
     except ValueError:
         pass
 
-    # Process as str
-    units = {"B": 1, "KB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40}
+    # Process as str, with 2 versions
+    units = {"B": 1,
+             "KB": 2**10, "K": 2**10,
+             "MB": 2**20, "M": 2**20,
+             "GB": 2**30, "G": 2**30,
+             "TB": 2**40, "T": 2**40}
     
+    # Make sure all uppercase
     size = size.upper()
 
+    # Match replace with or w/o B
     if not re.match(r' ', size):
-        size = re.sub(r'([KMGT]?B)', r' \1', size)
+        size = re.sub(r'([KMGT]B?)', r' \1', size)
 
+    # Split number and unit
     number, unit = [string.strip() for string in size.split()]
+
+    # Return number * unit as int
     return int(float(number)*units[unit])

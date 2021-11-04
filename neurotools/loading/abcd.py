@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 from ..misc.text import readable_size_to_bytes
+from ..misc.print import _get_print
 from .. import data_dr
 
 def _base_load_from_csv(cols, csv_loc, eventname):
@@ -63,9 +64,6 @@ def _get_load_hash_str(cols, csv_loc, eventname):
 
 def _get_load_cache_loc(cols, csv_loc, eventname, cache_dr):
 
-     # Proc cache dr argument
-    cache_dr = _get_cache_dr(cache_dr)
-
     # Otherwise, caching behavior is expected
     # Get unique hash for these arguments - with tolerance to order and
     # and a few other things.
@@ -94,7 +92,9 @@ def _order_cache_loaded(data, cols):
     # Apply the ordering and return
     return data[ordered_cols]
 
-def _check_cache_sz_limit(cache_dr, cache_max_sz):
+def _check_cache_sz_limit(cache_dr, cache_max_sz, _print):
+
+    _print('Checking cache size limit', level=2)
 
     # Get full file paths of all cached
     all_cached = [os.path.join(cache_dr, f)
@@ -105,6 +105,8 @@ def _check_cache_sz_limit(cache_dr, cache_max_sz):
 
     # Make sure cache_max_sz as bytes
     cache_max_sz = readable_size_to_bytes(cache_max_sz)
+
+    _print(f'Current saved size is: {size} our of passed cache_max_sz: {cache_max_sz}', level=1)
 
     # If over the current limit
     if size > cache_max_sz:
@@ -128,19 +130,26 @@ def _check_cache_sz_limit(cache_dr, cache_max_sz):
             # Remove cached file
             os.remove(to_remove)
 
+            _print(f'Removed cached file at: {to_remove}', level=2)
+
 
 def _base_cache_load_from_csv(cols, csv_loc, eventname,
-                              cache_dr, cache_max_sz):
+                              cache_dr, cache_max_sz, _print):
 
     # If no caching, base case, just load as normal
     if cache_dr is None:
+        _print(f'No cache_dr specified, loading from {csv_loc}', level=1)
         return _base_load_from_csv(cols, csv_loc, eventname)
+
+    # Make sure cache_dr arg
+    cache_dr = _get_cache_dr(cache_dr)
 
     # Get cache loc
     cache_loc = _get_load_cache_loc(cols, csv_loc, eventname, cache_dr)
 
     # If exists, load from saved
     if os.path.exists(cache_loc):
+        _print(f'Loading from cache_loc: {cache_loc}', level=1)
 
         # Cached data saved as tab seperated, without any index cols
         data = pd.read_csv(cache_loc, sep='\t')
@@ -153,6 +162,7 @@ def _base_cache_load_from_csv(cols, csv_loc, eventname,
 
     # If doesn't yet exist, load like normal
     else:
+        _print(f'No existing cache found, loading from: {csv_loc}', level=1)
 
         # Base load
         data = _base_load_from_csv(cols, csv_loc, eventname)
@@ -160,16 +170,19 @@ def _base_cache_load_from_csv(cols, csv_loc, eventname,
         # Save a copy under the cache_loc as tsv, no index
         data.to_csv(cache_loc, index=False, sep='\t')
 
+        _print(f'Saving loaded data to cache_loc: {cache_loc}', level=1)
+
     # Before returning - check the cache_max_sz argument
     # clearing any files over the limit
-    _check_cache_sz_limit(cache_dr, cache_max_sz)
+    _check_cache_sz_limit(cache_dr, cache_max_sz, _print=_print)
 
     return data
 
 def load_from_csv(cols, csv_loc,
                   eventname='baseline_year_1_arm_1',
                   drop_nan=False, encode_cat_as='ordinal',
-                  cache_dr='default', cache_max_sz='30G'):
+                  cache_dr='default', cache_max_sz='30G',
+                  verbose=0):
     '''Special ABCD Study specific helper utility to load specific
     columns from a csv saved version of the DEAP release RDS
     file or simmilar ABCD specific csv dataset.
@@ -238,6 +251,9 @@ def load_from_csv(cols, csv_loc,
         column `src_subject_id` within the original csv.
 
     '''
+
+    # Get verbose printer
+    _print = _get_print(verbose)
     
     # Handle passing input as single str / column
     if isinstance(cols, str):
@@ -276,17 +292,22 @@ def load_from_csv(cols, csv_loc,
     # to cache this main operation.
     data = _base_cache_load_from_csv(
         cols=cols, csv_loc=csv_loc, eventname=eventname,
-        cache_dr=cache_dr, cache_max_sz=cache_max_sz)
+        cache_dr=cache_dr, cache_max_sz=cache_max_sz, _print=_print)
 
     # Set index as subject id
     data = data.set_index('src_subject_id')
 
     # Optionally drop NaN's
     if drop_nan:
+        original_len = len(data)
         data.dropna(inplace=True)
+        _print(f'Dropping {original_len - len(data)} subjects for missing data.', level=1)
     
     # Ordinally encode any C wrapped vars - categorical vars
+    _print(f'Categorical vars to be encoded =', cat_vars, level=3)
     if len(cat_vars) > 0:
+
+        _print(f'Encoding {len(cat_vars)} categorical vars with {encode_cat_as} encoding.', level=1)
 
         if encode_cat_as == 'ordinal':
             data[cat_vars] = OrdinalEncoder().fit_transform(data[cat_vars])
@@ -302,7 +323,8 @@ def load_from_csv(cols, csv_loc,
 
 def load_family_block_structure(csv_loc, subjects=None,
                                 eventname='baseline_year_1_arm_1',
-                                add_neg_ones=False, cache_dr='default', cache_max_sz='30G'):
+                                add_neg_ones=False, cache_dr='default',
+                                cache_max_sz='30G', verbose=0):
     '''This helper utility loads PALM-style exchanability blocks for ABCD study specific data
     according to right now a fixed set of rules:
 
@@ -364,6 +386,9 @@ def load_family_block_structure(csv_loc, subjects=None,
         this returned structure.
     '''
 
+    # Get verbose printer
+    _print = _get_print(verbose)
+
     # TODO: Add in support for what a block structure with
     # multiple eventnames, i.e., longitudinal data, and what
     #  that would look like.
@@ -374,7 +399,9 @@ def load_family_block_structure(csv_loc, subjects=None,
                          eventname=eventname,
                          drop_nan=False,
                          cache_dr=cache_dr,
-                         cache_max_sz=cache_max_sz)
+                         cache_max_sz=cache_max_sz,
+                         verbose=verbose)
+    _print(f'Loaded data needed with shape: {data.shape}', level=1)
 
     # Set to subset of passed subjects if any,
     if subjects is not None:
