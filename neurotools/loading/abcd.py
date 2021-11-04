@@ -2,21 +2,183 @@ import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 from joblib.hashing import hash as joblib_hash
 from sklearn.preprocessing import LabelEncoder
+import os
+from pathlib import Path
 
-# @TODO add option for caching
+from ..misc.text import readable_size_to_bytes
+from .. import data_dr
+
+def _base_load_from_csv(cols, csv_loc, eventname):
+    '''The actual loading piece'''
+
+    # Load from csv - using abcd specific NaN values
+    data = pd.read_csv(csv_loc,
+                       usecols=['src_subject_id', 'eventname'] + cols,
+                       na_values=['777', 999, '999', 777])
+
+    # If None, keep all and return
+    if eventname is None:
+        return data
+
+    # Otherwise, we assume eventname is list
+    data = data.loc[data[data['eventname'].isin(eventname)].index]
+
+    # If just one eventname, drop the eventname col
+    if len(eventname) == 1:
+        data = data.drop('eventname', axis=1)
+
+    return data
+
+def _get_cache_dr(cache_dr):
+
+    # Process default
+    if cache_dr == 'default':
+        cache_dr = os.path.join(data_dr, 'abcd_csv_cache')
+
+    # Give error if exists and not directory
+    if os.path.exists(cache_dr) and not os.path.isdir(cache_dr):
+        raise RuntimeError(f'Passed cache_dr: {cache_dr} already exists and is not a directory!')
+
+    # Make sure exists if doesn't exist
+    os.makedirs(cache_dr, exist_ok=True)
+
+    return cache_dr
+
+def _get_load_hash_str(cols, csv_loc, eventname):
+
+    # Sort cols for same behavior each time
+    sorted_cols = sorted(cols)
+
+    # Same with eventname, but if None, keep as None
+    try:
+        sorted_eventname = sorted(eventname)
+    except TypeError:
+        sorted_eventname = None
+    
+    # Use base name for csv instead of absolute path
+    csv_base_name = os.path.basename(csv_loc)
+
+    # Return joblib hash
+    return joblib_hash([sorted_cols, csv_base_name, sorted_eventname])
+
+def _get_load_cache_loc(cols, csv_loc, eventname, cache_dr):
+
+     # Proc cache dr argument
+    cache_dr = _get_cache_dr(cache_dr)
+
+    # Otherwise, caching behavior is expected
+    # Get unique hash for these arguments - with tolerance to order and
+    # and a few other things.
+    hash_str = _get_load_hash_str(cols, csv_loc, eventname)
+
+    # Determine loc from hash_str
+    cache_loc = os.path.join(cache_dr, hash_str)
+
+    return cache_loc
+
+def _order_cache_loaded(data, cols):
+    '''When loading from hash we make sure to return as ordered
+    by cols in the cases where the saved copy was saved with a different
+    column order.'''
+
+    # Generate correct ordering
+    ordered_cols = ['src_subject_id']
+
+    # Eventname may or may not be there
+    if 'eventname' in data:
+        ordered_cols += ['eventname']
+
+    # Add rest of cols
+    ordered_cols += cols
+
+    # Apply the ordering and return
+    return data[ordered_cols]
+
+def _check_cache_sz_limit(cache_dr, cache_max_sz):
+
+    # Get full file paths of all cached
+    all_cached = [os.path.join(cache_dr, f)
+                  for f in os.listdir(cache_dr)]
+
+    # Get size of current directory
+    size = sum(os.path.getsize(f) for f in all_cached)
+
+    # Make sure cache_max_sz as bytes
+    cache_max_sz = readable_size_to_bytes(cache_max_sz)
+
+    # If over the current limit
+    if size > cache_max_sz:
+
+        # Sort all cached files from oldest to newest, based
+        # on last modified.
+        old_to_new = sorted(all_cached, key=os.path.getctime)
+
+        # Delete in order from old to new
+        # until under the limit
+        removed, n = 0, 0
+        while size - removed > cache_max_sz:
+
+            # Select next to remove
+            to_remove = old_to_new[n]
+            
+            # Update counters
+            n += 1
+            removed += os.path.getsize(to_remove)
+
+            # Remove cached file
+            os.remove(to_remove)
+
+
+def _base_cache_load_from_csv(cols, csv_loc, eventname,
+                              cache_dr, cache_max_sz):
+
+    # If no caching, base case, just load as normal
+    if cache_dr is None:
+        return _base_load_from_csv(cols, csv_loc, eventname)
+
+    # Get cache loc
+    cache_loc = _get_load_cache_loc(cols, csv_loc, eventname, cache_dr)
+
+    # If exists, load from saved
+    if os.path.exists(cache_loc):
+
+        # Cached data saved as tab seperated, without any index cols
+        data = pd.read_csv(cache_loc, sep='\t')
+
+        # Make sure to updating last modified of file to now
+        Path(cache_loc).touch()
+
+        # Set to correct column order
+        data = _order_cache_loaded(data, cols)
+
+    # If doesn't yet exist, load like normal
+    else:
+
+        # Base load
+        data = _base_load_from_csv(cols, csv_loc, eventname)
+
+        # Save a copy under the cache_loc as tsv, no index
+        data.to_csv(cache_loc, index=False, sep='\t')
+
+    # Before returning - check the cache_max_sz argument
+    # clearing any files over the limit
+    _check_cache_sz_limit(cache_dr, cache_max_sz)
+
+    return data
 
 def load_from_csv(cols, csv_loc,
                   eventname='baseline_year_1_arm_1',
-                  drop_nan=False, encode_cat_as='ordinal'):
+                  drop_nan=False, encode_cat_as='ordinal',
+                  cache_dr='default', cache_max_sz='30G'):
     '''Special ABCD Study specific helper utility to load specific
     columns from a csv saved version of the DEAP release RDS
     file or simmilar ABCD specific csv dataset.
 
     Parameters
     ----------
-    cols : str or array-like
+    cols : str or list-like
         Either a single str with the column name to load,
-        or a list / array-like with the names of multiple columns to
+        or a list / list-like with the names of multiple columns to
         load.
 
         If any variable passed is wrapped in 'C(variable_name)'
@@ -29,7 +191,7 @@ def load_from_csv(cols, csv_loc,
         RDS file for the ABCD Study - or any other comma seperated dataset
         with an eventname column.
 
-    eventname : str, array-like or None, optional
+    eventname : str, list-like or None, optional
         The single eventname as a str, or multiple eventnames
         in which to include results by. If passed as None then
         all avaliable data will be kept.
@@ -77,9 +239,26 @@ def load_from_csv(cols, csv_loc,
 
     '''
     
-    # Handle passing cols as single column
+    # Handle passing input as single str / column
     if isinstance(cols, str):
         cols = [cols]
+    if isinstance(eventname, str):
+        eventname = [eventname]
+
+    # Make sure proper input for cols and eventname
+    # if not list, try to cast to list in case of other list-like
+    if not isinstance(cols, list):
+        try:
+            cols = list(cols)
+        except:
+            raise RuntimeError(f'Passed cols: {cols} must be passed as str or list-like!')
+
+    # Extra is None case for eventname
+    if not isinstance(eventname, list) and eventname is not None:
+        try:
+            eventname = list(eventname)
+        except:
+            raise RuntimeError(f'Passed eventname: {eventname} must be passed as str, list-like or None!')
 
     # Check for any wrapped in C()
     cat_vars = []
@@ -93,25 +272,15 @@ def load_from_csv(cols, csv_loc,
             # Keep track
             cat_vars.append(var_name)
     
-    # Load from csv
-    data = pd.read_csv(csv_loc,
-                       usecols=['src_subject_id', 'eventname'] + cols,
-                       na_values=['777', 999, '999', 777])
-    
-    # Load single eventname only
-    if isinstance(eventname, str):
-        data = data.loc[data[data['eventname'] == eventname].index]
-        
-        # Only drop eventname if a single eventname is kept
-        data = data.drop('eventname', axis=1)
-    
-    # Index by multiple eventnames
-    elif isinstance(eventname, list):
-        data = data.loc[data[data['eventname'].isin(eventname)].index]
+    # Load with optional caching - only need
+    # to cache this main operation.
+    data = _base_cache_load_from_csv(
+        cols=cols, csv_loc=csv_loc, eventname=eventname,
+        cache_dr=cache_dr, cache_max_sz=cache_max_sz)
 
-    # Set index
+    # Set index as subject id
     data = data.set_index('src_subject_id')
-    
+
     # Optionally drop NaN's
     if drop_nan:
         data.dropna(inplace=True)
@@ -132,7 +301,8 @@ def load_from_csv(cols, csv_loc,
 
 
 def load_family_block_structure(csv_loc, subjects=None,
-                                eventname='baseline_year_1_arm_1', add_neg_ones=False):
+                                eventname='baseline_year_1_arm_1',
+                                add_neg_ones=False, cache_dr='default', cache_max_sz='30G'):
     '''This helper utility loads PALM-style exchanability blocks for ABCD study specific data
     according to right now a fixed set of rules:
 
@@ -202,7 +372,9 @@ def load_family_block_structure(csv_loc, subjects=None,
     rel_cols = ['rel_family_id', 'rel_relationship', 'genetic_zygosity_status_1']
     data = load_from_csv(rel_cols, csv_loc,
                          eventname=eventname,
-                         drop_nan=False)
+                         drop_nan=False,
+                         cache_dr=cache_dr,
+                         cache_max_sz=cache_max_sz)
 
     # Set to subset of passed subjects if any,
     if subjects is not None:
