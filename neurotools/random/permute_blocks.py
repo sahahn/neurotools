@@ -63,6 +63,10 @@ def _between_grp_permute(blocks, rng):
 
 def _proc_block_input(in_blocks, within_grp=True):
 
+    # If passed as df, convert to array
+    if isinstance(in_blocks, pd.DataFrame):
+        in_blocks = np.array(in_blocks)
+
     # Passed 1D array case - expand
     if len(in_blocks.shape) == 1:
         in_blocks = np.expand_dims(in_blocks, axis=1)
@@ -123,10 +127,6 @@ def block_permutation(x, blocks, random_state=None, within_grp=True):
     Performs permutations according to passed blocks, where blocks
     are specified with PALM style Exchangeability Blocks.
     '''
-    
-    # Make sure blocks are np array
-    if isinstance(blocks, pd.DataFrame):
-        blocks = np.array(blocks)
     
     # Proc. random state
     rng = check_random_state(random_state)
