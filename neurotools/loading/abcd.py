@@ -277,7 +277,7 @@ def load_from_csv(cols, csv_loc,
             raise RuntimeError(f'Passed eventname: {eventname} must be passed as str, list-like or None!')
 
     # Check for any wrapped in C()
-    use_cols = cols
+    use_cols = cols.copy()
     cat_vars = []
     for i, col in enumerate(use_cols):
         if col.startswith('C(') and col.endswith(')'):
