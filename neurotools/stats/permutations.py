@@ -2,7 +2,6 @@
 import time
 import sys
 import numpy as np
-import scipy
 from sklearn.utils import check_random_state
 from joblib import Parallel, delayed
 
@@ -44,18 +43,21 @@ def _get_perm_matrix(permutation_structure, random_state):
 def _run_permutation_chunks(run_perm_func, original_scores,
                             thread_id, target_vars, rz, hz,
                             input_matrix, variance_groups, drm,
-                            contrast, n_perm_chunk, n_perms, random_state,
+                            contrast, n_perm_chunk, n_perm, random_state,
                             permutation_structure=None, verbose=0,
-                            use_z=False, two_sided_test=True):
+                            use_z=False, two_sided_test=True, use_special_tf=False):
 
-    # If n_perm_chunk is passed as not an int
-    # then this is the case where pre-generated permutations
-    # have been passed
-    if hasattr(n_perm_chunk, '__iter__'):
-        p_sets = n_perm_chunk
-        n_perm_chunk = len(p_sets)
-    else:
-        p_sets = None
+    # If the special tensorflow case, and the first job
+    if use_special_tf and thread_id == 1:
+        from ._tf_run_permutation import run_permutation, cast_input_to_tensor
+
+        # Override the run_perm_func with the tensorflow version
+        run_perm_func = run_permutation
+
+        # Cast input to tensor
+        target_vars, rz, hz, input_matrix, drm, contrast =\
+            cast_input_to_tensor(target_vars, rz, hz, input_matrix,
+                                    drm, contrast, dtype=target_vars.dtype)
 
     # Init starting vars
     t0 = time.time()
@@ -65,17 +67,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
     # Run each permutation
     for i in range(n_perm_chunk):
         
-        # Generate permutation on the fly case
-        if p_sets is None:
-            p_set = _get_perm_matrix(permutation_structure, random_state+i)
-
-        # Pre-generated permutations case
-        else:
-            p_set = p_sets[i]
-            
-            # If sparse, convert to dense
-            if scipy.sparse.issparse(p_set):
-                p_set = p_set.toarray()
+        # Generate permutation on the fly
+        p_set = _get_perm_matrix(permutation_structure, random_state+i)
 
         # Get v stats for this permutation
         perm_scores = run_perm_func(
@@ -100,7 +93,7 @@ def _run_permutation_chunks(run_perm_func, original_scores,
         if verbose > 0:
             step = 11 - min(verbose, 10)
             if i % step == 0:
-                if n_perms == n_perm_chunk:
+                if n_perm == n_perm_chunk:
                     crlf = "\r"
                 else:
                     crlf = "\n"
@@ -140,13 +133,19 @@ def proc_input(tested_vars, confounding_vars):
 
     return X, Z, contrast
 
-def _proc_n_perm_chunks(n_perm, n_jobs):
+def _proc_n_perm_chunks(n_perm, n_jobs, use_special_tf=False, special_tf_job_split=None):
 
-    # If n_perm is not an int, then split the
-    # passed permutations into a list and return that
-    # instead of n_perm_chunks
-    if hasattr(n_perm, '__iter__'):
-        return np.array_split(n_perm, n_jobs), len(n_perm)
+    # Special case
+    if use_special_tf:
+
+        # Set by default 75% of permutations to run on gpu
+        gpu_perms = np.int(np.round(n_perm * special_tf_job_split))
+
+        # Split rest across remaining jobs
+        rest_perm_chunks = _proc_n_perm_chunks(n_perm - gpu_perms, n_jobs-1)
+        
+        # Combine and return
+        return np.concatenate([[gpu_perms], rest_perm_chunks]).astype('int')
 
     # Otherwise, generate n_perm_chunks and return those
     if n_perm > n_jobs:
@@ -155,7 +154,7 @@ def _proc_n_perm_chunks(n_perm, n_jobs):
     else:
         n_perm_chunks = np.ones(n_perm, dtype=int)
 
-    return n_perm_chunks.astype('int'), int(n_perm)
+    return n_perm_chunks.astype('int')
 
 def _proc_dtype(vars):
 
@@ -175,11 +174,12 @@ def _nan_check(vars):
         raise RuntimeError('Currently no missing data is supported in tested_vars, target_vars or confounds_vars.')
     
 
-def permuted_v(tested_vars, target_vars,
-               confounding_vars, n_perm=30,
-               permutation_structure=None,
+def permuted_v(tested_vars,
+               target_vars,
+               confounding_vars,
+               permutation_structure,
+               n_perm=100,
                two_sided_test=True,
-               variance_groups=None,
                within_grp=True,
                random_state=None,
                use_tf=False,
@@ -191,8 +191,20 @@ def permuted_v(tested_vars, target_vars,
 
     # TODO add handle missing-ness better?
 
+    if n_perm < 0:
+        raise RuntimeError('n_perm must be 0 or greater.')
+
     # Get rng instance from passed random_state
     rng = check_random_state(random_state)
+
+    # Special case of n_jobs > 1 and use_tf
+    special_tf_job_split = .75
+    if isinstance(use_tf, float):
+        special_tf_job_split = use_tf
+        use_tf = True
+
+        if special_tf_job_split >= 1 or special_tf_job_split <= 0:
+            raise RuntimeError('use_tf must be between 0 and 1 or True / False.')
 
     # Error if both use_tf and request calculate z
     if use_tf and use_z:
@@ -225,14 +237,9 @@ def permuted_v(tested_vars, target_vars,
     # so default is True
     if demean_confounds:
         confounding_vars -= confounding_vars.mean(axis=0)
-
-    # Proc variance groups if not passed
-    if variance_groups is None:
-        if permutation_structure is None:
-            raise RuntimeError('No variance groups or permutation structure passed! If really no variance groups, you are better off using a standard permuted_ols.')
-        
-        # Calculate variance groups from passed permutation structure
-        variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
+    
+    # Calculate variance groups from passed permutation structure
+    variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
 
     # Process dtype argument if passed
     if dtype is not None:
@@ -258,14 +265,32 @@ def permuted_v(tested_vars, target_vars,
     # Save some memory
     del tested_resid, tested_vars, confounding_vars, confounding_resid
 
-    # If we are going to use tensorflow
-    if use_tf:
-        from ._tf_run_permutation import run_permutation, cast_input_to_tensor
+    if not n_jobs > 0:
+        raise RuntimeError('n_jobs must be 1 or more.')
 
-        # Cast to tensor
-        target_vars, rz, hz, input_matrix, drm, contrast =\
-            cast_input_to_tensor(target_vars, rz, hz, input_matrix,
-                                 drm, contrast, dtype=dtype)
+    # If we are going to use tensorflow
+    use_special_tf = False
+    if use_tf:
+
+        # If n_jobs is 1, base behavior just run tensorflow
+        if n_jobs == 1:
+
+            from ._tf_run_permutation import run_permutation, cast_input_to_tensor
+
+            # Cast to tensor
+            target_vars, rz, hz, input_matrix, drm, contrast =\
+                cast_input_to_tensor(target_vars, rz, hz, input_matrix,
+                                    drm, contrast, dtype=dtype)
+        
+        # Otherwise, special multi-processing case
+        else:
+
+            from ._base_run_permutation import run_permutation
+            
+            # Special tensorflow / cpu case
+            # so we use base cpu permutation for the initial baseline
+            # then use the special
+            use_special_tf = True
         
     else:
         from ._base_run_permutation import run_permutation
@@ -284,7 +309,7 @@ def permuted_v(tested_vars, target_vars,
         original_scores = np.fabs(original_scores)
 
     # Return original scores - if no permutation
-    if not hasattr(n_perm, '__iter__') and n_perm == 0:
+    if n_perm == 0:
 
         # Convert back to signed scores before returning
         if two_sided_test:
@@ -294,7 +319,7 @@ def permuted_v(tested_vars, target_vars,
 
     # Get n_perm_chunks, or also case where is n_perm
     # is pre-generated, splits it by jon
-    n_perm_chunks, n_perms = _proc_n_perm_chunks(n_perm, n_jobs)
+    n_perm_chunks = _proc_n_perm_chunks(n_perm, n_jobs, use_special_tf, special_tf_job_split)
 
     # Submit permutations with joblib
     ret = Parallel(n_jobs=n_jobs)(delayed(_run_permutation_chunks)(
@@ -302,10 +327,11 @@ def permuted_v(tested_vars, target_vars,
         thread_id=thread_id+1, target_vars=target_vars,
         rz=rz, hz=hz, input_matrix=input_matrix,
         variance_groups=variance_groups, drm=drm, contrast=contrast,
-        n_perm_chunk=n_perm_chunk, n_perms=n_perms,
+        n_perm_chunk=n_perm_chunk, n_perm=n_perm,
         random_state=rng.randint(1, np.iinfo(np.int32).max - 1),
         permutation_structure=permutation_structure,
-        verbose=verbose, use_z=use_z, two_sided_test=two_sided_test)
+        verbose=verbose, use_z=use_z, two_sided_test=two_sided_test,
+        use_special_tf=use_special_tf)
         for thread_id, n_perm_chunk in enumerate(n_perm_chunks))
 
     # Collect returned results together
@@ -318,7 +344,7 @@ def permuted_v(tested_vars, target_vars,
     scores_as_ranks = np.sum(scores_as_ranks_parts, axis=0)
  
     # Convert ranks into p-values
-    pvals = (n_perms + 1 - scores_as_ranks) / float(1 + n_perms)
+    pvals = (n_perm + 1 - scores_as_ranks) / float(1 + n_perm)
 
     # Convert back to signed scores before returning
     if two_sided_test:
