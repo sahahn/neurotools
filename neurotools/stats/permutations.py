@@ -106,6 +106,9 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                     "(%0.2f%%, %i seconds remaining)%s"
                     % (thread_id, i, n_perm_chunk, percent, remaining, crlf))
 
+    if verbose > 0:
+        print(f'Job finished in {time.time() - t0}')
+
     return scores_as_ranks_part, h0_vmax_part
 
 def proc_input(tested_vars, confounding_vars):
@@ -150,7 +153,11 @@ def _proc_n_perm_chunks(n_perm, n_jobs, use_special_tf=False, special_tf_job_spl
     # Otherwise, generate n_perm_chunks and return those
     if n_perm > n_jobs:
         n_perm_chunks = np.asarray([n_perm / n_jobs] * n_jobs, dtype=int)
-        n_perm_chunks[-1] += n_perm % n_jobs
+
+        # Distribute rest to remaining
+        remaining = n_perm % n_jobs
+        for r in range(remaining):
+            n_perm_chunks[r] += 1
     else:
         n_perm_chunks = np.ones(n_perm, dtype=int)
 
@@ -322,7 +329,7 @@ def permuted_v(tested_vars,
     n_perm_chunks = _proc_n_perm_chunks(n_perm, n_jobs, use_special_tf, special_tf_job_split)
 
     # Submit permutations with joblib
-    ret = Parallel(n_jobs=n_jobs)(delayed(_run_permutation_chunks)(
+    ret = Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(_run_permutation_chunks)(
         run_perm_func=run_permutation, original_scores=original_scores,
         thread_id=thread_id+1, target_vars=target_vars,
         rz=rz, hz=hz, input_matrix=input_matrix,

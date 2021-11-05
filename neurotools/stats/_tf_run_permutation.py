@@ -22,6 +22,22 @@ def calc_den_fast(c, cte, r):
     # Apply the contrast to extract correct pieces, and return squeezed
     return tnp.squeeze(tf.transpose((tf.transpose(c) @ cte_inv @ c), perm=[1, 2, 0]))
 
+@tf.function
+def proc_vg(vg_idx, drm, res, input_matrix):
+
+    # Sum the diag resid matrix for this variance group
+    diag_resid_sum_vg = tnp.sum(drm[vg_idx], axis=0)
+
+    # Divide by sum-squared residuals
+    weights_vg = diag_resid_sum_vg / tnp.sum(tnp.square(res[vg_idx]), axis=0)
+
+    # Get correct piece of input matrix
+    input_matrix_vg = tf.transpose(input_matrix[vg_idx]) @ input_matrix[vg_idx]
+
+    # Perform matrix dot product between weights_vg and input_matrix_vg
+    return tnp.dot(tnp.expand_dims(tf.reshape(input_matrix_vg, [-1]), axis=1),
+                   tnp.expand_dims(weights_vg, axis=0))
+
 def fastv(input_matrix, psi, res,
           variance_groups, drm, contrast):
     '''Note, this version of fastv does not calculate df2.'''
@@ -33,23 +49,11 @@ def fastv(input_matrix, psi, res,
 
     # Process each variance group
     for vg in np.unique(variance_groups):
-        
+
         # Get index of the current vg
         vg_idx = variance_groups == vg
-
-        # Sum the diag resid matrix for this variance group
-        diag_resid_sum_vg = tnp.sum(drm[vg_idx], axis=0)
-
-        # Divide by sum-squared residuals
-        weights_vg = diag_resid_sum_vg / tnp.sum(tnp.square(res[vg_idx]), axis=0)
-
-        # Get correct piece of input matrix
-        input_matrix_vg = tf.transpose(input_matrix[vg_idx]) @ input_matrix[vg_idx]
-
-        # Perform matrix dot product between weights_vg and input_matrix_vg
-        cte = cte + (tnp.dot(tnp.expand_dims(tf.reshape(input_matrix_vg, [-1]), axis=1),
-                     tnp.expand_dims(weights_vg, axis=0)))
-
+        cte += proc_vg(vg_idx, drm, res, input_matrix)
+      
     # Calc rest of v and return
     return tf.transpose(contrast) @ psi / tnp.sqrt(
         calc_den_fast(contrast, cte, r))
