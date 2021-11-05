@@ -45,8 +45,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             thread_id, target_vars, rz, hz,
                             input_matrix, variance_groups, drm,
                             contrast, n_perm_chunk, n_perms, random_state,
-                            permutation_structure=None,
-                            verbose=0, use_z=False):
+                            permutation_structure=None, verbose=0,
+                            use_z=False, two_sided_test=True):
 
     # If n_perm_chunk is passed as not an int
     # then this is the case where pre-generated permutations
@@ -82,6 +82,10 @@ def _run_permutation_chunks(run_perm_func, original_scores,
             p_set=p_set, target_vars=target_vars, rz=rz, hz=hz,
             input_matrix=input_matrix, variance_groups=variance_groups,
             drm=drm, contrast=contrast, use_z=use_z)
+        
+        # Convert perm scores to to absolute values if two sides
+        if two_sided_test:
+            perm_scores = np.fabs(perm_scores)
 
         # Add max v stat
         h0_vmax_part[i] = np.nanmax(perm_scores)
@@ -174,6 +178,7 @@ def _nan_check(vars):
 def permuted_v(tested_vars, target_vars,
                confounding_vars, n_perm=30,
                permutation_structure=None,
+               two_sided_test=True,
                variance_groups=None,
                within_grp=True,
                random_state=None,
@@ -183,8 +188,6 @@ def permuted_v(tested_vars, target_vars,
                dtype=None,
                use_z=False,
                demean_confounds=True):
-
-    # TODO add two sided test
 
     # TODO add handle missing-ness better?
 
@@ -275,8 +278,18 @@ def permuted_v(tested_vars, target_vars,
                                       drm=drm, contrast=contrast,
                                       use_z=use_z)
 
+    # If two sided test, get absolute value of the scores
+    if two_sided_test:
+        original_scores_sign = np.sign(original_scores)
+        original_scores = np.fabs(original_scores)
+
     # Return original scores - if no permutation
     if not hasattr(n_perm, '__iter__') and n_perm == 0:
+
+        # Convert back to signed scores before returning
+        if two_sided_test:
+            original_scores *= original_scores_sign
+
         return np.asarray([]), original_scores, np.asarray([])
 
     # Get n_perm_chunks, or also case where is n_perm
@@ -291,7 +304,8 @@ def permuted_v(tested_vars, target_vars,
         variance_groups=variance_groups, drm=drm, contrast=contrast,
         n_perm_chunk=n_perm_chunk, n_perms=n_perms,
         random_state=rng.randint(1, np.iinfo(np.int32).max - 1),
-        permutation_structure=permutation_structure, verbose=verbose, use_z=use_z)
+        permutation_structure=permutation_structure,
+        verbose=verbose, use_z=use_z, two_sided_test=two_sided_test)
         for thread_id, n_perm_chunk in enumerate(n_perm_chunks))
 
     # Collect returned results together
@@ -306,5 +320,8 @@ def permuted_v(tested_vars, target_vars,
     # Convert ranks into p-values
     pvals = (n_perms + 1 - scores_as_ranks) / float(1 + n_perms)
 
-    # Return
+    # Convert back to signed scores before returning
+    if two_sided_test:
+        original_scores *= original_scores_sign
+
     return pvals, original_scores, h0_vmax
