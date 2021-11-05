@@ -45,7 +45,7 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             thread_id, target_vars, rz, hz,
                             input_matrix, variance_groups, drm,
                             contrast, n_perm_chunk, n_perms, random_state,
-                            permutation_structure=None, verbose=0):
+                            permutation_structure=None, verbose=0, use_z=False):
 
     # If n_perm_chunk is passed as not an int
     # then this is the case where pre-generated permutations
@@ -77,10 +77,10 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                 p_set = p_set.toarray()
 
         # Get v stats for this permutation
-        perm_scores, _ = run_perm_func(
+        perm_scores = run_perm_func(
             p_set=p_set, target_vars=target_vars, rz=rz, hz=hz,
             input_matrix=input_matrix, variance_groups=variance_groups,
-            drm=drm, contrast=contrast)
+            drm=drm, contrast=contrast, uze_z=use_z)
 
         # Add max v stat
         h0_vmax_part[i] = np.nanmax(perm_scores)
@@ -162,14 +162,14 @@ def permuted_v(tested_vars, target_vars,
                n_jobs=1,
                verbose=0,
                dtype=None,
-               calc_z=False):
+               use_z=False):
 
     # Get rng instance from passed random_state
     rng = check_random_state(random_state)
 
     # Error if both use_tf and request calculate z
-    if use_tf and calc_z:
-        raise RuntimeError('calc_z is not currently supported with tensorflow version.')
+    if use_tf and use_z:
+        raise RuntimeError('use_z is not currently supported with tensorflow version.')
     
     # Make sure input correct
     if len(tested_vars.shape) == 1:
@@ -226,17 +226,15 @@ def permuted_v(tested_vars, target_vars,
         from ._base_run_permutation import run_permutation
 
     # Get original scores, pass permutation as None
-    original_scores, z = run_permutation(p_set=np.eye(len(input_matrix)),
-                                         target_vars=target_vars,
-                                         rz=rz, hz=hz, input_matrix=input_matrix,
-                                         variance_groups=variance_groups,
-                                         drm=drm, contrast=contrast,
-                                         calc_z=calc_z)
+    original_scores = run_permutation(p_set=np.eye(len(input_matrix)),
+                                      target_vars=target_vars,
+                                      rz=rz, hz=hz, input_matrix=input_matrix,
+                                      variance_groups=variance_groups,
+                                      drm=drm, contrast=contrast,
+                                      use_z=use_z)
 
     # Return original scores - if no permutation
     if not hasattr(n_perm, '__iter__') and n_perm == 0:
-        if calc_z:
-            return np.asarray([]), original_scores, np.asarray([]), z
         return np.asarray([]), original_scores, np.asarray([])
 
     # Get n_perm_chunks, or also case where is n_perm
@@ -251,7 +249,7 @@ def permuted_v(tested_vars, target_vars,
         variance_groups=variance_groups, drm=drm, contrast=contrast,
         n_perm_chunk=n_perm_chunk, n_perms=n_perms,
         random_state=rng.randint(1, np.iinfo(np.int32).max - 1),
-        permutation_structure=permutation_structure, verbose=verbose)
+        permutation_structure=permutation_structure, verbose=verbose, use_z=use_z)
         for thread_id, n_perm_chunk in enumerate(n_perm_chunks))
 
     # Collect returned results together
@@ -266,10 +264,5 @@ def permuted_v(tested_vars, target_vars,
     # Convert ranks into p-values
     pvals = (n_perms + 1 - scores_as_ranks) / float(1 + n_perms)
 
-    # Two return cases with and w/o z
-    if calc_z:
-        return pvals, original_scores, h0_vmax, z
+    # Return
     return pvals, original_scores, h0_vmax
-
-
-

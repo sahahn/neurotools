@@ -59,7 +59,10 @@ def freedmanlane(p_set, target_vars, rz, hz):
 
 def run_permutation(p_set, target_vars, rz, hz,
                     input_matrix, variance_groups,
-                    drm, contrast, calc_z=False):
+                    drm, contrast, use_z=False):
+
+    if use_z:
+        raise RuntimeError('use_z not supported with tensorflow.')
 
     # Need to convert each passed permutation to Tensor
     # w/ the same type as target

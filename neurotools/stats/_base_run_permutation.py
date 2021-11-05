@@ -124,7 +124,7 @@ def fastv_with_df(input_matrix, psi, res, variance_groups, drm, contrast):
 
 def run_permutation(p_set, target_vars, rz, hz,
                     input_matrix, variance_groups,
-                    drm, contrast, calc_z=False):
+                    drm, contrast, use_z=False):
 
     # Make sure passed p_set has same dtype as target vars
     p_set = p_set.astype(target_vars.dtype.name)
@@ -138,7 +138,7 @@ def run_permutation(p_set, target_vars, rz, hz,
     del Y
 
     # Base case, just compute v
-    if not calc_z:
+    if not use_z:
         v = fastv(input_matrix=input_matrix, psi=psi, res=res,
                 variance_groups=variance_groups, drm=drm,
                 contrast=contrast)
@@ -152,6 +152,6 @@ def run_permutation(p_set, target_vars, rz, hz,
     # Calculate z from v
     z = g_to_z(v, df2)
 
-    # Return both v and z
-    return np.squeeze(v), z
+    # Return just z instead
+    return z
 

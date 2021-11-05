@@ -277,13 +277,14 @@ def load_from_csv(cols, csv_loc,
             raise RuntimeError(f'Passed eventname: {eventname} must be passed as str, list-like or None!')
 
     # Check for any wrapped in C()
+    use_cols = cols
     cat_vars = []
-    for i, col in enumerate(cols):
+    for i, col in enumerate(use_cols):
         if col.startswith('C(') and col.endswith(')'):
             var_name = col[2:-1]
 
             # Replace with unwrapped
-            cols[i] = var_name
+            use_cols[i] = var_name
 
             # Keep track
             cat_vars.append(var_name)
@@ -291,7 +292,7 @@ def load_from_csv(cols, csv_loc,
     # Load with optional caching - only need
     # to cache this main operation.
     data = _base_cache_load_from_csv(
-        cols=cols, csv_loc=csv_loc, eventname=eventname,
+        cols=use_cols, csv_loc=csv_loc, eventname=eventname,
         cache_dr=cache_dr, cache_max_sz=cache_max_sz, _print=_print)
 
     # Set index as subject id
