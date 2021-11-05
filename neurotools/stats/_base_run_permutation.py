@@ -142,7 +142,7 @@ def run_permutation(p_set, target_vars, rz, hz,
         v = fastv(input_matrix=input_matrix, psi=psi, res=res,
                 variance_groups=variance_groups, drm=drm,
                 contrast=contrast)
-        return np.squeeze(v), None
+        return np.squeeze(v)
 
     # Otherwise, special case, compute z as well
     v, df2 = fastv_with_df(input_matrix=input_matrix, psi=psi, res=res,

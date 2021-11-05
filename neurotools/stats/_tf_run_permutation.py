@@ -82,4 +82,4 @@ def run_permutation(p_set, target_vars, rz, hz,
               contrast=contrast)
     
     # Return as numpy array for max compat
-    return np.array(tnp.squeeze(v)), None
+    return np.array(tnp.squeeze(v))

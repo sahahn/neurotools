@@ -45,7 +45,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             thread_id, target_vars, rz, hz,
                             input_matrix, variance_groups, drm,
                             contrast, n_perm_chunk, n_perms, random_state,
-                            permutation_structure=None, verbose=0, use_z=False):
+                            permutation_structure=None,
+                            verbose=0, use_z=False):
 
     # If n_perm_chunk is passed as not an int
     # then this is the case where pre-generated permutations
@@ -80,7 +81,7 @@ def _run_permutation_chunks(run_perm_func, original_scores,
         perm_scores = run_perm_func(
             p_set=p_set, target_vars=target_vars, rz=rz, hz=hz,
             input_matrix=input_matrix, variance_groups=variance_groups,
-            drm=drm, contrast=contrast, uze_z=use_z)
+            drm=drm, contrast=contrast, use_z=use_z)
 
         # Add max v stat
         h0_vmax_part[i] = np.nanmax(perm_scores)
