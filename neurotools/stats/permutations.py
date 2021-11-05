@@ -153,6 +153,24 @@ def _proc_n_perm_chunks(n_perm, n_jobs):
 
     return n_perm_chunks.astype('int'), int(n_perm)
 
+def _proc_dtype(vars):
+
+    # Passed as int cases
+    if 'int' in vars.dtype.name:
+
+        if vars.dtype.name == 'int64':
+            return vars.astype('float64')
+
+        # Default other case
+        return vars.astype('float32')
+
+    return vars
+
+def _nan_check(vars):
+    if np.isnan(vars).any():
+        raise RuntimeError('Currently no missing data is supported in tested_vars, target_vars or confounds_vars.')
+    
+
 def permuted_v(tested_vars, target_vars,
                confounding_vars, n_perm=30,
                permutation_structure=None,
@@ -163,7 +181,12 @@ def permuted_v(tested_vars, target_vars,
                n_jobs=1,
                verbose=0,
                dtype=None,
-               use_z=False):
+               use_z=False,
+               demean_confounds=True):
+
+    # TODO add two sided test
+
+    # TODO add handle missing-ness better?
 
     # Get rng instance from passed random_state
     rng = check_random_state(random_state)
@@ -175,12 +198,30 @@ def permuted_v(tested_vars, target_vars,
     # Make sure input correct
     if len(tested_vars.shape) == 1:
         tested_vars = np.expand_dims(tested_vars, axis=1)
-
+   
     if tested_vars.shape[1] > 1:
         raise RuntimeError('You may not pass more than one vars to test!')
 
     if len(confounding_vars.shape) == 1:
         confounding_vars = np.expand_dims(confounding_vars, axis=1)
+    
+    # Check for nans
+    _nan_check(confounding_vars)
+    _nan_check(tested_vars)
+    _nan_check(target_vars)
+
+    # Proc dtype
+    confounding_vars = _proc_dtype(confounding_vars)
+    tested_vars = _proc_dtype(tested_vars)
+    target_vars = _proc_dtype(target_vars)
+
+    # TODO make sure all the same dtype
+
+    # Optionally de-mean confounds, prevents common
+    # problems, especially when passing dummy coded variables
+    # so default is True
+    if demean_confounds:
+        confounding_vars -= confounding_vars.mean(axis=0)
 
     # Proc variance groups if not passed
     if variance_groups is None:
