@@ -98,8 +98,6 @@ def name_replace(in_obj, to_replace, replace_with):
 
     raise RuntimeError(f'type of {in_obj} not supported.')
 
-
-
 def readable_size_to_bytes(size):
     '''Based on https://stackoverflow.com/questions/42865724/parse-human-readable-filesizes-into-bytes'''
     
@@ -128,3 +126,51 @@ def readable_size_to_bytes(size):
 
     # Return number * unit as int
     return int(float(number)*units[unit])
+
+def substrs(x):
+    return {x[i:i+j] for i in range(len(x)) for j in range(len(x) - i + 1)}
+
+def find_substr(data):
+
+    s = substrs(data[0])
+
+    for val in data[1:]:
+        s.intersection_update(substrs(val))
+
+    try:
+        mx = max(s, key=len)
+
+    except ValueError:
+        mx = ''
+
+    return mx
+
+def get_top_substrs(keys):
+
+    found = []
+    top = find_substr(keys)
+
+    while len(top) > 1:
+        found.append(top)
+
+        keys = [k.replace(top, '') for k in keys]
+        top = find_substr(keys)
+
+    return found
+
+def get_unique_str_markers(strs):
+
+    # Get all top common sub strings
+    top_substrs = get_top_substrs(strs)
+
+    # Remove all common strs from each individual str
+    unique_strs = []
+    for s in strs:
+        piece = s
+        for substr in top_substrs:
+            piece = piece.replace(substr, '')
+
+        # Add final
+        unique_strs.append(piece)
+
+    return unique_strs

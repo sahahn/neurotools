@@ -3,6 +3,8 @@ from nilearn.surface import load_surf_data
 import numpy as np
 import nibabel as nib
 import os
+from ..misc.text import get_unique_str_markers
+from ..misc.print import _get_print
 from .. import data_dr as def_data_dr
 
 def save_mapping(mapping, loc):
@@ -38,7 +40,7 @@ def get_col_names(df):
 
     return name_col, value_col
 
-def get_roi_dict(data, i_keys=[], d_keys=[]):
+def get_roi_dict(data, i_keys=None, d_keys=None):
     '''If data is a df, with assume that the data is stored in two columns
     with name of ROI in one, and value in the other. Otherwise, if data is 
     a dictionary, assume that it is already in name of ROI, value form.
@@ -47,13 +49,19 @@ def get_roi_dict(data, i_keys=[], d_keys=[]):
     in the name of the roi for it to be kept, d_keys is a list / single item
     where if any of the d_keys are present in an roi it will be dropped.
     '''
+
+    if i_keys is None:
+        i_keys = []
+    if d_keys is None:
+        d_keys = []
     
     if not isinstance(i_keys, list):
         i_keys = [i_keys]
     if not isinstance(d_keys, list):
         d_keys = [d_keys]
         
-    # If not dict, assume pandas df with 2 columns
+    # If not dict, assume pandas dataframe with 2 columns
+    # and convert to dictionary
     if not isinstance(data, dict):
 
         as_dict = {}
@@ -65,20 +73,24 @@ def get_roi_dict(data, i_keys=[], d_keys=[]):
 
         data = as_dict
 
+    # Make a dict processing the passed i and d keys
     spec_data = {}
-
     for name in data:
         if all([key in name for key in i_keys]) and not any([key in name for key in d_keys]):
-            spec_data[name] = data[name]
+                spec_data[name] = data[name]
 
-    return spec_data
+    # Generate list of alt names
+    u_markers = get_unique_str_markers(list(spec_data))
+
+    return spec_data, u_markers
 
 class Ref():
     
-    def __init__(self, space, parc, data_dr='default'):
+    def __init__(self, space, parc, data_dr='default', verbose=0):
                
         self.space = space
         self.parc = parc
+        self._print = _get_print(verbose)
 
         if data_dr == 'default':
             data_dr = def_data_dr
@@ -95,6 +107,7 @@ class Ref():
         try:
             self.mapping = load_mapping(map_loc + 'mapping.txt')
             self.label_2_int = load_mapping(map_loc + 'label_2_int.txt')
+            self._print('Loaded mapping and label_2_int dicts.', level=2)
         except FileNotFoundError:
             self.mapping = None
             self.label_2_int = None
@@ -113,36 +126,72 @@ class Ref():
         key = key.replace('_', ' ')
         
         return key
+
+    def find_ref_ind(self, name, alt_name=None, i_keys=None):
+        
+        # Keep copy of original name for verbose print
+        original_name = name
+
+        # Base transform roi name
+        name = self.key_transform(name)
+
+        # Apply the mapping
+        for key in self.mapping:
+            trans_key = self.key_transform(key)
+
+            if trans_key in name:
+                name = name.replace(trans_key, self.key_transform(self.mapping[key]))
+
+        # Find the ind
+        for label in self.label_2_int:
+            trans_label = self.key_transform(label)
+
+            if trans_label in name:
+                ind = int(self.label_2_int[label])
+                self._print(f'Mapping: {original_name} -> {label}.', level=1)
+                return ind
+
+        # First pass if doesn't find is to try again, but with all i_keys removed
+        if i_keys is not None:
+            next_name = original_name
+            for key in i_keys:
+                next_name = next_name.replace(key, '')
+
+            self._print(f'Did not find roi for {original_name}, trying with {next_name}', level=2)
+            return self.find_ref_ind(next_name, alt_name=alt_name, i_keys=None)
+
+        # If still didn't find, try again with the passed alt name
+        if alt_name is not None:
+            self._print(f'Did not find roi for {name}, trying with {alt_name}', level=2)
+            return self.find_ref_ind(alt_name, alt_name=None, i_keys=i_keys)
+
+        # If error, print out the true region names
+        self._print('Note that the passed values must be able to map on in some way to one of these regions:',
+                    list(self.label_2_int), level=0)
+
+        # If didn't find with alt name also
+        raise RuntimeError(f'Could not find matching roi for {name}!')
     
-    def get_plot_vals(self, data, hemi=None, i_keys=[], d_keys=[]):
+    def get_plot_vals(self, data, hemi=None, i_keys=None, d_keys=None):
         
-        roi_dict = get_roi_dict(data, i_keys, d_keys)
+        # Get base roi dict
+        roi_dict, roi_alt_names = get_roi_dict(data, i_keys, d_keys)
         
+        # Get ref vals
         ref_vals = self.get_ref_vals(hemi)
+
+        # Init plot vals
         plot_vals = np.zeros(np.shape(ref_vals))
 
-        for name in roi_dict:
+        for name, alt_name in zip(roi_dict, roi_alt_names):
+
+            # Get plot value
             value = roi_dict[name]
 
-            name = self.key_transform(name)
+            # Try to find the name in the reference values
+            ind = self.find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
 
-            # Apply the mapping
-            for key in self.mapping:
-                trans_key = self.key_transform(key)
-
-                if trans_key in name:
-                    name = name.replace(trans_key, self.key_transform(self.mapping[key]))
-
-            # Find the ind
-            for label in self.label_2_int:
-                trans_label = self.key_transform(label)
-
-                if trans_label in name:
-                    ind = int(self.label_2_int[label])
-                    break
-            else:
-                print('Could not find ind for', name, 'are you using the right parc?')
-
+            # Set the proper values based on the found index
             plot_vals = np.where(ref_vals == ind, value, plot_vals)
 
         return plot_vals
@@ -150,9 +199,10 @@ class Ref():
 class SurfRef(Ref):
     
     def __init__(self, space='fsaverage5', parc='destr',
-                 data_dr='default', surf_mesh=None, bg_map=None):
+                 data_dr='default', surf_mesh=None,
+                 bg_map=None, verbose=0):
 
-        super().__init__(space, parc, data_dr)
+        super().__init__(space, parc, data_dr, verbose=verbose)
 
         self.surf_mesh = surf_mesh
         self.bg_map = bg_map
@@ -160,6 +210,7 @@ class SurfRef(Ref):
     def load_ref(self):
 
         ref_loc = os.path.join(self.data_dr, self.space, 'label')
+        self._print(f'Using base ref_loc = {ref_loc}', level=2)
 
         lh_loc = os.path.join(ref_loc, 'lh.' + self.parc)
         if os.path.exists(lh_loc + '.annot'):
@@ -223,8 +274,8 @@ class SurfRef(Ref):
 
 class VolRef(Ref):
     
-    def __init__(self, space='mni_1mm', parc='aseg', data_dr='default'):
-        super().__init__(space, parc, data_dr)
+    def __init__(self, space='mni_1mm', parc='aseg', data_dr='default', verbose=0):
+        super().__init__(space, parc, data_dr, verbose=verbose)
     
     @property
     def shape(self):
@@ -233,6 +284,7 @@ class VolRef(Ref):
     def load_ref(self):
         
         ref_loc = os.path.join(self.data_dr, self.space)
+        self._print(f'Using base ref_loc = {ref_loc}', level=2)
         
         # Get w/ flexible to different file extension
         options = os.listdir(ref_loc)
