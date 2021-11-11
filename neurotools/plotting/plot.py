@@ -62,6 +62,7 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     return vmin, vmax
 
+
 def _proc_threshold(data, threshold, percentile=75, rois=False):
     
     # Only proc if left at auto
