@@ -6,6 +6,7 @@ import os
 from nibabel.cifti2 import Cifti2BrainModel
 from .. import data_dr
 from ..loading import load
+from ..parc import clean_parcel_labels
 
 
 def _remove_medial_wall(fill_cifti, parcel, index_map, _print=None):
@@ -119,13 +120,16 @@ def prob_parc_to_cifti(parcel, index_map, _print=None):
     return np.stack(cort_slabs + subcort_slabs, axis=1)
 
 
-def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, verbose=0):
+def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, clean_parc=True, verbose=0):
     '''For now just works when parcel file is a parcellation
     in combined fs_LR_32k lh+rh space with medial wall included.
     Works for static or prob.
 
     Note: Assumes 0 is background for verbose statements, e.g.,
     when printing info about number of unique regions.
+
+    If clean_parc, then make sure the final parcellations contain
+    unique values in order with no missing labels
     '''
 
     _print = _get_print(verbose=verbose)
@@ -141,11 +145,17 @@ def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, verbose=0):
         return prob_parc_to_cifti(parcel, index_map, _print=_print)
 
     # Static case
-    return _static_parc_to_cifti(parcel=parcel, index_map=index_map,
-                                 add_sub=add_sub, _print=_print)
+    static = _static_parc_to_cifti(parcel=parcel, index_map=index_map,
+                                   add_sub=add_sub, _print=_print)
+
+    # Optionally clean labels
+    if clean_parc:
+        static =  clean_parcel_labels(static)
+
+    return static
 
 def add_surface_medial_walls(data):
-    '''Right now only works with just concat'ed surface level data'''
+    '''Right now only works with just concat'ed surface level data.'''
     
     # Load index maps
     if isinstance(data, nib.Cifti2Image):

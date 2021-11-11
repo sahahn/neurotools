@@ -16,12 +16,10 @@ def load(f, index_slice=None):
 
     Parameters
     ----------
-    f : file path
-        The location / file path of the data to load.
-
-        Note: This function can also accept non-file path's
-        e.g., can accept directly numpy :func:`arrays<numpy.array>` or objects from
-        nibabel.
+    f : str, :func:`arrays<numpy.array>` or other
+        The location / file path of the data to load passed
+        as a str, or can accept directly numpy :func:`arrays<numpy.array>`
+        or objects from nibabel, ect...
 
     index_slice : slices, tuple of slices, or :data:`None`, optional
         You may optional pass index slicing here.
