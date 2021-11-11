@@ -135,8 +135,14 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
             lh_data = _load(data['lh'])
         if 'rh' in data:
             rh_data = _load(data['rh'])
+        if 'concat' in data:
+            sz = len(data['concat']) // 2
+            lh_data, rh_data = _load(data['concat'][:sz]), _load(data['concat'][sz:])
         if 'sub' in data:
             sub_data = _load(data['sub'])
+
+        if 'vol' in data:
+            sub_data = _load(data['vol'])
 
     # Passed just single subcort case
     elif isinstance(data, nib.Nifti1Image):
