@@ -147,10 +147,9 @@ def surf_parc_to_cifti(cifti_file, parcel, add_sub=True, clean_parc=True, verbos
     # Static case
     static = _static_parc_to_cifti(parcel=parcel, index_map=index_map,
                                    add_sub=add_sub, _print=_print)
-
     # Optionally clean labels
     if clean_parc:
-        static =  clean_parcel_labels(static)
+        static = clean_parcel_labels(static)
 
     return static
 

@@ -18,7 +18,7 @@ def _proc_background_label(data, background_label):
 
     return data
 
-def merge_parc_hemis(lh, rh, background_label=0, merge_thresh=.75):
+def merge_parc_hemis(lh, rh, background_label=0, merge_thresh=.75, clean_parc=True):
     '''This function is designed to help merge two surface parcellations when
     saved in separate files or data arrays.
 
@@ -57,6 +57,14 @@ def merge_parc_hemis(lh, rh, background_label=0, merge_thresh=.75):
         ::
 
             default = .75
+
+    clean_parc : bool, optional
+        If True, ensures that labels are set to be 0 to n-1
+        removing any labels that are not sequential.
+
+        ::
+
+            default = True
     '''
 
     assert merge_thresh >= 0, 'Cannot be negative.'
@@ -85,6 +93,10 @@ def merge_parc_hemis(lh, rh, background_label=0, merge_thresh=.75):
 
     # Otherwise, just concatenate as is
     data = np.concatenate([lh, rh])
+
+    # Optionally clean parc labels
+    if clean_parc:
+        data = clean_parcel_labels(data)
 
     return data
 
