@@ -6,7 +6,7 @@ import os
 from nibabel.cifti2 import Cifti2BrainModel
 from .. import data_dr
 from ..loading import load
-from ..parc import clean_parcel_labels
+from .parc import clean_parcel_labels
 
 
 def _remove_medial_wall(fill_cifti, parcel, index_map, _print=None):
