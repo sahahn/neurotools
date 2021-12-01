@@ -11,7 +11,7 @@ from ..misc.print import _get_print
 def _gifti_to_np(data):
     return np.asarray([arr.data for arr in data.darrays]).T.squeeze()
 
-def load(f, index_slice=None):
+def load(f, index_slice=None, dtype=None):
     '''Smart loading function for neuro-imaging type data.
 
     Parameters
@@ -40,6 +40,17 @@ def load(f, index_slice=None):
         but if you wanted something more complex, e.g. passing
         something like :python:`my_array[1:5:2, ::3]` you should pass
         :python:`(slice(1,5,2), slice(None,None,3))` here.
+
+        ::
+
+            default = None
+
+    dtype : str or None, optional
+        The data type in which to cast loaded data to.
+        If left as None, keep original data type, otherwise
+        can pass as a string name of datatype to cast to.
+        For example, 'float32' to cast to 32 bit floating point
+        precision.
 
         ::
 
@@ -96,6 +107,15 @@ def load(f, index_slice=None):
         load(data, index_slice=(slice(None), slice(0, 2)))
 
     '''
+
+    def _proc(data):
+        '''Helper func, squeezes data and returns
+        with correct data type'''
+
+        if dtype is not None:
+            return np.squeeze(data.astype(dtype))
+        
+        return np.squeeze(data)
     
     # If already numpy array, return of as is
     if type(f) is np.ndarray:
@@ -151,7 +171,7 @@ def load(f, index_slice=None):
             elif index_slice is not None:
                 
                 # Return directly here
-                return np.squeeze(data.dataobj[index_slice])
+                return _proc(data.dataobj[index_slice])
             
             # Otherwise just load full
             else:
@@ -166,9 +186,9 @@ def load(f, index_slice=None):
 
     # Return either array or index'ed array
     if index_slice is not None:
-        return np.squeeze(raw[index_slice])
+        return _proc(raw[index_slice])
 
-    return np.squeeze(raw)
+    return _proc(raw)
 
 def _apply_template(subject, template_path, contrast=None):
     
@@ -185,7 +205,7 @@ def _apply_template(subject, template_path, contrast=None):
     return f
 
 def _load_subject(subject, contrast, template_path, mask=None,
-                  index_slice=None, _print=print):
+                  index_slice=None, dtype=None, _print=print):
 
     # Get the specific path for this subject based on the passed template
     f = _apply_template(subject=subject,
@@ -193,7 +213,7 @@ def _load_subject(subject, contrast, template_path, mask=None,
                         contrast=contrast)
 
     _print('Loading:', f, level=2)
-    raw = load(f, index_slice=index_slice)
+    raw = load(f, index_slice=index_slice, dtype=dtype)
 
     # If no mask, just flatten / make sure 1D
     if mask is None:
@@ -247,7 +267,7 @@ def _load_check_mask(mask, affine):
 
 def load_data(subjects, template_path, contrast=None, mask=None,
               index_slice=None, zero_as_nan=False, nan_as_zero=False,
-              n_jobs=1, verbose=1, _print=None):
+              dtype=None, n_jobs=1, verbose=1, _print=None):
     '''This method is designed to load data saved in a particular way,
     specifically where each subject / participants data is saved seperately.
 
@@ -353,6 +373,17 @@ def load_data(subjects, template_path, contrast=None, mask=None,
 
             default = False
 
+    dtype : str or None, optional
+        The data type in which to cast loaded data to.
+        If left as None, keep original data type, otherwise
+        can pass as a string name of datatype to cast to.
+        For example, 'float32' to cast to 32 bit floating point
+        precision.
+
+        ::
+
+            default = None
+
     n_jobs : int, optional
         The number of threads to use when loading data.
 
@@ -444,6 +475,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
         for subject in subjects:
             subjs_data.append(_load_subject(subject, contrast, template_path,
                                             mask=mask, index_slice=index_slice,
+                                            dtype=dtype,
                                             _print=_print))
 
     # Multi-proc case
@@ -455,6 +487,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
                 template_path=template_path,
                 mask=mask,
                 index_slice=index_slice,
+                dtype=dtype,
                 _print=_print) for subject in subjects)
 
     # Return array with shape as the number of subjects by the sum of the mask

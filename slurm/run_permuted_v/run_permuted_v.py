@@ -213,9 +213,14 @@ def select_next_fill_split(temp_dr):
     files = {}
     for rs in not_completed:
         try:
-            files[rs] =\
-                [int(file.split('.')[0]) for file in
-                 os.listdir(os.path.join(temp_result_dr, rs))]
+
+            splits = [int(file.split('.')[0]) for file in
+                      os.listdir(os.path.join(temp_result_dr, rs))]
+            
+            # Only add if some found
+            if len(splits) > 0:
+                files[rs] = splits
+
         except:
             continue
 
@@ -385,6 +390,10 @@ def run_permutations(temp_dr, arg_n, time_est, job_id,
             # Restart the permutation loop if the data split is different
             # then the current one
             if int(new_arg_n) != int(arg_n):
+
+                # Delete the current args from memory before submitting
+                del args
+
                 run_permutations(temp_dr=temp_dr,
                                  arg_n=new_arg_n,
                                  time_est=time_est,

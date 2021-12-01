@@ -17,13 +17,15 @@ def setup_and_run_permuted_v(results_dr,
                              random_state=None,
                              use_tf=False,
                              n_jobs=1,
-                             dtype=None,
+                             dtype='float32',
                              use_z=False,
                              demean_confounds=True,
                              use_short_jobs=True,
                              job_mem='4G',
                              job_factor=3,
                              sz_target=10000):
+
+    # TODO build in job limit
 
     # Make sure dr's init'ed - just error out if results dr already exists
     os.makedirs(results_dr, exist_ok=False)

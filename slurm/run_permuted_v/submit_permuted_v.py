@@ -37,12 +37,12 @@ mask = '/users/s/a/sahahn/ABCD_Data/sub_mask.nii'
 
 # Optionally, can drop the top X number of outliers
 # just determined crudely by absolute mean value
-drop_top = 200
+drop_top = 500
 
 #### Options for how permutations are run / submitted ####
 
 # The number of permutations to use
-n_perm = 500
+n_perm = 10000
 
 # Use short jobs (3hr limit) or bluemoon jobs if False (30hr limit)
 # tradeoff is will need less of bluemoon jobs but they will take longer.
@@ -59,7 +59,7 @@ job_mem = sys.argv[1]
 # submit more jobs and therefore finish faster
 # where a smaller job factor close to 1, might not
 # even finish the requested number of permutations.
-job_factor = 5
+job_factor = 3
 
 # Imaging data can be split to run
 # permutations seperately per chunks of data
@@ -68,10 +68,17 @@ job_factor = 5
 # This parameter specifies the target size (number of vertex or voxel)
 # to run at once. Data will be split such that each chunk is as close to this size
 # as possible.
-sz_target = 2000
+sz_target = 5000
 
 # Optionally de-mean confounds
 demean_confounds = True
+
+# Set to None to use whatever loaded data is,
+# but float32 produces very simmilar results
+# and is less memory intensive.
+dtype = 'float32'
+
+####
 
 results_dr = f'test_{n_perm}_{job_factor}_{sz_target}'
 
@@ -120,6 +127,7 @@ target_vars = load_data(subjects=subjects,
                         template_path=template_path,
                         mask=mask,
                         nan_as_zero=True,
+                        dtype=dtype,
                         n_jobs=4, verbose=1)
 
 # Perform optional outlier filtering
@@ -143,7 +151,7 @@ setup_and_run_permuted_v(results_dr,
                          within_grp=True,
                          random_state=None,
                          use_tf=False,
-                         dtype=None,
+                         dtype=dtype,
                          use_z=False,
                          demean_confounds=demean_confounds,
                          use_short_jobs=use_short_jobs,

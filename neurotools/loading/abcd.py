@@ -2,12 +2,9 @@ import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 from joblib.hashing import hash as joblib_hash
 from sklearn.preprocessing import LabelEncoder
-import os
-from pathlib import Path
-
-from ..misc.text import readable_size_to_bytes
 from ..misc.print import _get_print
-from .. import data_dr
+from .cache import _base_cache_load
+
 
 def _base_load_from_csv(cols, csv_loc, eventname):
     '''The actual loading piece'''
@@ -30,50 +27,6 @@ def _base_load_from_csv(cols, csv_loc, eventname):
 
     return data
 
-def _get_cache_dr(cache_dr):
-
-    # Process default
-    if cache_dr == 'default':
-        cache_dr = os.path.join(data_dr, 'abcd_csv_cache')
-
-    # Give error if exists and not directory
-    if os.path.exists(cache_dr) and not os.path.isdir(cache_dr):
-        raise RuntimeError(f'Passed cache_dr: {cache_dr} already exists and is not a directory!')
-
-    # Make sure exists if doesn't exist
-    os.makedirs(cache_dr, exist_ok=True)
-
-    return cache_dr
-
-def _get_load_hash_str(cols, csv_loc, eventname):
-
-    # Sort cols for same behavior each time
-    sorted_cols = sorted(cols)
-
-    # Same with eventname, but if None, keep as None
-    try:
-        sorted_eventname = sorted(eventname)
-    except TypeError:
-        sorted_eventname = None
-    
-    # Use base name for csv instead of absolute path
-    csv_base_name = os.path.basename(csv_loc)
-
-    # Return joblib hash
-    return joblib_hash([sorted_cols, csv_base_name, sorted_eventname])
-
-def _get_load_cache_loc(cols, csv_loc, eventname, cache_dr):
-
-    # Otherwise, caching behavior is expected
-    # Get unique hash for these arguments - with tolerance to order and
-    # and a few other things.
-    hash_str = _get_load_hash_str(cols, csv_loc, eventname)
-
-    # Determine loc from hash_str
-    cache_loc = os.path.join(cache_dr, hash_str)
-
-    return cache_loc
-
 def _order_cache_loaded(data, cols):
     '''When loading from hash we make sure to return as ordered
     by cols in the cases where the saved copy was saved with a different
@@ -92,96 +45,25 @@ def _order_cache_loaded(data, cols):
     # Apply the ordering and return
     return data[ordered_cols]
 
-def _check_cache_sz_limit(cache_dr, cache_max_sz, _print):
+def _csv_cache_load_func(cache_loc, load_args):
 
-    _print('Checking cache size limit', level=2)
+    # Cached data saved as tab seperated, without any index cols
+    data = pd.read_csv(cache_loc, sep='\t')
 
-    # Get full file paths of all cached
-    all_cached = [os.path.join(cache_dr, f)
-                  for f in os.listdir(cache_dr)]
-
-    # Get size of current directory
-    size = sum(os.path.getsize(f) for f in all_cached)
-
-    # Make sure cache_max_sz as bytes
-    cache_max_sz = readable_size_to_bytes(cache_max_sz)
-
-    _print(f'Current saved size is: {size} our of passed cache_max_sz: {cache_max_sz}', level=1)
-
-    # If over the current limit
-    if size > cache_max_sz:
-
-        # Sort all cached files from oldest to newest, based
-        # on last modified.
-        old_to_new = sorted(all_cached, key=os.path.getctime)
-
-        # Delete in order from old to new
-        # until under the limit
-        removed, n = 0, 0
-        while size - removed > cache_max_sz:
-
-            # Select next to remove
-            to_remove = old_to_new[n]
-            
-            # Update counters
-            n += 1
-            removed += os.path.getsize(to_remove)
-
-            # Remove cached file
-            os.remove(to_remove)
-
-            _print(f'Removed cached file at: {to_remove}', level=2)
-
-def _base_cache_load_from_csv(cols, csv_loc, eventname,
-                              cache_dr, cache_max_sz, _print):
-
-    # If no caching, base case, just load as normal
-    if cache_dr is None:
-        _print(f'No cache_dr specified, loading from {csv_loc}', level=1)
-        return _base_load_from_csv(cols, csv_loc, eventname)
-
-    # Make sure cache_dr arg
-    cache_dr = _get_cache_dr(cache_dr)
-
-    # Get cache loc
-    cache_loc = _get_load_cache_loc(cols, csv_loc, eventname, cache_dr)
-
-    # If exists, load from saved
-    if os.path.exists(cache_loc):
-        _print(f'Loading from cache_loc: {cache_loc}', level=1)
-
-        # Cached data saved as tab seperated, without any index cols
-        data = pd.read_csv(cache_loc, sep='\t')
-
-        # Make sure to updating last modified of file to now
-        Path(cache_loc).touch()
-
-        # Set to correct column order
-        data = _order_cache_loaded(data, cols)
-
-    # If doesn't yet exist, load like normal
-    else:
-        _print(f'No existing cache found, loading from: {csv_loc}', level=1)
-
-        # Base load
-        data = _base_load_from_csv(cols, csv_loc, eventname)
-
-        # Save a copy under the cache_loc as tsv, no index
-        data.to_csv(cache_loc, index=False, sep='\t')
-
-        _print(f'Saving loaded data to cache_loc: {cache_loc}', level=1)
-
-    # Before returning - check the cache_max_sz argument
-    # clearing any files over the limit
-    _check_cache_sz_limit(cache_dr, cache_max_sz, _print=_print)
+    # Set to correct column order
+    data = _order_cache_loaded(data, load_args[0])
 
     return data
+
+def _csv_cache_save_func(data, cache_loc):
+
+     # Save a copy under the cache_loc as tsv, no index
+    data.to_csv(cache_loc, index=False, sep='\t')
 
 def load_from_csv(cols, csv_loc,
                   eventname='baseline_year_1_arm_1',
                   drop_nan=False, encode_cat_as='ordinal',
-                  cache_dr='default', cache_max_sz='30G',
-                  verbose=0):
+                  verbose=0, **cache_args):
     '''Special ABCD Study specific helper utility to load specific
     columns from a csv saved version of the DEAP release RDS
     file or simmilar ABCD specific csv dataset.
@@ -293,9 +175,12 @@ def load_from_csv(cols, csv_loc,
     
     # Load with optional caching - only need
     # to cache this main operation.
-    data = _base_cache_load_from_csv(
-        cols=use_cols, csv_loc=csv_loc, eventname=eventname,
-        cache_dr=cache_dr, cache_max_sz=cache_max_sz, _print=_print)
+    data = _base_cache_load(load_args=(use_cols, csv_loc, eventname),
+                            load_func=_base_load_from_csv,
+                            cache_load_func=_csv_cache_load_func,
+                            cache_save_func=_csv_cache_save_func,
+                            cache_args=cache_args,
+                            _print=_print)
 
     # Set index as subject id
     data = data.set_index('src_subject_id')
