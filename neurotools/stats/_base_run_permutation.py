@@ -124,7 +124,7 @@ def fastv_with_df(input_matrix, psi, res, variance_groups, drm, contrast):
 
 def run_permutation(p_set, target_vars, rz, hz,
                     input_matrix, variance_groups,
-                    drm, contrast, use_z=False):
+                    drm, contrast, use_z=False, **kwargs):
 
     # Make sure passed p_set has same dtype as target vars
     p_set = p_set.astype(target_vars.dtype.name)

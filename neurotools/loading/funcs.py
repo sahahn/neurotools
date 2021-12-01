@@ -246,7 +246,7 @@ def _load_check_mask(mask, affine):
     return mask_data.astype('bool'), affine
 
 def load_data(subjects, template_path, contrast=None, mask=None,
-              index_slice=None, zero_as_nan=False,
+              index_slice=None, zero_as_nan=False, nan_as_zero=False,
               n_jobs=1, verbose=1, _print=None):
     '''This method is designed to load data saved in a particular way,
     specifically where each subject / participants data is saved seperately.
@@ -343,6 +343,16 @@ def load_data(subjects, template_path, contrast=None, mask=None,
 
             default = False
 
+    nan_as_zero : bool, optional
+        As an alternative to zero_as_nan, can
+        instead set any NaNs found to zeros.
+        Note, if this is True then zero_as_nan can
+        not also be True.
+
+        ::
+
+            default = False
+
     n_jobs : int, optional
         The number of threads to use when loading data.
 
@@ -413,7 +423,11 @@ def load_data(subjects, template_path, contrast=None, mask=None,
                              mask=mask)
 
     '''
-    
+
+    # Error if both set
+    if zero_as_nan and nan_as_zero:
+        raise RuntimeError('zero_as_nan and nan_as_zero cannot both be True.')
+
     # Keep track of loading time
     start_time = time.time()
     
@@ -454,6 +468,11 @@ def load_data(subjects, template_path, contrast=None, mask=None,
     if zero_as_nan:
         _print(f'Setting {len(data[data == 0])} == 0 data points to NaN.')
         data[data == 0] = np.nan
+
+    # Process nan_as_zero flag
+    if nan_as_zero:
+        _print(f'Setting {len(data[np.isnan(data)])} == NaN data points to 0.')
+        data[np.isnan(data)] = 0
 
     return data
 

@@ -63,7 +63,7 @@ def freedmanlane(p_set, target_vars, rz, hz):
 
 def run_permutation(p_set, target_vars, rz, hz,
                     input_matrix, variance_groups,
-                    drm, contrast, use_z=False):
+                    drm, contrast, use_z=False, **kwargs):
 
     if use_z:
         raise RuntimeError('use_z not supported with tensorflow.')

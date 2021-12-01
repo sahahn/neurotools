@@ -9,3 +9,12 @@ doc_src/_build
 .vscode
 neurotools.egg-info
 build/
+slurm/run_mm/Match_Bader/errors.txt
+slurm/run_mm/iq.xlsx
+slurm/run_mm/submit_bader_mm.py
+slurm/run_mm/Match_Bader/results.pkl
+slurm/run_mm/Match_Bader_Repeat/errors.txt
+slurm/run_mm/Match_Bader_Repeat/results.pkl
+slurm/run_permuted_v/test_1/h0_vmax.npy
+slurm/run_permuted_v/test_1/original_scores.npy
+slurm/run_permuted_v/test_*

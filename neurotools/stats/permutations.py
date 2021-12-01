@@ -25,7 +25,7 @@ def get_contrast(tested_vars, confounding_vars):
 def _get_perm_matrix(permutation_structure, random_state):
     
     # If passed in variance group 1D form
-    if len(permutation_structure.shape):
+    if len(permutation_structure.shape) == 1:
         neg_ones = -np.ones(len(permutation_structure))
         p_struc = np.stack([neg_ones, permutation_structure], axis=1)
     
@@ -179,27 +179,30 @@ def _proc_dtype(vars):
 def _nan_check(vars):
     if np.isnan(vars).any():
         raise RuntimeError('Currently no missing data is supported in tested_vars, target_vars or confounds_vars.')
-    
 
-def permuted_v(tested_vars,
-               target_vars,
-               confounding_vars,
-               permutation_structure,
-               n_perm=100,
-               two_sided_test=True,
-               within_grp=True,
-               random_state=None,
-               use_tf=False,
-               n_jobs=1,
-               verbose=0,
-               dtype=None,
-               use_z=False,
-               demean_confounds=True):
+def _process_permuted_v_base(tested_vars,
+                             target_vars,
+                             confounding_vars,
+                             permutation_structure,
+                             n_perm=100,
+                             two_sided_test=True,
+                             within_grp=True,
+                             random_state=None,
+                             use_tf=False,
+                             n_jobs=1,
+                             dtype=None,
+                             use_z=False,
+                             demean_confounds=True):
 
-    # TODO add handle missing-ness better?
-
+    # Make sure input okay / right types
     if n_perm < 0:
         raise RuntimeError('n_perm must be 0 or greater.')
+    if not n_jobs > 0:
+        raise RuntimeError('n_jobs must be 1 or more.')
+    if not isinstance(two_sided_test, bool):
+        raise RuntimeError('two_sided_test must be passed a bool True / False.')
+    if not isinstance(within_grp, bool):
+        raise RuntimeError('within_grp must be passed a bool True / False.')
 
     # Get rng instance from passed random_state
     rng = check_random_state(random_state)
@@ -272,9 +275,6 @@ def permuted_v(tested_vars,
     # Save some memory
     del tested_resid, tested_vars, confounding_vars, confounding_resid
 
-    if not n_jobs > 0:
-        raise RuntimeError('n_jobs must be 1 or more.')
-
     # If we are going to use tensorflow
     use_special_tf = False
     if use_tf:
@@ -287,7 +287,7 @@ def permuted_v(tested_vars,
             # Cast to tensor
             target_vars, rz, hz, input_matrix, drm, contrast =\
                 cast_input_to_tensor(target_vars, rz, hz, input_matrix,
-                                    drm, contrast, dtype=dtype)
+                                     drm, contrast, dtype=dtype)
         
         # Otherwise, special multi-processing case
         else:
@@ -300,6 +300,7 @@ def permuted_v(tested_vars,
             use_special_tf = True
         
     else:
+
         from ._base_run_permutation import run_permutation
 
     # Get original scores, pass permutation as None
@@ -311,9 +312,100 @@ def permuted_v(tested_vars,
                                       use_z=use_z)
 
     # If two sided test, get absolute value of the scores
+    original_scores_sign = None
     if two_sided_test:
         original_scores_sign = np.sign(original_scores)
         original_scores = np.fabs(original_scores)
+
+    # A little ugly but ... for now
+    return (original_scores, original_scores_sign,
+            run_permutation, target_vars,
+            rz, hz, input_matrix, variance_groups, 
+            drm, contrast, rng, use_special_tf, special_tf_job_split)
+
+def permuted_v(tested_vars,
+               target_vars,
+               confounding_vars,
+               permutation_structure,
+               n_perm=100,
+               two_sided_test=True,
+               within_grp=True,
+               random_state=None,
+               use_tf=False,
+               n_jobs=1,
+               verbose=0,
+               dtype=None,
+               use_z=False,
+               demean_confounds=True):
+    '''This function is used to perform a permutation based statistical test
+    on data with an underlying exchangability-block type structure.
+
+
+
+    Parameters
+    -----------
+    tested_vars : numpy array
+        An array, either 1D or 2D as subjects x 1, containing the
+        values of interest in which to statistically test
+        against the passed `target_vars`.
+
+    target_vars : numpy array
+        X
+
+    confounding_vars : numpy array
+        X
+
+    permutation_structure : numpy array
+        X
+
+    n_perm : int, optional
+        The number of permutations to test.
+
+        ::
+
+            default = 0
+
+    two_sided_test : bool, optional
+        
+        ::
+
+            default = True
+
+    Returns
+    --------
+    pvals : numpy array
+        X
+    
+    original_scores : numpy array
+        X 
+    
+    h0_vmax : numpy array:
+        X
+
+    '''
+
+    # TODO add handle missing-ness better?
+    # TODO if tested vars multiple, setup to run each seperately ... same as nilearn
+    # TODO change to class based for cleaner? Whole function as a class instead
+    # TODO support no confounding vars (in that case add intercept?)
+
+    # Separate function for initial processing
+    (original_scores, original_scores_sign, run_permutation,
+     target_vars, rz, hz, input_matrix, variance_groups, drm,
+     contrast, rng, use_special_tf, special_tf_job_split) =\
+        _process_permuted_v_base(tested_vars=tested_vars,
+                                 target_vars=target_vars,
+                                 confounding_vars=confounding_vars,
+                                 permutation_structure=permutation_structure,
+                                 n_perm=n_perm,
+                                 two_sided_test=two_sided_test,
+                                 within_grp=within_grp,
+                                 random_state=random_state,
+                                 use_tf=use_tf,
+                                 n_jobs=n_jobs,
+                                 dtype=dtype,
+                                 use_z=use_z,
+                                 demean_confounds=demean_confounds)
 
     # Return original scores - if no permutation
     if n_perm == 0:
@@ -326,7 +418,9 @@ def permuted_v(tested_vars,
 
     # Get n_perm_chunks, or also case where is n_perm
     # is pre-generated, splits it by jon
-    n_perm_chunks = _proc_n_perm_chunks(n_perm, n_jobs, use_special_tf, special_tf_job_split)
+    n_perm_chunks = _proc_n_perm_chunks(n_perm, n_jobs,
+                                        use_special_tf,
+                                        special_tf_job_split)
 
     # Submit permutations with joblib
     ret = Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(_run_permutation_chunks)(

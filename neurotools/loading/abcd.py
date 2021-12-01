@@ -132,7 +132,6 @@ def _check_cache_sz_limit(cache_dr, cache_max_sz, _print):
 
             _print(f'Removed cached file at: {to_remove}', level=2)
 
-
 def _base_cache_load_from_csv(cols, csv_loc, eventname,
                               cache_dr, cache_max_sz, _print):
 
@@ -252,6 +251,9 @@ def load_from_csv(cols, csv_loc,
 
     '''
 
+    # TODO move default cache location to
+    # user's home directory ??? 
+
     # Get verbose printer
     _print = _get_print(verbose)
     
@@ -320,7 +322,6 @@ def load_from_csv(cols, csv_loc,
             raise RuntimeError(f'encode_cat_as {encode_cat_as} not valid option.')    
 
     return data
-
 
 def load_family_block_structure(csv_loc, subjects=None,
                                 eventname='baseline_year_1_arm_1',
@@ -407,6 +408,7 @@ def load_family_block_structure(csv_loc, subjects=None,
     # Set to subset of passed subjects if any,
     if subjects is not None:
         data = data.loc[subjects]
+        _print(f'Set to {len(data)} subjects', level=1)
 
     # Drop any data points if rel_family_id or rel_relationship is missing
     to_drop = data[pd.isnull(data[['rel_relationship',
