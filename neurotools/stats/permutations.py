@@ -2,6 +2,7 @@
 import time
 import sys
 import numpy as np
+import pandas as pd
 from sklearn.utils import check_random_state
 from joblib import Parallel, delayed
 
@@ -180,6 +181,23 @@ def _nan_check(vars):
     if np.isnan(vars).any():
         raise RuntimeError('Currently no missing data is supported in tested_vars, target_vars or confounds_vars.')
 
+def proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
+                     target_vars, permutation_structure, variance_groups):
+
+    # Calc sizes
+    u_groups, u_vg_cnts = np.unique(variance_groups, return_counts=True)
+
+    print(f'Dropping {len(u_groups[u_vg_cnts < min_vg_size])} data points for < min_vg_size = {min_vg_size}', flush=True)
+
+    # Get group index to keep
+    to_keep = u_groups[u_vg_cnts >= min_vg_size]
+
+    # Get index of subjects to keep
+    i = np.where(np.isin(variance_groups, to_keep))[0]
+
+    return (confounding_vars[i], tested_vars[i], target_vars[i],
+            permutation_structure[i], variance_groups[i])
+
 def _process_permuted_v_base(tested_vars,
                              target_vars,
                              confounding_vars,
@@ -192,7 +210,8 @@ def _process_permuted_v_base(tested_vars,
                              n_jobs=1,
                              dtype=None,
                              use_z=False,
-                             demean_confounds=True):
+                             demean_confounds=True,
+                             min_vg_size=None):
 
     # Make sure input okay / right types
     if n_perm < 0:
@@ -219,8 +238,16 @@ def _process_permuted_v_base(tested_vars,
     # Error if both use_tf and request calculate z
     if use_tf and use_z:
         raise RuntimeError('use_z is not currently supported with tensorflow version.')
-    
-    # Make sure input correct
+
+    # If passed as DataFrame or Series cast to array
+    if isinstance(tested_vars, (pd.DataFrame, pd.Series)):
+        tested_vars = np.array(tested_vars)
+    if isinstance(confounding_vars, (pd.DataFrame, pd.Series)):
+        confounding_vars = np.array(confounding_vars)
+    if isinstance(permutation_structure, (pd.DataFrame, pd.Series)):
+        permutation_structure = np.array(permutation_structure)
+
+    # Make sure input shape / dims are correct
     if len(tested_vars.shape) == 1:
         tested_vars = np.expand_dims(tested_vars, axis=1)
    
@@ -229,11 +256,18 @@ def _process_permuted_v_base(tested_vars,
 
     if len(confounding_vars.shape) == 1:
         confounding_vars = np.expand_dims(confounding_vars, axis=1)
+
+    # Make sure the same len for main passed vars
+    if (len(tested_vars) != len(target_vars)) or (len(confounding_vars)) !=\
+        len(permutation_structure) or (len(confounding_vars) != len(tested_vars)):
+        raise RuntimeError('The passed lengths for tested_vars, target_vars, ' \
+                           'confounding_vars and permutation structure must all be the same!')
     
     # Check for nans
     _nan_check(confounding_vars)
     _nan_check(tested_vars)
     _nan_check(target_vars)
+    _nan_check(permutation_structure)
 
     # Proc dtype
     confounding_vars = _proc_dtype(confounding_vars)
@@ -242,16 +276,20 @@ def _process_permuted_v_base(tested_vars,
 
     # TODO make sure all the same dtype
 
+    # Calculate variance groups from passed permutation structure
+    variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
+
+    # Optionally, remove some data points based on too small unique variance group
+    if min_vg_size is not None:
+        confounding_vars, tested_vars, target_vars, permutation_structure, variance_groups =\
+            proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
+                             target_vars, permutation_structure, variance_groups)
+
     # Optionally de-mean confounds, prevents common
     # problems, especially when passing dummy coded variables
     # so default is True
     if demean_confounds:
         confounding_vars -= confounding_vars.mean(axis=0)
-    
-    # Calculate variance groups from passed permutation structure
-    variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
-    u_groups, cnts = np.unique(variance_groups, return_counts=True)
-    print(cnts, flush=True)
 
     # Process dtype argument if passed
     if dtype is not None:
@@ -322,7 +360,7 @@ def _process_permuted_v_base(tested_vars,
     # A little ugly but ... for now
     return (original_scores, original_scores_sign,
             run_permutation, target_vars,
-            rz, hz, input_matrix, variance_groups, 
+            rz, hz, input_matrix, permutation_structure, variance_groups, 
             drm, contrast, rng, use_special_tf, special_tf_job_split)
 
 def permuted_v(tested_vars,
@@ -338,7 +376,8 @@ def permuted_v(tested_vars,
                verbose=0,
                dtype=None,
                use_z=False,
-               demean_confounds=True):
+               demean_confounds=True,
+               min_vg_size=None):
     '''This function is used to perform a permutation based statistical test
     on data with an underlying exchangability-block type structure.
 
@@ -346,19 +385,48 @@ def permuted_v(tested_vars,
 
     Parameters
     -----------
-    tested_vars : numpy array
-        An array, either 1D or 2D as subjects x 1, containing the
-        values of interest in which to statistically test
-        against the passed `target_vars`.
+    tested_vars : numpy array or pandas DataFrame
+        Pass as an array or DataFrame, with shape
+        either 1D or 2D as subjects x 1, and containing the
+        values of interest in which to calculate the v-statistic
+        against the passed `target_vars`, and as corrected for
+        any passed `confounding_vars`.
+
+        Note: The subject / data point order and length should match exactly
+        between the first dimensions of `tested_vars`, 'target_vars`,
+        `confounding_vars` and `permutation_structure`.
 
     target_vars : numpy array
-        X
+        A 2D numpy array with shape subjects x features, containing
+        the typically imaging features per subject to univariately
+        calculate v-stats for.
 
-    confounding_vars : numpy array
-        X
+        Note: The subject / data point order and length should match exactly
+        between the first dimensions of `tested_vars`, 'target_vars`,
+        `confounding_vars` and `permutation_structure`.
 
-    permutation_structure : numpy array
-        X
+    confounding_vars : numpy array or pandas DataFrame
+
+        Note: The subject / data point order and length should match exactly
+        between the first dimensions of `tested_vars`, 'target_vars`,
+        `confounding_vars` and `permutation_structure`.
+
+    permutation_structure : numpy array or pandas DataFrame
+        This parameter represents the underlying exchangability-block
+        structure of the data passed. It is also used in order to automatically determine
+        the underlying variance structure of the passed data.
+
+        See PALM's documentation for an introduction on how to format ExchangeabilityBlocks:
+        https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM/ExchangeabilityBlocks
+
+        This parameter accepts the same style input as PALM, except it is passed
+        here as an array or DataFrame instead of as a file. The main requirement 
+        is that the shape of the structure match the number of subjects / data points
+        in the first dimension.
+        
+        Note: The subject / data point order and length should match exactly
+        between the first dimensions of `tested_vars`, 'target_vars`,
+        `confounding_vars` and `permutation_structure`.
 
     n_perm : int, optional
         The number of permutations to test.
@@ -393,8 +461,8 @@ def permuted_v(tested_vars,
 
     # Separate function for initial processing
     (original_scores, original_scores_sign, run_permutation,
-     target_vars, rz, hz, input_matrix, variance_groups, drm,
-     contrast, rng, use_special_tf, special_tf_job_split) =\
+     target_vars, rz, hz, input_matrix, permutation_structure,
+     variance_groups, drm, contrast, rng, use_special_tf, special_tf_job_split) =\
         _process_permuted_v_base(tested_vars=tested_vars,
                                  target_vars=target_vars,
                                  confounding_vars=confounding_vars,
@@ -407,7 +475,8 @@ def permuted_v(tested_vars,
                                  n_jobs=n_jobs,
                                  dtype=dtype,
                                  use_z=use_z,
-                                 demean_confounds=demean_confounds)
+                                 demean_confounds=demean_confounds,
+                                 min_vg_size=min_vg_size)
 
     # Return original scores - if no permutation
     if n_perm == 0:

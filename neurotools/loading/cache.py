@@ -157,7 +157,7 @@ def _check_cache_sz_limit(cache_dr, cache_max_sz, _print):
     # Make sure cache_max_sz as bytes
     cache_max_sz = readable_size_to_bytes(cache_max_sz)
 
-    _print(f'Current saved size is: {size} our of passed cache_max_sz: {cache_max_sz}', level=1)
+    _print(f'Current saved size is: {size} / {cache_max_sz} (cache_max_sz)', level=1)
 
     # If over the current limit
     if size > cache_max_sz:

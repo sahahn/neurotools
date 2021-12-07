@@ -122,7 +122,8 @@ def setup_and_run_permuted_v(results_dr,
                              job_mem=None,
                              job_factor=3,
                              sz_target=10000,
-                             job_limit=500):
+                             job_limit=500,
+                             min_vg_size=None):
 
     # Process initial directories
     results_dr, jobs_logs_dr, temp_dr = init_drs(results_dr)
@@ -160,14 +161,16 @@ def setup_and_run_permuted_v(results_dr,
                 n_perm=n_perm, two_sided_test=two_sided_test,
                 within_grp=within_grp, random_state=random_state,
                 use_tf=use_tf, n_jobs=n_jobs, dtype=dtype,
-                use_z=use_z, demean_confounds=demean_confounds)
+                use_z=use_z, demean_confounds=demean_confounds,
+                min_vg_size=min_vg_size)
 
         # Most of the arguments, only need to save once / first time
         if i == 0:
             base_args = {'run_perm_func': base[2], 'rz': base[4],
                          'hz': base[5], 'input_matrix': base[6],
-                         'variance_groups': base[7], 'drm': base[8], 'contrast': base[9],
-                         'rng': base[10], 'permutation_structure': permutation_structure,
+                         'permutation_structure': base[7],
+                         'variance_groups': base[8], 'drm': base[9],
+                         'contrast': base[10], 'rng': base[11],
                          'use_z': use_z, 'two_sided_test': two_sided_test,
                          'n_splits': n_splits, 'limit': limit, 'n_perm': n_perm}
 
