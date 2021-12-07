@@ -250,6 +250,8 @@ def _process_permuted_v_base(tested_vars,
     
     # Calculate variance groups from passed permutation structure
     variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
+    u_groups, cnts = np.unique(variance_groups, return_counts=True)
+    print(cnts, flush=True)
 
     # Process dtype argument if passed
     if dtype is not None:

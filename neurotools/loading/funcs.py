@@ -5,7 +5,7 @@ import time
 from joblib import Parallel, delayed
 from nibabel import freesurfer as fs
 from nibabel import GiftiImage
-
+from .cache import _base_cache_load
 from ..misc.print import _get_print
 
 def _gifti_to_np(data):
@@ -191,18 +191,28 @@ def load(f, index_slice=None, dtype=None):
     return _proc(raw)
 
 def _apply_template(subject, template_path, contrast=None):
-    
-    # Copy template path under f
-    f = template_path 
 
-    # Replace subject
-    f = f.replace('SUBJECT', str(subject))
+    # Base case is template path as a str
+    if isinstance(template_path, str):
     
-    # Optionally replace contrast
-    if contrast is not None:
-        f = f.replace('CONTRAST', str(contrast))
+        # Copy template path under f
+        f = template_path 
+
+        # Replace subject
+        f = f.replace('SUBJECT', str(subject))
+        
+        # Optionally replace contrast
+        if contrast is not None:
+            f = f.replace('CONTRAST', str(contrast))
+        
+        return f
+
+    # Alternative case is that template path is passed as function
+    if contrast is None:
+        return template_path(subject)
     
-    return f
+    # Subject + contrast, func case
+    return template_path(subject, contrast)
 
 def _load_subject(subject, contrast, template_path, mask=None,
                   index_slice=None, dtype=None, _print=print):
@@ -265,9 +275,57 @@ def _load_check_mask(mask, affine):
 
     return mask_data.astype('bool'), affine
 
+def _base_load_data(subjects, contrast, template_path, mask,
+                    index_slice, dtype, n_jobs, verbose):
+
+    # Init print based on verbose
+    _print = _get_print(verbose)
+
+    # Single core case
+    if n_jobs == 1:
+
+        subjs_data = []
+        for subject in subjects:
+            subjs_data.append(_load_subject(subject, contrast, template_path,
+                                            mask=mask, index_slice=index_slice,
+                                            dtype=dtype,
+                                            _print=_print))
+
+    # Multi-proc case
+    else:
+        subjs_data = Parallel(n_jobs=n_jobs, prefer="threads")(
+            delayed(_load_subject)(
+                subject=subject,
+                contrast=contrast,
+                template_path=template_path,
+                mask=mask,
+                index_slice=index_slice,
+                dtype=dtype,
+                _print=_print) for subject in subjects)
+
+    # Return array with shape as the number of subjects by the sum of the mask
+    data = np.stack(subjs_data)
+
+    return data
+
+def _cache_load_data(cache_loc, load_args):
+
+    # TODO
+    # Needs to be responsible here for any potential
+    # re-ordering of subjects or anything - hmm not sure how actually
+    # maybe make sure subjects isn't list-like, i.e., cast to array, so
+    # that it doesn't cache based on that
+    # subjects = load_args[0]
+
+    data = np.load(cache_loc)
+    return data
+
+def _cache_save_data(data, cache_loc):
+    np.save(cache_loc, data)
+
 def load_data(subjects, template_path, contrast=None, mask=None,
               index_slice=None, zero_as_nan=False, nan_as_zero=False,
-              dtype=None, n_jobs=1, verbose=1, _print=None):
+              dtype=None, n_jobs=1, verbose=1, _print=None, **cache_args):
     '''This method is designed to load data saved in a particular way,
     specifically where each subject / participants data is saved seperately.
 
@@ -278,7 +336,7 @@ def load_data(subjects, template_path, contrast=None, mask=None,
         the names correspond in some way to the way the way the subject's data
         is saved. This correspondence is specified in template_path.
 
-    template_path : str
+    template_path : str or func
         A str indicating the template form for how a single
         subjects data should be loaded, where SUBJECT will be
         replaced with that subjects name, and optionally CONTRAST will
@@ -287,6 +345,11 @@ def load_data(subjects, template_path, contrast=None, mask=None,
         For example, to load subject X's contrast Y saved under
         'some_loc/X_Y.nii.gz'
         the template_path would be: 'some_loc/SUBJECT_CONTRAST.nii.gz'.
+
+        You may also alternatively pass template_path as a python function,
+        with first argument accepting subject, and optional second argument
+        accepting contrast. In this case, the function should return the correct
+        path for that subject / contrast pair when given one or both of these arguments.
 
         Note: The use of CONTRAST within the template path is optional, but
         this parameter is not.
@@ -468,43 +531,29 @@ def load_data(subjects, template_path, contrast=None, mask=None,
     # Can pass mask as None, file loc, or numpy array
     mask, _ = _load_mask(mask)
 
-    # Single core case
-    if n_jobs == 1:
-
-        subjs_data = []
-        for subject in subjects:
-            subjs_data.append(_load_subject(subject, contrast, template_path,
-                                            mask=mask, index_slice=index_slice,
-                                            dtype=dtype,
-                                            _print=_print))
-
-    # Multi-proc case
-    else:
-        subjs_data = Parallel(n_jobs=n_jobs, prefer="threads")(
-            delayed(_load_subject)(
-                subject=subject,
-                contrast=contrast,
-                template_path=template_path,
-                mask=mask,
-                index_slice=index_slice,
-                dtype=dtype,
-                _print=_print) for subject in subjects)
-
-    # Return array with shape as the number of subjects by the sum of the mask
-    data = np.stack(subjs_data)
-
+    # Load data, with caching behavior
+    data = _base_cache_load(load_args=(np.array(subjects), contrast, template_path,
+                                       mask, index_slice, dtype),
+                            load_func=_base_load_data,
+                            cache_load_func=_cache_load_data,
+                            cache_save_func=_cache_save_data,
+                            cache_args=cache_args,
+                            _print=_print,
+                            no_cache_args={'n_jobs': n_jobs,
+                                           'verbose': verbose})
+                    
     _print('Loaded data with shape:', data.shape, 'in',
            time.time() - start_time,
            'seconds.', level=1)
 
     # Process zero_as_nan flag
     if zero_as_nan:
-        _print(f'Setting {len(data[data == 0])} == 0 data points to NaN.')
+        _print(f'Setting {len(data[data == 0])} are 0 data points to NaN.')
         data[data == 0] = np.nan
 
     # Process nan_as_zero flag
     if nan_as_zero:
-        _print(f'Setting {len(data[np.isnan(data)])} == NaN data points to 0.')
+        _print(f'Setting {len(data[np.isnan(data)])} are NaN data points to 0.')
         data[np.isnan(data)] = 0
 
     return data

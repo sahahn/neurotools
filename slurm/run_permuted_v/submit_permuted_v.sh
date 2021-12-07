@@ -16,4 +16,4 @@ source /users/s/a/sahahn/.bashrc
 
 cd ${SLURM_SUBMIT_DIR}
 
-python submit_permuted_v.py ${SLURM_MEM_PER_NODE}
+python submit_permuted_v.py

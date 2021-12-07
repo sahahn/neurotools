@@ -41,7 +41,6 @@ def _get_load_hash_str(load_args, use_base_name):
 
         # Otherwise add directly
         else:
-            print(arg)
             to_cache_args.append(arg)
 
     # Return joblib hash
@@ -54,17 +53,32 @@ def _get_load_cache_loc(load_args, cache_dr, use_base_name):
     # and a few other things.
     hash_str = _get_load_hash_str(load_args, use_base_name)
 
-    # Determine loc from hash_str
+    # Next, we want to be able to handle arbitrary file ext.
+    # an existing cache_loc might be saved under
+    existing_cached = os.listdir(cache_dr)
+
+    # Get just hashes
+    existing_hashes = [file.split('.')[0] for file in existing_cached]
+
+    # Check if hash str is an existing hash
+    if hash_str in existing_hashes:
+
+        # If exists, replace hash_str with full
+        # hash + file ext.
+        hash_str = existing_cached[existing_hashes.index(hash_str)]
+
+    # Set full path
     cache_loc = os.path.join(cache_dr, hash_str)
 
     return cache_loc
 
 def _unpack_cache_args(cache_args):
+    '''Unpack possible args, otherwise set to default'''
 
     if 'cache_dr' in cache_args:
         cache_dr = cache_args['cache_dr']
     else:
-        cache_dr = None
+        cache_dr = 'default'
 
     if 'cache_max_sz' in cache_args:
         cache_max_sz = cache_args['cache_max_sz']
@@ -82,7 +96,10 @@ def _unpack_cache_args(cache_args):
 
 def _base_cache_load(load_args, load_func,
                      cache_load_func, cache_save_func,
-                     cache_args, _print):
+                     cache_args, _print, no_cache_args=None):
+
+    if no_cache_args is None:
+        no_cache_args = {}
 
     # Unpack cache args
     cache_dr, cache_max_sz, use_base_name = _unpack_cache_args(cache_args)
@@ -90,7 +107,7 @@ def _base_cache_load(load_args, load_func,
     # If no caching, base case, just load as normal
     if cache_dr is None:
         _print(f'No cache_dr specified, loading directly', level=1)
-        return load_func(*load_args)
+        return load_func(*load_args, **no_cache_args)
 
     # Make sure cache_dr arg
     cache_dr = _get_cache_dr(cache_dr, load_func)
@@ -113,7 +130,7 @@ def _base_cache_load(load_args, load_func,
         _print(f'No existing cache found, loading directly', level=1)
 
         # Base load
-        data = load_func(*load_args)
+        data = load_func(*load_args, **no_cache_args)
 
         # Save with special cache func
         cache_save_func(data=data, cache_loc=cache_loc)

@@ -12,15 +12,15 @@ from neurotools.stats.permutations import _get_perm_matrix
 
 # Some tunable params here
 EXTRA_PAD = 600
-VERBOSE_EVERY = 25
-CHECK_END_EVERY = 10
+CHECK_END_EVERY = 5
 CHANGE_FILLER_EVERY = 20
+CHECK_PROGRESS_EVERY = 10
 
 # Keep track of number start time for verbose / filler jobs
 # as global variable
 script_start_time = time.time()
 
-def unpack_args():
+def unpack_passed_args():
 
     # Unpack args
     args = list(sys.argv[1:])
@@ -29,7 +29,7 @@ def unpack_args():
     temp_dr = args[0]
 
     # The data dimension split
-    arg_n = int(args[1])
+    data_split = int(args[1])
 
     # Estimate per job from submitting job
     time_est = float(args[2])
@@ -37,14 +37,16 @@ def unpack_args():
     # Job array id
     job_id = int(args[3])
 
-    return temp_dr, arg_n, time_est, job_id
+    return temp_dr, data_split, time_est, job_id
 
-def end_job_print(n_run):
+def end_job_print(n_run, n_failed):
 
     print('Job Finished.', flush=True)
-    print(f'Completed {n_run} permutations in {(time.time() - script_start_time):.3f}')
+    print(f'Completed {n_run} permutations in {(time.time() - script_start_time):.3f} (n_failed={n_failed})')
 
-def check_already_finished(results_dr, temp_dr, n_run):
+def check_already_finished(temp_dr, n_run, n_failed):
+
+    results_dr = Path(temp_dr).parent.absolute()
     
     # If h0_vmax is saved, then we know already done
     if os.path.exists(os.path.join(results_dr, 'h0_vmax.npy')):
@@ -56,19 +58,19 @@ def check_already_finished(results_dr, temp_dr, n_run):
                 shutil.rmtree(temp_dr, ignore_errors=True)
 
         # Print before finish / quit
-        end_job_print(n_run)
+        end_job_print(n_run, n_failed)
 
         # Exit
         sys.exit()
 
-def check_already_exists(temp_dr, arg_n, random_state):
+def check_already_exists(temp_dr, data_split, random_state):
 
     # First check final save loc
     if os.path.exists(get_merged_save_loc(temp_dr, random_state)):
         return True
 
     # Next check the intermediate save_loc
-    if os.path.exists(get_split_save_loc(temp_dr, random_state, arg_n)):
+    if os.path.exists(get_split_save_loc(temp_dr, random_state, data_split)):
         return True
 
     return False
@@ -84,7 +86,7 @@ def get_merged_save_loc(temp_dr, random_state, init_dr=False):
     # Save just under random state
     return os.path.join(save_dr, f'{random_state}.npy')
 
-def get_split_save_loc(temp_dr, random_state, arg_n, init_dr=False):
+def get_split_save_loc(temp_dr, random_state, data_split, init_dr=False):
 
     # Make sure the directory exists first if passed
     save_dr = os.path.join(temp_dr, 'temp_results', str(random_state))
@@ -92,9 +94,9 @@ def get_split_save_loc(temp_dr, random_state, arg_n, init_dr=False):
         os.makedirs(save_dr, exist_ok=True)
 
     # Return save loc of this chunk of data's h0 vmax
-    return os.path.join(save_dr, f'{arg_n}.npy')
+    return os.path.join(save_dr, f'{data_split}.npy')
 
-def proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, n_splits):
+def proc_perm_vmax(temp_dr, random_state, data_split, h0_vmax, n_splits, n_run):
 
     # If n_splits is 1, means no data splits
     # were done, and we can save this result directly to merged_save_loc
@@ -104,17 +106,17 @@ def proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, n_splits):
             get_merged_save_loc(temp_dr, random_state, init_dr=True)
         np.save(merged_save_loc, h0_vmax)
 
-        return
+        return n_run + 1
 
     # Otherwise, if there were splits then
     # check to see if saving this split
     # would finish across all data pieces
     split_save_locs = glob.glob(
-        get_split_save_loc(temp_dr, random_state, arg_n='*'))
+        get_split_save_loc(temp_dr, random_state, data_split='*'))
 
     # The current split save loc
     split_save_loc =\
-        get_split_save_loc(temp_dr, random_state, arg_n, init_dr=True)
+        get_split_save_loc(temp_dr, random_state, data_split, init_dr=True)
 
     # In this case, compute vmax across pieces
     if len(split_save_locs) == n_splits - 1:
@@ -123,8 +125,7 @@ def proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, n_splits):
         # but if the current split_save_loc already exists then
         # just return, as this is a duplicate case
         if os.path.exists(split_save_loc):
-            print('SPLIT ALREADY EXISTED', random_state, arg_n, flush=True)
-            return
+            return n_run
 
         # Load all and get max of max's
         try:
@@ -140,7 +141,7 @@ def proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, n_splits):
 
             # And if it still fails, then just skip this one
             except:
-                return
+                return n_run
 
         # Set to max across all
         merged_h0_vmax = np.max(all_v_maxs)
@@ -156,17 +157,16 @@ def proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, n_splits):
         old_dr = os.path.join(temp_dr, 'temp_results', str(random_state))
         shutil.rmtree(old_dr, ignore_errors=True)
 
-        return
-    
-    # Otherwise, just save split vmax, if already
-    # exists, just skip
-    if os.path.exists(split_save_loc):
-        print('SPLIT ALREADY EXISTED', random_state, arg_n, flush=True)
-        return
+        return n_run + 1
 
+    # If exists, return, marked as failed job
+    if os.path.exists(split_save_loc):
+        return n_run
+
+    # Save split
     np.save(split_save_loc, h0_vmax)
 
-    return
+    return n_run + 1
 
 def check_end_condition(results_dr, temp_dr, n_perm, two_sided_test):
 
@@ -203,7 +203,7 @@ def check_end_condition(results_dr, temp_dr, n_perm, two_sided_test):
 
     return
 
-def select_next_fill_split(temp_dr):
+def select_next_fill_split(temp_dr, n_run, n_failed):
 
     # Get list of not completed files
     temp_result_dr = os.path.join(temp_dr, 'temp_results')
@@ -249,6 +249,18 @@ def select_next_fill_split(temp_dr):
     # setting higher values exponentially higher
     probs = probs ** 1.5
 
+    # If sum == 0, wait then try again
+    if np.sum(probs) == 0:
+
+        # Check if already finished, to avoid getting stuck
+        check_already_finished(temp_dr, n_run, n_failed)
+        
+        # Stall
+        time.sleep(3)
+
+        # Then try again
+        return select_next_fill_split(temp_dr, n_run, n_failed)
+        
     # Normalize to between 0 and 1
     probs = probs / np.sum(probs)
 
@@ -257,13 +269,20 @@ def select_next_fill_split(temp_dr):
     choice = rs.choice(np.arange(len(records)), p=probs)
     return choice
 
-def get_not_completed(temp_dr, arg_n=None):
-    
-    # Since this folder may not exist yet, wrap in a try/except 
+def get_completed_files(temp_dr):
+
+     # Since this folder may not exist yet, wrap in a try/except 
     try:
         completed_files = os.listdir(os.path.join(temp_dr, 'results'))
     except:
         completed_files = []
+
+    return completed_files
+
+def get_not_completed(temp_dr, data_split=None):
+    
+    # Get completed files
+    completed_files = get_completed_files(temp_dr)
 
     # Conv to set representing all completed files
     completed = set([r.split('.')[0] for r in completed_files])
@@ -279,20 +298,19 @@ def get_not_completed(temp_dr, arg_n=None):
     # Remove completed from not completed
     not_completed = not_completed - completed
 
-    # If passed arg_n limit to just not_completed specific to that arg_n
-    if arg_n is not None:
+    # If passed data_split limit to just not_completed specific to that data_split
+    if data_split is not None:
 
         # For each random state in not completed
-        # if arg_n done, remove that random state from
+        # if data_split done, remove that random state from
         # not completed
         for rs in list(not_completed):
-            if os.path.exists(get_split_save_loc(temp_dr, rs, arg_n)):
+            if os.path.exists(get_split_save_loc(temp_dr, rs, data_split)):
                 not_completed.remove(rs)
 
     return list(not_completed)
     
-
-def next_random_state(random_state, temp_dr, is_filler, arg_n):
+def next_random_state(random_state, temp_dr, is_filler, data_split):
 
     # Base non filler case is just increment random state.
     if not is_filler:
@@ -301,136 +319,235 @@ def next_random_state(random_state, temp_dr, is_filler, arg_n):
     # Make sure temp results exists
     os.makedirs(os.path.join(temp_dr, 'temp_results'), exist_ok=True)
 
-    # Otherwise, if filler, check which runs are not finished yet,
-    # and sleep while None
-    while len(not_completed := get_not_completed(temp_dr, arg_n)) == 0:
-        time.sleep(5)
+    # Get list of uncompleted jobs
+    not_completed = get_not_completed(temp_dr, data_split)
+
+    # If none, this is a good sign that this
+    # data split is not a good option anymore. 
+    if len(not_completed) == 0:
+        return 'change'
 
     # Select randomly from the uncompleted jobs
     rs = int(random.choice(not_completed))
 
     return rs
 
-def run_permutations(temp_dr, arg_n, time_est, job_id,
-                     script_start_time, is_filler=False, n_run=0):
+def change_target_vars(temp_dr, is_filler, n_run, n_failed):
+    '''This method is called when changing data split.
+    Even if selects same as current, treat as low risk and just
+    re-load anyway.'''
 
-    # Load saved args - if data is split, loads just that chunk
-    with open(os.path.join(temp_dr, f'args_{arg_n}.pkl'), 'rb') as f:
-        args = pkl.load(f)
-    print(f'Loaded: args_{arg_n}.pkl', flush=True)
+    # Select a new data split
+    new_data_split = select_next_fill_split(temp_dr, n_run, n_failed)
+
+    # Load new target vars split
+    target_vars = load_target_vars(temp_dr, new_data_split)
+
+    # Init with new random state
+    random_state = next_random_state(None, temp_dr, is_filler, new_data_split)
+
+    # If selects empty one, ... try again
+    if random_state == 'change':
+        del target_vars
+        return change_target_vars(temp_dr, is_filler, n_run, n_failed)
+
+    return target_vars, new_data_split, random_state
+
+def load_target_vars(temp_dr, data_split):
+    return np.load(os.path.join(temp_dr, f'target_vars_{data_split}.npy'))
+
+def check_swap_filler(temp_dr, data_split, n_perm):
+
+    # Get number of all complete
+    base_done = len(get_completed_files(temp_dr))
+
+    # Find number of saved in split loc w/ globbing
+    split_done = len(glob.glob(get_split_save_loc(temp_dr, '*', data_split)))
+
+    completed = base_done + split_done
+    print(f'Completed {completed}/{n_perm} permutations in {(time.time() - script_start_time):.3f} (data split={data_split})', flush=True)
+    
+    # If over or equal to, then True
+    if completed >= n_perm:
+        return True
+    
+    # Otherwise False
+    return False
+
+def load_base_args(temp_dr):
+
+    try:
+        with open(os.path.join(temp_dr, 'base_args.pkl'), 'rb') as f:
+            args = pkl.load(f)
+    
+    # If missing - check if permutations already done
+    except FileNotFoundError:
+        check_already_finished(temp_dr, 0, 0)
+
+    return args
+
+def run_permutations(temp_dr, results_dr, data_split, time_est, job_id,
+                     script_start_time, is_filler=False):
+
+    n_run, n_failed = 0, 0
+
+    # Load base args - these don't change based on split
+    args = load_base_args(temp_dr)
+
+    # Load current split of target vars
+    target_vars = load_target_vars(temp_dr, data_split)
 
     # Gen random state based on the passed rng + job_id if not filler
     if is_filler:
-        random_state = next_random_state(None, temp_dr, is_filler, arg_n)
+        random_state = next_random_state(None, temp_dr, is_filler, data_split)
+        
+        # Process possible data split change
+        if random_state == 'change':
+            del target_vars
+            target_vars, data_split, random_state =\
+                change_target_vars(temp_dr, is_filler, n_run, n_failed)
+
     else:
         random_state = args['rng'].randint(1, np.iinfo(np.int32).max - 1, size=job_id)[-1]
-        print(f'Starting job w/ random_state: {random_state}, data_split {arg_n}.', flush=True)
+        print(f'Starting job w/ random_state: {random_state}, data_split {data_split}.', flush=True)
 
     # Only run another permutation if limit - time elapsed is
     # more than the longest we expect a permutation to take
     while args['limit'] - (time.time() - script_start_time) > time_est + EXTRA_PAD:
 
-        # Check to see if permutation limit already hit somewhere
-        # and results already proc'ed so we should just quit
-        check_already_finished(results_dr, temp_dr, n_run)
+        try:
 
-        # Want to check first to see if for some reason
-        # this random state has already been run - increment random
-        # state and restart loop
-        if check_already_exists(temp_dr, arg_n, random_state):
-            random_state = next_random_state(random_state, temp_dr, is_filler, arg_n)
-            continue
-        
-        # Otherwise, start the permutation
-        p_start_time = time.time()
+            # Check to see if permutation limit already hit somewhere
+            # and results already proc'ed so we should just quit
+            check_already_finished(temp_dr, n_run, n_failed)
 
-        # Generate this permutation based on current random state
-        p_set = _get_perm_matrix(args['permutation_structure'],
-                                 random_state=random_state)
+            # Want to check first to see if for some reason
+            # this random state has already been run - increment random
+            # state and restart loop
+            if check_already_exists(temp_dr, data_split, random_state):
+                random_state = next_random_state(random_state, temp_dr, is_filler, data_split)
 
-        # Get v or z stats for this permutation
-        perm_scores = args['run_perm_func'](p_set=p_set, **args)
+                # Process possible data split change
+                if random_state == 'change':
+                    del target_vars
+                    target_vars, data_split, random_state = change_target_vars(temp_dr, is_filler, n_run, n_failed)
 
-        # Convert perm scores to to absolute values if two sides
-        if args['two_sided_test']:
-            perm_scores = np.fabs(perm_scores)
-
-        # Calc h0 vmax
-        h0_vmax = np.nanmax(perm_scores)
-
-        # Save this result, either for just a split
-        # or merging data splits, ect...
-        proc_perm_vmax(temp_dr, random_state, arg_n, h0_vmax, args['n_splits'])
-
-        # Next random state
-        random_state = next_random_state(random_state, temp_dr, is_filler, arg_n)
-
-        # Increment n_run
-        n_run += 1
-
-        # If time from this run was longer than time_est, replace time_est
-        p_time = time.time() - p_start_time
-        if p_time > time_est:
-            time_est = p_time
-
-        # Verbose every
-        if n_run % VERBOSE_EVERY == 0:
-            print(f'Finished permutation {n_run} in: {p_time:.3f} (total time: {(time.time() - script_start_time):.3f})', flush=True)
-
-        # Check end condition every
-        if n_run % CHECK_END_EVERY == 0:
-            check_end_condition(results_dr, temp_dr, args['n_perm'], args['two_sided_test'])
-
-        # If a filler job, check every x, to select a new arg_n
-        if is_filler and n_run % CHANGE_FILLER_EVERY == 0:
+                # Skip rest of loop
+                continue
             
-            # Select a new data split based on the slowest job so far
-            new_arg_n = select_next_fill_split(temp_dr)
+            # Otherwise, start the permutation
+            p_start_time = time.time()
 
-            # Restart the permutation loop if the data split is different
-            # then the current one
-            if int(new_arg_n) != int(arg_n):
+            # Generate this permutation based on current random state
+            p_set = _get_perm_matrix(args['permutation_structure'],
+                                    random_state=random_state)
 
-                # Delete the current args from memory before submitting
-                del args
+            # Get v or z stats for this permutation
+            perm_scores = args['run_perm_func'](p_set=p_set, target_vars=target_vars, **args)
 
-                run_permutations(temp_dr=temp_dr,
-                                 arg_n=new_arg_n,
-                                 time_est=time_est,
-                                 job_id=job_id, 
-                                 script_start_time=script_start_time,
-                                 is_filler=True, n_run=n_run)
+            # Convert perm scores to to absolute values if two sides
+            if args['two_sided_test']:
+                perm_scores = np.fabs(perm_scores)
+
+            # Calc h0 vmax
+            h0_vmax = np.nanmax(perm_scores)
+
+            # Save this result, either for just a split
+            # or merging data splits, ect...
+            new_n_run = proc_perm_vmax(temp_dr, random_state,
+                                       data_split, h0_vmax,
+                                       args['n_splits'], n_run)
+
+            # Get next random state
+            random_state = next_random_state(random_state, temp_dr,
+                                            is_filler, data_split)
+
+            # If a filler job, check every x, or if random state condition
+            if (is_filler and n_run % CHANGE_FILLER_EVERY == 0) or (random_state == 'change'):
+                del target_vars
+                target_vars, data_split, random_state = change_target_vars(temp_dr, is_filler, n_run, n_failed)
+
+            # If time from this run was longer than time_est, replace time_est
+            p_time = time.time() - p_start_time
+            if p_time > time_est:
+                time_est = p_time
+
+            # Check if was a failed job,
+            # in that case, skip rest of loop
+            # this is just to avoid printing progress
+            # or whatever if run was a failure
+            if new_n_run == n_run:
+                n_failed += 1
+                continue
+            
+            # Set to new
+            n_run = new_n_run
+
+            # Check end condition every
+            if n_run % CHECK_END_EVERY == 0:
+                check_end_condition(results_dr, temp_dr, args['n_perm'], args['two_sided_test'])
+
+            # Update progress every
+            if n_run % CHECK_PROGRESS_EVERY == 0:
                 
-                # Escape from the current function call in this case once done
-                return n_run
+                # Check to see if this data split is at the requested number
+                # of permutations. In that case, switch it to a filler job
+                # instead of running more permutations then needed
+                if not is_filler:
+
+                    if check_swap_filler(temp_dr, data_split, args['n_perm']):
+                        print('Base permutations finished, switching to filler job', flush=True)
+
+                        # Set to filler
+                        is_filler = True
+
+                        # Change target vars
+                        del target_vars
+                        target_vars, data_split, random_state = change_target_vars(temp_dr, is_filler, n_run, n_failed)
+
+                # Filler-case, just print
+                else:
+                    print(f'This job has completed {n_run} total permutations in {(time.time() - script_start_time):.3f}', flush=True)
+
+
+        # If missing ever hit file not found, check to see, could be already finished
+        except FileNotFoundError:
+            check_already_finished(temp_dr, n_run, n_failed)
 
     # Also include a final check outside of the loop
     check_end_condition(results_dr, temp_dr,
                         args['n_perm'], args['two_sided_test'])
-    check_already_finished(results_dr, temp_dr, n_run)
+    check_already_finished(temp_dr, n_run, n_failed)
 
-    return n_run
+    return n_run, n_failed
 
-# Un-pack args into vars
-temp_dr, arg_n, time_est, job_id = unpack_args()
-results_dr = Path(temp_dr).parent.absolute()
+def main():
 
-# If passed -1, then means this is a filler job
-is_filler = False
-if arg_n == -1:
-    is_filler = True
-    print('Starting filler job', flush=True)
+    # Un-pack args into vars
+    temp_dr, data_split, time_est, job_id = unpack_passed_args()
+    results_dr = Path(temp_dr).parent.absolute()
 
-    # Start by waiting one time est length
-    time.sleep(time_est)
+    # If passed -1, then means this is a filler job
+    is_filler = False
+    if data_split == -1:
+        is_filler = True
+        print('Starting filler job', flush=True)
 
-    # Then select an arg_n
-    arg_n = select_next_fill_split(temp_dr)
+        # Start by waiting one time est length
+        time.sleep(time_est)
 
-# Run main loops
-n_run = run_permutations(temp_dr, arg_n, time_est,
-                         job_id, script_start_time,
-                         is_filler=is_filler, n_run=0)
+        # Then select an data_split
+        data_split = select_next_fill_split(temp_dr, 0, 0)
 
-# Print if not quit earlier
-end_job_print(n_run)
+    # Run main loops
+    n_run, n_failed = run_permutations(temp_dr, results_dr, data_split,
+                                       time_est, job_id, script_start_time,
+                                       is_filler=is_filler)
+
+    # Print if not quit earlier
+    end_job_print(n_run, n_failed)
+
+
+if __name__ == '__main__':
+    main()
+
