@@ -277,8 +277,6 @@ class SurfRef(Ref):
 
         loc = os.path.join(self.data_dr, self.space, 'surf',  hemi + '.' + name)
 
-        print(loc)
-
         if os.path.exists(loc):
             try:
                 return read_geometry(loc)
@@ -286,7 +284,6 @@ class SurfRef(Ref):
                 return load_surf_data(loc)
                 
         else:
-            print('load gii')
             surf = load_surf_data(loc + '.gii')
             if len(surf) == 2:
                 surf = (surf[0], surf[1])
