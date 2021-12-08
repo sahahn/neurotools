@@ -1,5 +1,7 @@
 from funcs import setup_and_run_permuted_v, load_and_setup_data
+from nilearn.masking import compute_brain_mask
 import numpy as np
+import nibabel as nib
 
 # Save dr / name for folder where results will be saved
 results_dr = 'temp'
@@ -26,8 +28,10 @@ def template_path(subject, contrast=None):
     sub = subject.replace('NDAR_', '')
     return f'/users/s/a/sahahn/ABCD_Data/All_Merged_Voxel_2.0.1/nBack_2_back_vs_0_back/{sub}_nBack.nii.gz'
 
-# Apply mask to data
-mask = '/users/s/a/sahahn/ABCD_Data/sub_mask.nii'
+# Compute mask
+# mask = '/users/s/a/sahahn/ABCD_Data/sub_mask.nii'
+ex_data = nib.load(template_path('NDAR_INV92V7K5PE'))
+mask = compute_brain_mask(ex_data, threshold=.2).get_fdata()
 
 # Optionally, can drop the top X number of outliers
 # just determined crudely by absolute mean value

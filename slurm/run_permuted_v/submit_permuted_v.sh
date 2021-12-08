@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --partition=short
 #SBATCH --time=3:00:00
-#SBATCH --mem=12G
+#SBATCH --mem=32G
 
 #SBATCH --job-name=submit_permuted_v
 #SBATCH --output=Job_Logs/%x_%j.out

@@ -56,7 +56,7 @@ def freedmanlane(P, Y, Rz, Hz):
 
 def calc_den_fast(eC, cte, r):
     cte_reshape = cte.reshape((r, r, cte.shape[-1])).transpose(2, 0, 1)
-    return np.squeeze((eC.T @ np.linalg.inv(cte_reshape) @ eC).transpose(1, 2, 0))
+    return np.squeeze((eC.T @ np.linalg.pinv(cte_reshape) @ eC).transpose(1, 2, 0))
 
 def fastv(input_matrix, psi, res,
           variance_groups, drm, contrast):

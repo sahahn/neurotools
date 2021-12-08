@@ -14,10 +14,10 @@ def cast_input_to_tensor(target_vars, rz, hz, input_matrix,
 
 def calc_den_fast(c, cte, r):
 
-    # Reshape and calc inverse of cte
-    cte_inv = tf.linalg.inv(tf.transpose(tf.reshape(cte,
+    # Reshape and calc pinverse of cte
+    cte_inv = tf.linalg.pinv(tf.transpose(tf.reshape(cte,
                                                     (r, r, cte.shape[-1])),
-                                         perm=[2, 0, 1]))
+                                          perm=[2, 0, 1]))
 
     # Apply the contrast to extract correct pieces, and return squeezed
     return tnp.squeeze(tf.transpose((tf.transpose(c) @ cte_inv @ c), perm=[1, 2, 0]))
