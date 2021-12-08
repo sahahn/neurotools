@@ -35,7 +35,7 @@ mask = compute_brain_mask(ex_data, threshold=.2).get_fdata()
 
 # Optionally, can drop the top X number of outliers
 # just determined crudely by absolute mean value
-drop_top = 1000
+drop_top = 1250
 
 #### Options for how permutations are run / submitted ####
 
