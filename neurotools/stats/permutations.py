@@ -52,7 +52,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             input_matrix, variance_groups, drm,
                             contrast, n_perm_chunk, n_perm, random_state,
                             permutation_structure=None, verbose=0,
-                            use_z=False, two_sided_test=True, intercept_test=False,
+                            use_z=False, two_sided_test=True,
+                            intercept_test=False,
                             use_special_tf=False):
 
     # If the special tensorflow case, and the first job
