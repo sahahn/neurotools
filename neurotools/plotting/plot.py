@@ -501,7 +501,7 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
     # fs_LR space defaults
     elif 'fs_LR' in space:
         ref.surf_mesh = 'very_inflated'
-        ref.bg_map = 'sulc_conte'
+        ref.bg_map = 'sulc'
         ref.darkness = .5
     
     # Freesurfer spaces defaults
@@ -899,8 +899,7 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
             within the current surface space, or as a valid array of values,
             again, with respect to the current space. This map is plotted in greyscale
             underneath the data points, often used for realistic shading.
-            The default for when plotting freesurfer spaces is 'sulc'
-            and for fs_LR spaces is 'sulc_conte'.
+            The default for when plotting is 'sulc'.
 
             This parameter is only used when plotting surfaces.
 
