@@ -87,6 +87,9 @@ job_limit = 500
 # The minimum variance group size allowed
 min_vg_size =  5
 
+# If a model intercept should be added as a confound
+model_intercept = False
+
 ####
 
 results_dr = f'test_{n_perm}_{job_factor}_{sz_target}'
@@ -104,7 +107,8 @@ setup_and_run_permuted_v(results_dr, tested_vars=tested_vars,
                          permutation_structure=permutation_structure, n_perm=n_perm,
                          two_sided_test=True, within_grp=True, random_state=None,
                          use_tf=False, dtype=dtype, use_z=False, demean_confounds=demean_confounds,
-                         use_short_jobs=use_short_jobs, job_mem=job_mem, job_factor=job_factor,
+                         model_intercept=model_intercept, use_short_jobs=use_short_jobs,
+                         job_mem=job_mem, job_factor=job_factor,
                          sz_target=sz_target, job_limit=job_limit, min_vg_size=min_vg_size)
 
 

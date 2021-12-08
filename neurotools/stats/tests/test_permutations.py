@@ -246,40 +246,41 @@ def test_permuted_v_rand_vals_dtype_compare():
 
     _, original_scores1, _ =\
         permuted_v(tested_vars=tested_vars,
-                   target_vars=target_vars,
-                   confounding_vars=confounding_vars,
-                   permutation_structure=permutation_structure,
-                   n_perm=0,
-                   two_sided_test=True,
-                   within_grp=True,
-                   random_state=None,
-                   use_tf=False,
-                   n_jobs=1,
-                   verbose=0,
-                   dtype='float64',
-                   use_z=False,
-                   demean_confounds=True,
-                   min_vg_size=None)
+                target_vars=target_vars,
+                confounding_vars=confounding_vars,
+                permutation_structure=permutation_structure,
+                n_perm=0,
+                two_sided_test=True,
+                within_grp=True,
+                random_state=None,
+                use_tf=False,
+                n_jobs=1,
+                verbose=0,
+                dtype='float64',
+                use_z=False,
+                demean_confounds=True,
+                min_vg_size=None)
 
     _, original_scores2, _ =\
         permuted_v(tested_vars=tested_vars,
-                   target_vars=target_vars,
-                   confounding_vars=confounding_vars,
-                   permutation_structure=permutation_structure,
-                   n_perm=0,
-                   two_sided_test=True,
-                   within_grp=True,
-                   random_state=None,
-                   use_tf=False,
-                   n_jobs=1,
-                   verbose=0,
-                   dtype='float32',
-                   use_z=False,
-                   demean_confounds=True,
-                   min_vg_size=None)
+                target_vars=target_vars,
+                confounding_vars=confounding_vars,
+                permutation_structure=permutation_structure,
+                n_perm=0,
+                two_sided_test=True,
+                within_grp=True,
+                random_state=None,
+                use_tf=False,
+                n_jobs=1,
+                verbose=0,
+                dtype='float32',
+                use_z=False,
+                demean_confounds=True,
+                min_vg_size=None)
 
     # All close, but not equal
-    assert np.allclose(original_scores1, original_scores2)
+    assert np.allclose(original_scores1, original_scores2,
+                        rtol=1e-03, atol=1e-06)
     assert not np.array_equal(original_scores1, original_scores2)
 
 
@@ -362,3 +363,50 @@ def test_permuted_v_rand_vals_min_vg_size2():
 
     # All close, but not equal
     assert np.array_equal(original_scores1, original_scores2)
+
+def test_permuted_v_rand_vals_no_covars():
+
+    pvals, original_scores, h0_vmax =\
+        permuted_v(tested_vars=np.random.random((4)),
+                   target_vars=np.random.random((4, 5)),
+                   confounding_vars=None,
+                   permutation_structure=np.array([1, 1, 2, 2]),
+                   n_perm=10,
+                   two_sided_test=True,
+                   within_grp=True,
+                   random_state=None,
+                   use_tf=False,
+                   n_jobs=1,
+                   verbose=0,
+                   dtype=None,
+                   use_z=False,
+                   demean_confounds=True,
+                   min_vg_size=None)
+
+    assert len(pvals) == 5
+    assert len(original_scores) ==  5
+    assert len(h0_vmax) == 10
+
+def test_permuted_v_rand_vals_no_covars_model_intercept():
+
+    pvals, original_scores, h0_vmax =\
+        permuted_v(tested_vars=np.random.random((4)),
+                   target_vars=np.random.random((4, 5)),
+                   confounding_vars=None,
+                   permutation_structure=np.array([1, 1, 2, 2]),
+                   n_perm=10,
+                   two_sided_test=True,
+                   within_grp=True,
+                   random_state=None,
+                   use_tf=False,
+                   n_jobs=1,
+                   verbose=0,
+                   dtype=None,
+                   use_z=False,
+                   model_intercept=True,
+                   demean_confounds=True,
+                   min_vg_size=None)
+
+    assert len(pvals) == 5
+    assert len(original_scores) ==  5
+    assert len(h0_vmax) == 10

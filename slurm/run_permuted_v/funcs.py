@@ -105,25 +105,15 @@ def save_original_scores(original_scores, original_scores_sign,
     np.save(save_loc, original_scores)
 
 def setup_and_run_permuted_v(results_dr,
-                             tested_vars,
                              target_vars,
-                             confounding_vars,
-                             permutation_structure,
                              n_perm,
                              two_sided_test=True,
-                             within_grp=True,
-                             random_state=None,
-                             use_tf=False,
-                             n_jobs=1,
-                             dtype='float32',
-                             use_z=False,
-                             demean_confounds=True,
                              use_short_jobs=True,
                              job_mem=None,
                              job_factor=3,
                              sz_target=10000,
-                             job_limit=500,
-                             min_vg_size=None):
+                             job_limit=500, 
+                             **kwargs):
 
     # Process initial directories
     results_dr, jobs_logs_dr, temp_dr = init_drs(results_dr)
@@ -154,15 +144,7 @@ def setup_and_run_permuted_v(results_dr,
         # which help us get an idea at runtime also.
         start = time.time()
         base =\
-            _process_permuted_v_base(
-                tested_vars=tested_vars, target_vars=target_vars_part,
-                confounding_vars=confounding_vars,
-                permutation_structure=permutation_structure,
-                n_perm=n_perm, two_sided_test=two_sided_test,
-                within_grp=within_grp, random_state=random_state,
-                use_tf=use_tf, n_jobs=n_jobs, dtype=dtype,
-                use_z=use_z, demean_confounds=demean_confounds,
-                min_vg_size=min_vg_size)
+            _process_permuted_v_base(target_vars=target_vars_part,  **kwargs)
 
         # Most of the arguments, only need to save once / first time
         if i == 0:
@@ -172,7 +154,7 @@ def setup_and_run_permuted_v(results_dr,
                          'variance_groups': base[8], 'drm': base[9],
                          'contrast': base[10], 'rng': base[11],
                          'intercept_test': base[12],
-                         'use_z': use_z, 'two_sided_test': two_sided_test,
+                         'use_z': kwargs['use_z'], 'two_sided_test': two_sided_test,
                          'n_splits': n_splits, 'limit': limit, 'n_perm': n_perm}
 
             with open(os.path.join(temp_dr, f'base_args.pkl'), 'wb') as f:

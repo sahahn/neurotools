@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_random_state
 from joblib import Parallel, delayed
+from nilearn.mass_univariate import permuted_ols
 
 from ..random.permute_blocks import block_permutation, get_auto_vg
 
@@ -218,6 +219,7 @@ def _process_permuted_v_base(tested_vars,
                              n_jobs=1,
                              dtype=None,
                              use_z=False,
+                             model_intercept=False,
                              demean_confounds=True,
                              min_vg_size=None):
 
@@ -246,6 +248,10 @@ def _process_permuted_v_base(tested_vars,
     # Error if both use_tf and request calculate z
     if use_tf and use_z:
         raise RuntimeError('use_z is not currently supported with tensorflow version.')
+
+    # If confounding vars passed as None
+    if confounding_vars is None:
+        confounding_vars = np.zeros((len(tested_vars), 0))
 
     # If passed as DataFrame or Series cast to array
     if isinstance(tested_vars, (pd.DataFrame, pd.Series)):
@@ -289,6 +295,10 @@ def _process_permuted_v_base(tested_vars,
         intercept_test = False
 
     # TODO make sure all the same dtype
+
+    # Optionally add intercept
+    if model_intercept and not intercept_test:
+        confounding_vars = np.hstack((confounding_vars, np.ones((len(tested_vars), 1))))
 
     # Calculate variance groups from passed permutation structure
     variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
@@ -379,21 +389,31 @@ def _process_permuted_v_base(tested_vars,
 
 def permuted_v(tested_vars,
                target_vars,
-               confounding_vars,
-               permutation_structure,
+               confounding_vars=None,
+               permutation_structure=None,
+               within_grp=True,
                n_perm=100,
                two_sided_test=True,
-               within_grp=True,
-               random_state=None,
-               use_tf=False,
-               n_jobs=1,
-               verbose=0,
-               dtype=None,
-               use_z=False,
                demean_confounds=True,
-               min_vg_size=None):
+               model_intercept=False,
+               min_vg_size=None,
+               dtype=None,
+               use_tf=False,
+               use_z=False,
+               random_state=None,
+               n_jobs=1,
+               verbose=0):
     '''This function is used to perform a permutation based statistical test
     on data with an underlying exchangability-block type structure.
+
+    In this case that no permutation structure is passed, i.e., value of None,
+    then the original function will NOT be called. Instead,
+    :func:`nilearn.mass_univariate.permuted_ols` will be used instead, and
+    t-statistics calculated!
+
+    This code is based to a large degree upon matlab code from
+    program PALM, as well as influence by the permutation function in python
+    library nilearn.
 
     Parameters
     -----------
@@ -417,13 +437,24 @@ def permuted_v(tested_vars,
         between the first dimensions of `tested_vars`, 'target_vars`,
         `confounding_vars` and `permutation_structure`.
 
-    confounding_vars : numpy array or pandas DataFrame
+    confounding_vars : numpy array, pandas DataFrame or None, optional
+
+        Confounding variates / covariates, passed as a 2D numpy array
+        with shape subjects x number of confounding variables, or as None.
+        If None, no variates are added, except maybe a constant column according to the
+        value of parameter `model_intercept`. Otherwise, the passed variables influence
+        will be removed from `tested_vars` before calculating the relationship between
+        `tested_vars` and `target_vars`.
 
         Note: The subject / data point order and length should match exactly
         between the first dimensions of `tested_vars`, 'target_vars`,
         `confounding_vars` and `permutation_structure`.
 
-    permutation_structure : numpy array or pandas DataFrame
+        ::
+
+            default = None
+
+    permutation_structure : numpy array, pandas DataFrame or None, optional
         This parameter represents the underlying exchangability-block
         structure of the data passed. It is also used in order to automatically determine
         the underlying variance structure of the passed data.
@@ -435,36 +466,167 @@ def permuted_v(tested_vars,
         here as an array or DataFrame instead of as a file. The main requirement 
         is that the shape of the structure match the number of subjects / data points
         in the first dimension.
+
+        In this case that no permutation structure is passed, i.e., value of None,
+        then the original function will NOT be called. Instead,
+        :func:`nilearn.mass_univariate.permuted_ols` will be used instead, and
+        t-statistics calculated!
         
         Note: The subject / data point order and length should match exactly
         between the first dimensions of `tested_vars`, 'target_vars`,
         `confounding_vars` and `permutation_structure`.
 
-    n_perm : int, optional
-        The number of permutations to test.
+        ::
+
+            default = None
+
+    within_grp : bool, optional
+        This parameter is only relevant when a permutation structure is passed, in that
+        case it describes how the left-most exchanability / permutation structure column should act.
+        Specifically, if True, then it specifies that the left-most column should be treated as groups
+        to act in a within group swap only manner. If False, then it will consider the left-most column
+        groups to only be able to swap at the group level with other groups of the same size.
 
         ::
 
-            default = 0
+            default = True
+
+    n_perm : int, optional
+        The number of permutations to perform. Permutations are costly but the more are performed,
+        the more precision one gets in the p-values estimation.
+
+        If passed 0, this a valid option, and can be used to calculate just the original scores.
+
+        ::
+
+            default = 500
 
     two_sided_test : bool, optional
+
+        If True, performs an unsigned v-test, where
+        both positive and negative effects are considered.
+        If False, only positive effects are considered as relevant.
         
         ::
 
             default = True
 
+    demean_confounds : bool, optional
+
+        ::
+        
+            default = True
+
+    model_intercept : bool, optional
+      If True, a constant column is added to the confounding variates
+      unless the tested variate is already the intercept.
+      
+      ::
+
+        default = False
+
+    min_vg_size : int or None, optional
+        If None, this parameter is ignored. Otherwise,
+        if passed as int, this defines the smallest sized unique variance
+        group allowed. Specifically, variance groups are calculated automatically
+        from the passed permutation structure, and like-wise some statistics are calculated
+        seperately per variance group, so that it can be a group idea to set a filter here
+        that will drop any subject's data that are below that threshold.
+
+        ::
+
+            default = None
+        
+    dtype : str or None, optional
+        If left as default of None, then the original
+        datatypes for all passed data will be used.
+        Alternatively, you may specify either 'float32' or 'float64'
+        and all data and calculations will be cast to that datatype.
+
+        It can be very beneficial in practice to specify 'float32'
+        and perform less precise calculations. This can greatly improve
+        memory and will also provide a speedup (a significant speed up when
+        `use_tf` is set, otherwise a modest one).
+
+        ::
+
+            default = None
+    
+    use_tf : bool, optional
+        This flag specifies if permutations should be
+        run on a special optimized version of the code
+        designed to use a GPU, written in tensorflow.
+
+        Note: If True, then this parameter requires that you have
+        tensorflow installed and working. Ideally, also setup with a gpu,
+        as using tensorflow with a cpu will not provide any benefit relative to using
+        the base numpy version of the code.
+
+        ::
+
+            default = False
+
+    use_z : bool, optional
+        v-statstics can optionally be converted into z-statstics. If
+        passed True, then the returned `original_scores` will be z-statstics
+        instead of v-statstics, and likewise, the permutation test will be performed
+        by comparing max z-stats instead of v-stats.
+
+        Note: This parameter cannot be used with use_tf.
+
+        ::
+
+            default = False
+    
+    random_state : int or None, optional
+        The random seed for random number generator. This
+        can be set by passing an int to specify the same permutations, or
+        by passing None a random seed will be used.
+
+        ::
+
+            default = None
+    
+    n_jobs : int, optional
+
+        Number of parallel workers. If 0 is provided, all CPUs are used.
+        A negative number indicates that all the CPUs except (abs(n_jobs) - 1) ones will be used.
+
+        ::
+
+            default = 1
+    
+    verbose : int, optional
+        verbosity level (0 means no message).
+
+        ::
+
+            default = 0
+
     Returns
     --------
     pvals : numpy array
-        X
+        Negative log10 p-values associated with the significance test of the
+        explanatory variates against the target variates. Family-wise corrected p-values.
     
     original_scores : numpy array
-        X 
-    
-    h0_vmax : numpy array:
-        X
+        Either v (default), z or t statistics associated with the
+        significance test of the explanatory variates against the target variates.
+        The ranks of the scores into the h0 distribution correspond to the p-values.
+
+    h0_vmax : numpy array
+        Distribution of the (max) v/z/t-statistic under the null hypothesis
+        (obtained from the permutations). Array is sorted.
 
     '''
+
+    # Special case, switch functions
+    if permutation_structure is None:
+        print('No permutation structure passed, switching to nilearn permuted_ols!', flush=True)
+        return permuted_ols(tested_vars=tested_vars, target_vars=target_vars,
+                            confounding_vars=confounding_vars, model_intercept=model_intercept,
+                            n_perm=n_perm, two_sided_test=two_sided_test, random_state=random_state,
+                            n_jobs=n_jobs, verbose=verbose)
 
     # TODO add handle missing-ness better?
     # TODO if tested vars multiple, setup to run each seperately ... same as nilearn
@@ -488,6 +650,7 @@ def permuted_v(tested_vars,
                                  n_jobs=n_jobs,
                                  dtype=dtype,
                                  use_z=use_z,
+                                 model_intercept=model_intercept,
                                  demean_confounds=demean_confounds,
                                  min_vg_size=min_vg_size)
 
