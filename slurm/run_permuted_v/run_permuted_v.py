@@ -440,7 +440,8 @@ def run_permutations(temp_dr, results_dr, data_split, time_est, job_id,
 
             # Generate this permutation based on current random state
             p_set = _get_perm_matrix(args['permutation_structure'],
-                                    random_state=random_state)
+                                     random_state=random_state,
+                                     intercept_test=args['intercept_test'])
 
             # Get v or z stats for this permutation
             perm_scores = args['run_perm_func'](p_set=p_set, target_vars=target_vars, **args)

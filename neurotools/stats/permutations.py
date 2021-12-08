@@ -8,10 +8,10 @@ from joblib import Parallel, delayed
 
 from ..random.permute_blocks import block_permutation, get_auto_vg
 
-def self_inverse(arr):
+def _self_inverse(arr):
     return arr @ np.linalg.pinv(arr)
 
-def get_contrast(tested_vars, confounding_vars):
+def _get_contrast(tested_vars, confounding_vars):
     
     dtype = dtype=tested_vars.dtype.name
     
@@ -23,7 +23,13 @@ def get_contrast(tested_vars, confounding_vars):
     
     return contrast
 
-def _get_perm_matrix(permutation_structure, random_state):
+def _get_perm_matrix(permutation_structure, random_state, intercept_test=False):
+
+    # If intercept test, ignore permutation structure,
+    # and the permutation is just eye with random 1's and -1's.
+    if intercept_test:
+        flip_vals = (check_random_state(random_state).randint(2, size=(len(permutation_structure))) * 2) - 1
+        return np.eye(len(permutation_structure)) * flip_vals
     
     # If passed in variance group 1D form
     if len(permutation_structure.shape) == 1:
@@ -46,7 +52,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             input_matrix, variance_groups, drm,
                             contrast, n_perm_chunk, n_perm, random_state,
                             permutation_structure=None, verbose=0,
-                            use_z=False, two_sided_test=True, use_special_tf=False):
+                            use_z=False, two_sided_test=True, intercept_test=False,
+                            use_special_tf=False):
 
     # If the special tensorflow case, and the first job
     if use_special_tf and thread_id == 1:
@@ -69,7 +76,7 @@ def _run_permutation_chunks(run_perm_func, original_scores,
     for i in range(n_perm_chunk):
         
         # Generate permutation on the fly
-        p_set = _get_perm_matrix(permutation_structure, random_state+i)
+        p_set = _get_perm_matrix(permutation_structure, random_state+i, intercept_test)
 
         # Get v stats for this permutation
         perm_scores = run_perm_func(
@@ -112,13 +119,13 @@ def _run_permutation_chunks(run_perm_func, original_scores,
 
     return scores_as_ranks_part, h0_vmax_part
 
-def proc_input(tested_vars, confounding_vars):
+def _proc_input(tested_vars, confounding_vars):
     
     # Stack input vars
     input_vars = np.hstack([tested_vars, confounding_vars])
     
     # Get contrasts
-    contrast = get_contrast(tested_vars, confounding_vars)
+    contrast = _get_contrast(tested_vars, confounding_vars)
     contrast_pinv = np.linalg.pinv(contrast.T)
     I_temp = np.eye(len(contrast), dtype=tested_vars.dtype.name)
     contrast0 = I_temp - contrast @ np.linalg.pinv(contrast)
@@ -181,7 +188,7 @@ def _nan_check(vars):
     if np.isnan(vars).any():
         raise RuntimeError('Currently no missing data is supported in tested_vars, target_vars or confounds_vars.')
 
-def proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
+def _proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
                      target_vars, permutation_structure, variance_groups):
 
     # Calc sizes
@@ -274,6 +281,12 @@ def _process_permuted_v_base(tested_vars,
     tested_vars = _proc_dtype(tested_vars)
     target_vars = _proc_dtype(target_vars)
 
+    # Check if tested_vars is intercept or not
+    if np.unique(tested_vars).size == 1:
+        intercept_test = True
+    else:
+        intercept_test = False
+
     # TODO make sure all the same dtype
 
     # Calculate variance groups from passed permutation structure
@@ -282,7 +295,7 @@ def _process_permuted_v_base(tested_vars,
     # Optionally, remove some data points based on too small unique variance group
     if min_vg_size is not None:
         confounding_vars, tested_vars, target_vars, permutation_structure, variance_groups =\
-            proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
+            _proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
                              target_vars, permutation_structure, variance_groups)
 
     # Optionally de-mean confounds, prevents common
@@ -299,17 +312,17 @@ def _process_permuted_v_base(tested_vars,
 
     # Process / resid ?
     tested_resid, confounding_resid, contrast =\
-        proc_input(tested_vars, confounding_vars)
+        _proc_input(tested_vars, confounding_vars)
 
     # Get all input vars
     input_matrix = np.hstack([tested_resid, confounding_resid])
 
     # Pre-calculate here
     I = np.eye(len(input_matrix), dtype=input_matrix.dtype.name)
-    drm = np.diag(I - self_inverse(input_matrix))
+    drm = np.diag(I - _self_inverse(input_matrix))
 
     # Get inverse of confounding vars
-    hz = self_inverse(confounding_resid)
+    hz = _self_inverse(confounding_resid)
     rz = I - hz
 
     # Save some memory
@@ -361,7 +374,7 @@ def _process_permuted_v_base(tested_vars,
     return (original_scores, original_scores_sign,
             run_permutation, target_vars,
             rz, hz, input_matrix, permutation_structure, variance_groups, 
-            drm, contrast, rng, use_special_tf, special_tf_job_split)
+            drm, contrast, rng, intercept_test, use_special_tf, special_tf_job_split)
 
 def permuted_v(tested_vars,
                target_vars,
@@ -380,8 +393,6 @@ def permuted_v(tested_vars,
                min_vg_size=None):
     '''This function is used to perform a permutation based statistical test
     on data with an underlying exchangability-block type structure.
-
-
 
     Parameters
     -----------
@@ -462,7 +473,8 @@ def permuted_v(tested_vars,
     # Separate function for initial processing
     (original_scores, original_scores_sign, run_permutation,
      target_vars, rz, hz, input_matrix, permutation_structure,
-     variance_groups, drm, contrast, rng, use_special_tf, special_tf_job_split) =\
+     variance_groups, drm, contrast, rng, intercept_test,
+     use_special_tf, special_tf_job_split) =\
         _process_permuted_v_base(tested_vars=tested_vars,
                                  target_vars=target_vars,
                                  confounding_vars=confounding_vars,
@@ -503,6 +515,7 @@ def permuted_v(tested_vars,
         random_state=rng.randint(1, np.iinfo(np.int32).max - 1),
         permutation_structure=permutation_structure,
         verbose=verbose, use_z=use_z, two_sided_test=two_sided_test,
+        intercept_test=intercept_test,
         use_special_tf=use_special_tf)
         for thread_id, n_perm_chunk in enumerate(n_perm_chunks))
 

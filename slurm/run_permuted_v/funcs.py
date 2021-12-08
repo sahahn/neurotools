@@ -171,6 +171,7 @@ def setup_and_run_permuted_v(results_dr,
                          'permutation_structure': base[7],
                          'variance_groups': base[8], 'drm': base[9],
                          'contrast': base[10], 'rng': base[11],
+                         'intercept_test': base[12],
                          'use_z': use_z, 'two_sided_test': two_sided_test,
                          'n_splits': n_splits, 'limit': limit, 'n_perm': n_perm}
 
