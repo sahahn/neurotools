@@ -24,7 +24,7 @@ def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
         List of fixed effect variables, where if any
         variables are categorical they should be wrapped in `C(variable_name)`.
 
-    random_effects_Vars : list of str or str
+    random_effects_vars : list of str or str
         Either a single random effect or a list with two
         random effect variables specifying that multiple
         layers of nesting should be done. In the case

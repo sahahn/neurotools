@@ -220,6 +220,7 @@ def _process_permuted_v_base(tested_vars,
                              dtype=None,
                              use_z=False,
                              model_intercept=False,
+                             demean_targets=True,
                              demean_confounds=True,
                              min_vg_size=None):
 
@@ -309,7 +310,15 @@ def _process_permuted_v_base(tested_vars,
             _proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
                              target_vars, permutation_structure, variance_groups)
 
-    # Optionally de-mean confounds, prevents common
+    # De-mean target variable
+    if demean_targets:
+        target_vars -= target_vars.mean(axis=0)
+
+    # If set False and intercept test, warn
+    elif intercept_test:
+        print('Warning: Preforming intercept test based on sign flips, if target vars are not de-meaned this can cause problems!', flush=True)
+
+    # Optionally de-mean confounds, can prevent common
     # problems, especially when passing dummy coded variables
     # so default is True
     if demean_confounds:
@@ -394,6 +403,7 @@ def permuted_v(tested_vars,
                within_grp=True,
                n_perm=100,
                two_sided_test=True,
+               demean_targets=True,
                demean_confounds=True,
                model_intercept=False,
                min_vg_size=None,
@@ -406,10 +416,15 @@ def permuted_v(tested_vars,
     '''This function is used to perform a permutation based statistical test
     on data with an underlying exchangability-block type structure.
 
-    In this case that no permutation structure is passed, i.e., value of None,
+    In the case that no permutation structure is passed, i.e., value of None,
     then the original function will NOT be called. Instead,
     :func:`nilearn.mass_univariate.permuted_ols` will be used instead, and
     t-statistics calculated!
+
+    In the case that the passed tested_vars are a single group only, e.g., all
+    1's, then any passed permutation_structure will only be used to generate variance groups,
+    as instead of permutations based on swapping data, permutations will be performed
+    through random sign flips of the data.
 
     This code is based to a large degree upon matlab code from
     program PALM, as well as influence by the permutation function in python
@@ -511,7 +526,21 @@ def permuted_v(tested_vars,
 
             default = True
 
+    demean_targets : bool, optional
+        If True, then the passed `target_vars` are demeaned across passed
+        subjects (i.e., each single feature scaled to have mean 0 across subjects).
+
+        Note: If performing an intercept based test (i.e., the tested vars are all 1's)
+        then this parameter should be left True, as sign flips to data that are not de-meaned
+        might cause strange issues.
+
+        ::
+
+            default = True
+
     demean_confounds : bool, optional
+        If True, then the passed `confounding_vars` are demeaned across passed
+        subjects (i.e., each single variable / column scaled to have mean 0 across subjects).
 
         ::
         
@@ -651,6 +680,7 @@ def permuted_v(tested_vars,
                                  dtype=dtype,
                                  use_z=use_z,
                                  model_intercept=model_intercept,
+                                 demean_targets=demean_targets,
                                  demean_confounds=demean_confounds,
                                  min_vg_size=min_vg_size)
 
