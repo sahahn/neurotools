@@ -191,6 +191,307 @@
         <article role="main">
           <div class="section" id="transform">
 <h1>transform<a class="headerlink" href="#transform" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="surflabels">
+<h2>SurfLabels<a class="headerlink" href="#surflabels" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="neurotools.transform.rois.SurfLabels">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract signals from non-overlapping labels.</p>
+<p>This class functions similar to
+<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiLabelsMasker</span></code></a>, except
+it is designed to work for surface, cifti or any arbitrary
+1 or 2D numpy arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em>) – This should represent an array, of the same size as the data
+dimension, as a mask with unique integer values for each ROI.
+You can also pass a str location in which to load in this array.
+Anything accepted by <code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code> is acceptable here.</p></li>
+<li><p><strong>background_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>array-like of int</em><em>, </em><em>optional</em>) – <p>This parameter determines which label, if any,
+in the corresponding
+passed labels, should be treated as ‘background’
+and therefore no ROI
+calculated for that value or values.
+You may pass either a single interger
+value, an array-like of integer values.</p>
+<p>If not background label is desired, just pass
+a label which doesn’t exist in any of the data,
+e.g., -100.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+which to not calculate ROI values for.
+This can be passed as a str or
+array-like of values (just like labels),
+and should be comprised of
+a boolean array (or 1’s and 0’s),
+where a value of 1 means that value
+will be ignored (set to background label)
+should be kept, and a value of 0,
+for that value should be masked away.
+This array should have the same length as the passed <cite>labels</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>strategy</strong> (<em>specific str</em><em>, </em><em>custom_func</em><em>, </em><em>optional</em>) – <p>This parameter dictates the function to be applied
+to each data’s ROI’s
+individually, e.g., mean to calculate the mean by ROI.</p>
+<p>If a str is passed, it must correspond to one of the below preset
+options:</p>
+<ul>
+<li><dl class="simple">
+<dt>’mean’</dt><dd><p>Calculate the mean with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.mean()</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’sum’</dt><dd><p>Calculate the sum with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.sum()</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’min’ or ‘minimum</dt><dd><p>Calculate the min value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.min()</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’max’ or ‘maximum</dt><dd><p>Calculate the max value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.max()</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’std’ or ‘standard_deviation’</dt><dd><p>Calculate the standard deviation with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.std.html#numpy.std" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.std()</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’var’ or  ‘variance’</dt><dd><p>Calculate the variance with <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.var.html#numpy.var" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.var()</span></code></a></p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>If a custom function is passed, it must accept two arguments,
+custom_func(X_i, axis=data_dim), X_i, where X_i is a subjects data
+array where that subjects data corresponds to
+labels == some class i, and can potentially
+be either a 1D array or 2D array, and an axis argument
+to specify which axis is
+the data dimension (e.g., if calculating for a time-series
+[n_timepoints, data_dim], then data_dim = 1,
+if calculating for say stacked contrasts where
+[data_dim, n_contrasts], data_dim = 0, and lastly for a 1D
+array, data_dim is also 0.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'mean'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If the returned array should be flattened to 1D. E.g., if the
+last step in a set of loader steps this should be True, if before
+a different step it may make sense to set to False.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#neurotools.transform.rois.SurfMaps" title="neurotools.transform.rois.SurfMaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SurfMaps</span></code></a></dt><dd><p>For extracting non-static / probabilistic parcellations.</p>
+</dd>
+<dt><a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiLabelsMasker</span></code></a></dt><dd><p>For working with volumetric data.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+</div>
+<div class="section" id="surfmaps">
+<h2>SurfMaps<a class="headerlink" href="#surfmaps" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="neurotools.transform.rois.SurfMaps">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract signals from overlapping labels.</p>
+<p>This class functions similar to
+<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiMapsMasker</span></code></a>, except
+it is designed to work for surface, cifti or any arbitrary
+1 or 2D numpy arrays.</p>
+<p>This object calculates the signal for each of the
+passed maps as extracted from the input during fit,
+and returns for each map a value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>maps</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter represents the maps in which
+to apply to each surface, where the shape of
+the passed maps should be (# of features, # of maps)
+or in other words, the size of the data array in the first
+dimension and the number of maps
+(i.e., the number of outputted ROIs from fit)
+as the second dimension.</p>
+<p>You may pass maps as either an array-like,
+or the str file location of a numpy or other
+valid surface file format array in which to load.</p>
+</p></li>
+<li><p><strong>strategy</strong> (<em>{'auto'</em><em>, </em><em>'ls'</em><em>, </em><em>'average'}</em><em>, </em><em>optional</em>) – <p>The strategy in which the maps are used to extract
+signal. If ‘ls’ is selected, which stands for
+least squares, the least-squares solution will
+be used for each region.</p>
+<p>Alternatively, if ‘average’ is passed, then
+the weighted average value for each map
+will be computed.</p>
+<p>By default ‘auto’ will be selected,
+which will use ‘average’ if the passed
+maps contain only positive weights, and
+‘ls’ in the case that there are
+any negative values in the passed maps.</p>
+<p>Otherwise, you can set a specific strategy.
+In deciding which method to use,
+consider an example. Let’s say the
+fit data X, and maps are</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">maps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>In this case, the ‘ls’ method would
+yield region signals [2.5, -2.5], whereas
+the weighted ‘average’ method, would yield
+[5, 5], notably ignoring the negative weights.
+This highlights an important limitation to the
+weighted averaged method, as it does not
+handle negative values well.</p>
+<p>On the other hand, consider changing the maps
+weights to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">maps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+
+<span class="n">ls_sol</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.</span> <span class="p">,</span> <span class="mf">0.6</span><span class="p">]</span>
+<span class="n">average_sol</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In this case, we can see that the weighted
+average gives a maybe more intuitive summary
+of the regions. In general, it depends on
+what signal you are trying to summarize, and
+how you are trying to summarize it.</p>
+</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+which to not calculate ROI values for.
+This can be passed as a str or
+array-like of values (just like maps),
+and should be comprised of
+a boolean array (or 1’s and 0’s),
+where a value of 1 means that value
+will be ignored (set to 0)
+should be kept, and a value of 0,
+for that value should be masked away.
+This array should have the same length as the passed <cite>maps</cite>.
+Specifically, where the shape of maps is (size, n_maps),
+the shape of mask should be (size).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If the returned array should be flattened to 1D. E.g., if this is
+the last step in a set of loader steps this should be True.
+Also note, if the surface data it is being applied to is 1D,
+then the output will be 1D regardless of this parameter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#neurotools.transform.rois.SurfLabels" title="neurotools.transform.rois.SurfLabels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SurfLabels</span></code></a></dt><dd><p>For extracting static / non-probabilistic parcellations.</p>
+</dd>
+<dt><a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiMapsMasker</span></code></a></dt><dd><p>For volumetric nifti data.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>First let’s define an example set of probabilistic maps, we
+will assume there are just 5 features in our data, and we will
+define 6 total maps.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">neurotools.transform</span> <span class="kn">import</span> <span class="n">SurfMaps</span>
+
+<span class="go"># This should have shape number of features x number of maps!</span>
+<span class="gp">In [3]: </span><span class="n">prob_maps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">   ...: </span>                      <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">   ...: </span>                      <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">   ...: </span>                      <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">   ...: </span>                      <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="gp">   ...: </span>
+
+<span class="gp">In [4]: </span><span class="n">prob_maps</span><span class="o">.</span><span class="n">shape</span>
+<span class="gh">Out[4]: </span><span class="go">(5, 6)</span>
+</pre></div>
+</div>
+<p>Next we can define some input data to use with these maps.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="n">data1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float'</span><span class="p">)</span>
+
+<span class="gp">In [6]: </span><span class="n">data1</span>
+<span class="gh">Out[6]: </span><span class="go">array([0., 1., 2., 3., 4.])</span>
+
+<span class="gp">In [7]: </span><span class="n">data2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float'</span><span class="p">)</span>
+
+<span class="gp">In [8]: </span><span class="n">data2</span>
+<span class="gh">Out[8]: </span><span class="go">array([1., 1., 1., 1., 1.])</span>
+</pre></div>
+</div>
+<p>Now let’s define the actual object and use it to transform the data.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="n">sm</span> <span class="o">=</span> <span class="n">SurfMaps</span><span class="p">(</span><span class="n">maps</span><span class="o">=</span><span class="n">prob_maps</span><span class="p">)</span>
+
+<span class="gp">In [10]: </span><span class="n">sm</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data1</span><span class="p">)</span>
+<span class="gh">Out[10]: </span><span class="go"></span>
+<span class="go">array([1.42857143, 1.71428571, 2.        , 2.28571429, 2.57142857,</span>
+<span class="go">       2.        ])</span>
+
+<span class="gp">In [11]: </span><span class="n">sm</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
+<span class="gh">Out[11]: </span><span class="go">array([1., 1., 1., 1., 1., 1.])</span>
+</pre></div>
+</div>
+<p>Okay so what is going on when we transform this data? Basically we are
+just taking weighted averages for each one of the defined maps. We could
+also explicitly change the strategy from ‘auto’ to ‘ls’ which would
+take the least squares solution instead.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="n">sm</span> <span class="o">=</span> <span class="n">SurfMaps</span><span class="p">(</span><span class="n">maps</span><span class="o">=</span><span class="n">prob_maps</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'ls'</span><span class="p">)</span>
+
+<span class="gp">In [13]: </span><span class="n">data_trans</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data1</span><span class="p">)</span>
+
+<span class="gp">In [14]: </span><span class="n">data_trans</span>
+<span class="gh">Out[14]: </span><span class="go"></span>
+<span class="go">array([-0.74074074, -0.24074074,  0.25925926,  0.75925926,  1.25925926,</span>
+<span class="go">        0.18518519])</span>
+</pre></div>
+</div>
+<p>While a little less intuitive, the least squares solution allows
+us to reverse the feature transformation (although not always exactly)</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">sm</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">data_trans</span><span class="p">)</span>
+<span class="gh">Out[15]: </span><span class="go"></span>
+<span class="go">array([-1.11022302e-15,  1.00000000e+00,  2.00000000e+00,  3.00000000e+00,</span>
+<span class="go">        4.00000000e+00])</span>
+</pre></div>
+</div>
+<p>This can be useful in the say the case of converting back downstream
+calculated feature importance to the original data space.</p>
+</dd></dl>
+</div>
 <div class="section" id="gen-ks-roi-network">
 <h2>gen_ks_roi_network<a class="headerlink" href="#gen-ks-roi-network" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -349,6 +650,8 @@ every combination of ROI.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">transform</a><ul>
+<li><a class="reference internal" href="#surflabels">SurfLabels</a></li>
+<li><a class="reference internal" href="#surfmaps">SurfMaps</a></li>
 <li><a class="reference internal" href="#gen-ks-roi-network">gen_ks_roi_network</a></li>
 <li><a class="reference internal" href="#gen-fs-subj-vertex-network">gen_fs_subj_vertex_network</a></li>
 </ul>
