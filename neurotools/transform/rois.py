@@ -13,20 +13,13 @@ class SurfLabels(BaseEstimator, TransformerMixin):
     it is designed to work for surface, cifti or any arbitrary
     1 or 2D numpy arrays.
 
-    This transformer code is duplicated from BPt extensions code.
-
     Parameters
     -----------
     labels : str or array-like
         This should represent an array, of the same size as the data
-        dimension, as a mask
-        with unique integer values for each ROI. You can also pass a str
-        location in which
-        to load in this array (though the saved file must be loadable by
-        either numpy.load, or
-        if not a numpy array, will try and load with
-        nilearn.surface.load_surf_data(), which you
-        will need nilearn installed to use.)
+        dimension, as a mask with unique integer values for each ROI.
+        You can also pass a str location in which to load in this array.
+        Anything accepted by :func:`load` is acceptable here.
 
     background_label : int, array-like of int, optional
         This parameter determines which label, if any,
@@ -324,6 +317,7 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         # Save original shape if vectorize called,
         # used for reverse transform
         self.original_transformed_shape_ = X_trans.shape
+        
         return X_trans.flatten()
 
     def inverse_transform(self, X_trans):
@@ -513,7 +507,7 @@ class SurfMaps(BaseEstimator, TransformerMixin):
     .. ipython:: python
 
         import numpy as np
-        from BPt.extensions import SurfMaps
+        from neurotools.transform import SurfMaps
 
         # This should have shape number of features x number of maps!
         prob_maps = np.array([[3, 1, 1, 1, 1, 1],
