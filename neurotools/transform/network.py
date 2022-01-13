@@ -63,13 +63,13 @@ def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_di
         corresponding to which vertex or data elements belong
         to different ROIs.
 
-    metric : {'jsd', 'ks', 'ks demean', 'ks normalize'}, optional
+    metric : {'jsd', 'ks', 'ks_demean', 'ks_normalize'}, optional
         The type of distance to compute between points.
 
         - 'jsd' : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.
         - 'ks' : Use the 1 - Kolmogorov–Smirnov distance between distributions.
-        - 'ks demean' : Same as 'ks', but with each ROI's points de-meaned.
-        - 'ks normalize' : Same as 'ks', but with each ROI's points normalized.
+        - 'ks_demean' : Same as 'ks', but with each ROI's points de-meaned.
+        - 'ks_normalize' : Same as 'ks', but with each ROI's points normalized.
 
         ::
 
@@ -106,9 +106,9 @@ def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_di
         dist_metric = _jsd_metric
     elif metric == 'ks':
         dist_metric = _ks_metric
-    elif metric == 'ks demean':
+    elif metric == 'ks_demean':
         dist_metric = _ks_demean_metric
-    elif metric == 'ks normalize':
+    elif metric == 'ks_normalize':
         dist_metric = _ks_normalize_metric
     else:
         raise RuntimeError(f'Passed metric {metric} invalid!')
@@ -198,13 +198,13 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
 
             default = 'aparc.a2009s.annot'
 
-     metric : {'jsd', 'ks', 'ks demean', 'ks normalize'}, optional
+     metric : {'jsd', 'ks', 'ks_demean', 'ks_normalize'}, optional
         The type of distance to compute between points.
 
         - 'jsd' : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.
         - 'ks' : Use the 1 - Kolmogorov–Smirnov distance between distributions.
-        - 'ks demean' : Same as 'ks', but with each ROI's points de-meaned.
-        - 'ks normalize' : Same as 'ks', but with each ROI's points normalized.
+        - 'ks_demean' : Same as 'ks', but with each ROI's points de-meaned.
+        - 'ks_normalize' : Same as 'ks', but with each ROI's points normalized.
 
         ::
 
