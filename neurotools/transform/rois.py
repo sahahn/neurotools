@@ -6,12 +6,10 @@ from ..loading import load
 
 
 class SurfLabels(BaseEstimator, TransformerMixin):
-    '''Extract signals from non-overlapping labels.
+    '''Extract signals from non-overlapping labels for surface data.
 
-    This class functions similar to
-    :class:`nilearn.input_data.NiftiLabelsMasker`, except
-    it is designed to work for surface, cifti or any arbitrary
-    1 or 2D numpy arrays.
+    This class functions similar to :class:`NiftiLabelsMasker<nilearn.input_data.NiftiLabelsMasker>`,
+    except is designed to work with surface data. 
 
     Parameters
     -----------
@@ -19,20 +17,19 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         This should represent an array, of the same size as the data
         dimension, as a mask with unique integer values for each ROI.
         You can also pass a str location in which to load in this array.
-        Anything accepted by :func:`load` is acceptable here.
+        Anything accepted by :func:`load<neurotools.loading.load>` is acceptable here.
 
     background_label : int, array-like of int, optional
         This parameter determines which label, if any,
-        in the corresponding
-        passed labels, should be treated as 'background'
-        and therefore no ROI
+        in the corresponding passed labels,
+        should be treated as 'background' and therefore no ROI
         calculated for that value or values.
         You may pass either a single interger
         value, an array-like of integer values.
 
         If not background label is desired, just pass
         a label which doesn't exist in any of the data,
-        e.g., -100.
+        e.g., -2.
 
         ::
 
@@ -70,10 +67,10 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             Calculate the sum with :func:`numpy.sum`
 
         - 'min' or 'minimum
-            Calculate the min value with :func:`numpy.min`
+            Calculate the min value with :func:`numpy.ndarray.min`
 
         - 'max' or 'maximum
-            Calculate the max value with :func:`numpy.max`
+            Calculate the max value with :func:`numpy.ndarray.max`
 
         - 'std' or 'standard_deviation'
             Calculate the standard deviation with :func:`numpy.std`
@@ -381,16 +378,10 @@ class SurfLabels(BaseEstimator, TransformerMixin):
 
 
 class SurfMaps(BaseEstimator, TransformerMixin):
-    '''Extract signals from overlapping labels.
+    '''Extract signals from overlapping labels for surface data.
 
-    This class functions similar to
-    :class:`nilearn.input_data.NiftiMapsMasker`, except
-    it is designed to work for surface, cifti or any arbitrary
-    1 or 2D numpy arrays.
-
-    This object calculates the signal for each of the
-    passed maps as extracted from the input during fit,
-    and returns for each map a value.
+    This class functions similar to :class:`NiftiMapsMasker<nilearn.input_data.NiftiMapsMasker>`,
+    except it is designed to work with surface projected data, instead of 3D/4D Nifti files.
 
     Parameters
     -----------
@@ -406,6 +397,7 @@ class SurfMaps(BaseEstimator, TransformerMixin):
         You may pass maps as either an array-like,
         or the str file location of a numpy or other
         valid surface file format array in which to load.
+        Anything accepted by :func:`load<neurotools.loading.load>` is acceptable here.
 
     strategy : {'auto', 'ls', 'average'}, optional
         The strategy in which the maps are used to extract

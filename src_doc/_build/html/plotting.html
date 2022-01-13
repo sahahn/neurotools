@@ -275,14 +275,14 @@ levels are made avaliable:</p>
 <li><p>&gt;1 : Automatic choices are shown as well as additional helper text.</p></li>
 </ul>
 </p></li>
-<li><p><strong>kwargs</strong> (<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) – <p>There are number of different plotting specific arguments
+<li><p><strong>kwargs</strong> – <p>There are number of different plotting specific arguments
 that can optionally be modified. The default values for these arguments
 may change also depending on different auto-detected settings, i.e.,
 if plotting a single surface vs. surface collage, or if plotting
-a volumetric image.</p>
+a volumetric image. The remaining parameters below are these kwargs.</p>
 <ul>
-<li><dl>
-<dt>surf_mesh<span class="classifier">str or 2D array</span></dt><dd><p>A str indicator specifying a valid surface mesh,
+<li><p>surf_mesh : str or array</p>
+<p>A str indicator specifying a valid surface mesh,
 with respect to the current space, or a two dimensional array
 with information about the coordinates and vertex-faces
 in which to plot the data on. The default for
@@ -291,35 +291,28 @@ is ‘very_inflated’. If you wish to plot surface
 data in native subject space, then this argument must be
 supplied with a loaded 2D array / valid mesh, and data
 must be passed in dictionary style.</p>
-<p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
+<p>This parameter is only relevant when plotting surfaces.</p>
 </li>
-<li><dl>
-<dt>bg_map<span class="classifier">str or 2D array</span></dt><dd><p>This argument specifies
-a background map to be used when plotting. This
+<li><p>bg_map : str or 2D array</p></li>
+</ul>
+<p>This argument specifies a background map to be used when plotting. This
 should be passed as either a str indicator specifying a valid file
 within the current surface space, or as a valid array of values,
 again, with respect to the current space. This map is plotted in greyscale
 underneath the data points, often used for realistic shading.
 The default for when plotting is ‘sulc’.</p>
-<p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
-</li>
-<li><dl>
-<dt>cmap<span class="classifier">str or <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a></span></dt><dd><p>This should be pass as an instance
+<ul>
+<li><p>cmap : str or <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a></p>
+<p>This should be pass as an instance
 of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a> or str
 representing the name of a matplotlib colormap. This will be the color map
 in which the values are plotted according to. When plotting surface
 parcellations, the default cmaps are ‘prism’ if plotting rois, ‘Reds’
 if plotting not symmetric statistical maps, and ‘cold_hot’ if plotting
 symmetric statistical maps (e.g., values above and below 0).</p>
-</dd>
-</dl>
 </li>
-<li><dl>
-<dt>vol_plot_type<span class="classifier">{‘glass’, ‘stat’, ‘roi’}</span></dt><dd><p>This parameter control the type of volumetric plot in which to generate,
+<li><p>vol_plot_type : {‘glass’, ‘stat’, ‘roi’}</p>
+<p>This parameter control the type of volumetric plot in which to generate,
 with valid values as one of ‘glass’, ‘stat’ and ‘roi’. By default,
 if detected to be plotting a parcellation, the value ‘roi’ is used.
 Otherwise, the default volumetric plotting type is ‘glass’.
@@ -330,11 +323,9 @@ The corresponding back-end nilearn functions used are:</p>
 <li><p>’roi’: <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.plotting.plot_roi.html#nilearn.plotting.plot_roi" title="(in Nilearn)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nilearn.plotting.plot_roi()</span></code></a></p></li>
 </ul>
 <p>This parameter is only used when plotting volumetric data.</p>
-</dd>
-</dl>
 </li>
-<li><dl>
-<dt>bg_on_data<span class="classifier">bool or float</span></dt><dd><p>If True, and a bg_map is specified,
+<li><p>bg_on_data : bool or float
+If True, and a bg_map is specified,
 the data to plot is multiplied by the background image,
 so that e.g. sulcal depth is visible beneath the surf_data.</p>
 <p>If passed as a float value, then that will trigger multiplying
@@ -344,11 +335,9 @@ False is the same as passing 0.
 This allows for fine tuning how much the background image
 is melded with the data shown. The default value is .25.</p>
 <p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
 </li>
-<li><dl>
-<dt>view<span class="classifier">str</span></dt><dd><p>If plotting a single surface hemisphere, this
+<li><p>view : str</p>
+<p>If plotting a single surface hemisphere, this
 parameter must be one of:
 {‘lateral’, ‘medial’, ‘dorsal’, ‘ventral’, ‘anterior’, ‘posterior’}
 Where ‘lateral’ is the default view if none is set.</p>
@@ -360,26 +349,32 @@ The default is ‘standard’.</p>
 <p>Note: If plotting a collage of surface and volumetric views,
 it is reccomended to keep the default collage ‘standard’ view,
 as the other views have not yet been properly formatted yet.</p>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>figsize<span class="classifier">’default’ or (int, int)</span></dt><dd><p>This parameter is used when axes are not passed, and
+<li><p>figsize : ‘default’ or (int, int)</p>
+<p>This parameter is used when axes are not passed, and
 a new figure is being generated. It represents
 the size of the underlying matplotlib figure to plot on.
 The default value for this function varies based on what type of
 plot is being made (e.g., not the same for surface collage vs. single surface).</p>
-</dd>
-</dl>
 </li>
-<li><p>darkness : temp</p></li>
-<li><p>avg_method : temp</p></li>
-<li><p>alpha : temp</p></li>
-<li><p>colorbar : temp</p></li>
-<li><p>symmetric_cbar : temp</p></li>
-<li><p>threshold : temp</p></li>
-<li><p>wspace : temp</p></li>
-<li><p>hspace : temp</p></li>
+<li><p>darkness : temp</p>
+<p>a</p>
+</li>
+<li><p>avg_method : temp</p>
+<p>a</p>
+</li>
+<li><p>alpha : temp</p>
+<p>a</p>
+</li>
+<li><p>colorbar : temp</p>
+<p>a</p>
+</li>
+<li><p>symmetric_cbar : temp
+a</p></li>
+<li><p>threshold : temp
+a</p></li>
+<li><p>wspace : temp
+a</p></li>
 </ul>
 </p></li>
 </ul>

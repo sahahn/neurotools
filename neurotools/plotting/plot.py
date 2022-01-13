@@ -1,3 +1,4 @@
+from typing import Type
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -139,89 +140,113 @@ def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
     return True
 
 
-def _setup_fig_axes(figure, axes,
-                    subplot_spec,
-                    get_grid, figsize,
-                    n_rows, n_cols, widths,
-                    heights, proj_3d,
-                    title, title_sz,
-                    colorbar, colorbar_params,
-                    wspace, hspace):
+def _setup_fig_axes(widths, heights, 
+                    figure=None, subplot_spec=None,
+                    get_grid=False, figsize=(10, 10),
+                    proj_3d=None, title=None, title_sz=12,
+                    title_y=None, colorbar=False, colorbar_params=None,
+                    wspace=1, hspace=1):
 
+    # Keep track of the number of original
+    # passed cols and rows.
+    if widths is None:
+        n_cols = 1
+    else:
+        n_cols = len(widths)
+        widths = widths.copy()
+
+    if heights is None:
+        n_rows = 1
+    else:
+        n_rows = len(heights)
+
+    # Proc arg
+    if colorbar_params is None:
+        colorbar_params = {}
+
+    # Init colorbar ax as None
     colorbar_ax = None
 
-    # If no axes or figure is passed,
-    if axes is None:
-        if figure is None:
-            figure = plt.figure(figsize=figsize)
+    # If no figure, init
+    if figure is None:
+        figure = plt.figure(figsize=figsize)
+
+    # If colorbar, add extra width
+    if colorbar is True:
         
-        if colorbar is True:
-
-            if 'cbar_fig_ratio' in colorbar_params:
-                widths += [colorbar_params['cbar_fig_ratio']]
-            else:
-                widths += [.5]
-
-        if subplot_spec is None:
-            grid = gridspec.GridSpec(n_rows, len(widths),
-                                     wspace=wspace,
-                                     hspace=hspace,
-                                     width_ratios=widths,
-                                     height_ratios=heights)
+        if 'cbar_fig_ratio' in colorbar_params:
+            widths += [colorbar_params['cbar_fig_ratio']]
         else:
-            grid =\
-                gridspec.GridSpecFromSubplotSpec(n_rows, len(widths),
-                                                 wspace=wspace,
-                                                 hspace=hspace,
-                                                 width_ratios=widths,
-                                                 height_ratios=heights,
-                                                 subplot_spec=subplot_spec)
+            widths += [.5]
+
+    # Two cases for init'ing grid, either init as nested
+    # if subplot_spec, or as base / new
+    if subplot_spec is None:
+        grid = gridspec.GridSpec(n_rows, len(widths),
+                                 wspace=wspace,
+                                 hspace=hspace,
+                                 width_ratios=widths,
+                                 height_ratios=heights)
+    else:
+        grid =\
+            gridspec.GridSpecFromSubplotSpec(n_rows, len(widths),
+                                             wspace=wspace,
+                                             hspace=hspace,
+                                             width_ratios=widths,
+                                             height_ratios=heights,
+                                             subplot_spec=subplot_spec)
+    
+    # Next, add the colorbar axis if colorbar, adds by default
+    # slash as only option now to the far right
+    if colorbar:
+
+        if n_rows == 1:
+            colorbar_ax = figure.add_subplot(grid[-1])
+        else:
+            colorbar_ax = figure.add_subplot(grid[:, -1])
         
+        colorbar_ax.set_axis_off()
+
+    # If a title is passed, also add a special title axis
+    if title is not None:
+        
+        # Colorbar and title case
         if colorbar:
+            if n_rows == 1:
+                title_ax = figure.add_subplot(grid[:-1])
+            else:
+                title_ax = figure.add_subplot(grid[:,:-1])
+
+        # Just title
+        else:
+            title_ax = figure.add_subplot(grid[:])
+            
+        # Set title and axis off
+        title_ax.set_title(title, fontsize=title_sz, y=title_y)
+        title_ax.set_axis_off()
+
+    # Optionally, return here, the grid object and figure directly
+    if get_grid:
+        return figure, grid, colorbar_ax
+
+    # If passed as single str,  or None, set for all
+    if isinstance(proj_3d, str) or proj_3d is None:
+        proj_3d = [[proj_3d for _ in range(n_cols)] for _ in range(n_rows)]
+
+    # Otherwise, we use the grid to add_subplots generating axes
+    # with each subplot according to the passed proj_3d if it is
+    # 3D or not. Use the original number of passed n_rows and n_cols
+    axes = []
+    for i in range(n_rows):
+        for j in range(n_cols):
 
             if n_rows == 1:
-                colorbar_ax = figure.add_subplot(grid[-1])
+                axes.append(figure.add_subplot(grid[j], projection=proj_3d[i][j]))
+            elif len(widths) == 1:
+                axes.append(figure.add_subplot(grid[i], projection=proj_3d[i][j]))
             else:
-                colorbar_ax = figure.add_subplot(grid[:, -1])
-            
-            colorbar_ax.set_axis_off()
+                axes.append(figure.add_subplot(grid[i, j], projection=proj_3d[i][j]))
 
-        if title is not None:
-
-            if colorbar:
-                if n_rows == 1:
-                    title_ax = figure.add_subplot(grid[:-1])
-                else:
-                    title_ax = figure.add_subplot(grid[:,:-1])
-
-            else:
-                title_ax = figure.add_subplot(grid[:])
-            
-            title_ax.set_title(title, fontsize=title_sz)
-            title_ax.set_axis_off()
-
-        if get_grid:
-            return figure, grid, colorbar_ax
-        
-        else:
-            axes = []
-            for i in range(n_rows):
-                for j in range(n_cols):
-
-                    if n_rows == 1:
-                        axes.append(figure.add_subplot(grid[j], projection=proj_3d[i][j]))
-                    elif len(widths) == 1:
-                        axes.append(figure.add_subplot(grid[i], projection=proj_3d[i][j]))
-                    else:
-                        axes.append(figure.add_subplot(grid[i, j], projection=proj_3d[i][j]))
-
-            return figure, axes, colorbar_ax
-
-    # If axes passed, but no figure passed
-    if figure is None:
-        figure = axes.get_figure()
-
-    # If passed axes explicitly, then doesn't matter what the get_grid param is
     return figure, axes, colorbar_ax
 
 
@@ -254,27 +279,28 @@ def plot_surf_hemi(data, ref, hemi,
                             vmax=vmax,
                             **kwargs)
 
+
 def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       bg_map='sulc', view='standard',
-                      title=None, title_sz=18,
+                      title=None, title_sz=18, title_y=None,
                       vmin=None, vmax=None,
                       cbar_vmin=None, cbar_vmax=None,
                       figsize=(15, 10), symmetric_cbar='auto',
-                      figure=None, axes=None, subplot_spec=None,
+                      figure=None, subplot_spec=None,
                       wspace=-.35, hspace=-.1,
                       colorbar=False, dist=6.5,
-                      colorbar_params={}, **kwargs):
+                      colorbar_params=None, **kwargs):
     '''
     data should be list with two elements [lh, rh] data.
 
     view: 'standard' means plot left and right hemisphere lateral
     and medial views in a grid. 
     'fb' / front back, means plot anterior posterior views in a row.
-    
-    If axes is passed, it should be a flat list with 4 axes,
-    and if colorbar is True, then the 5th axes passed should be
-    the spot for the color bar.
     '''
+
+    # Proc default
+    if colorbar_params is None:
+        colorbar_params = {}
 
     # Proc if sym cbar auto - assume rois False here
     symmetric_cbar = _get_if_sym_cbar(data, symmetric_cbar, rois=False)
@@ -285,40 +311,35 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
     
     # Set params based on requested view
     if view in ['standard', 'default']:
-        n_rows, n_cols = 2, 2
         hemis = ['lh', 'rh', 'lh', 'rh']
         views = ['lateral', 'lateral', 'medial', 'medial']
-        widths = [1, 1]
+        widths, heights = [1, 1], [1, 1]
 
     elif view in ['fb', 'front back', 'ap', 'anterior posterior']:
-        n_rows, n_cols = 1, 5
         hemis = ['lh', 'rh', 'b', 'lh', 'rh']
         views = ['anterior', 'anterior', 'b',
                  'posterior', 'posterior']
-        widths = [1, 1, .5, 1, 1]
+        widths, heights = [1, 1, .5, 1, 1], [1]
 
     elif view in ['f', 'front', 'a', 'anterior']:
-        n_rows, n_cols = 1, 2
         hemis = ['lh', 'rh']
         views = ['anterior', 'anterior']
-        widths = [1, 1]
+        widths, heights = [1, 1], [1]
 
     elif view in ['b', 'back', 'p', 'posterior']:
-        n_rows, n_cols = 1, 2
         hemis = ['lh', 'rh']
         views = ['posterior', 'posterior']
-        widths = [1, 1]
-
-    proj_3d = [['3d' for _ in range(n_cols)] for _ in range(n_rows)]
+        widths, heights = [1, 1], [1]
 
     # Setup figres and axes
     figure, axes, colorbar_ax =\
-        _setup_fig_axes(figure, axes, subplot_spec, False,
-                        figsize, n_rows, n_cols,
-                        widths, None, proj_3d, title, title_sz,
-                        colorbar, colorbar_params,
-                        wspace, hspace)
-        
+        _setup_fig_axes(widths=widths, heights=heights,
+                        figure=figure, subplot_spec=subplot_spec,
+                        get_grid=False, figsize=figsize,
+                        proj_3d='3d', title=title, title_sz=title_sz, title_y=title_y,
+                        colorbar=colorbar, colorbar_params=colorbar_params,
+                        wspace=wspace, hspace=hspace)
+
     # Fill the axes with appropriate values
     for i in range(len(hemis)):
 
@@ -351,6 +372,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
 
     return figure, axes, smfs
 
+
 def plot_surf_vol_collage(surf, vol,
                           vol_plot_type='glass',
                           cmap='cold_hot',
@@ -358,16 +380,26 @@ def plot_surf_vol_collage(surf, vol,
                           surf_to_vol_ratio=1,
                           vmin=None, vmax=None,
                           cbar_vmin=None, cbar_vmax=None,
-                          figure=None, axes=None,
+                          figure=None,
                           subplot_spec=None,
                           figsize=(20, 20),
                           title=None, title_sz=18,
+                          title_y=None,
                           colorbar=False,
                           symmetric_cbar=False,
                           hspace=0, wspace=0,
-                          colorbar_params={},
-                          surf_params={}, vol_params={},
+                          colorbar_params=None,
+                          surf_params=None,
+                          vol_params=None,
                           verbose=0, _print=None):
+
+    # Proc defaults
+    if colorbar_params is None:
+        colorbar_params = {}
+    if surf_params is None:
+        surf_params = {}
+    if vol_params is None:
+        vol_params = {}
 
     # Get verbose print object
     _get_print(verbose, _print=_print)
@@ -389,19 +421,18 @@ def plot_surf_vol_collage(surf, vol,
     smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
     
     # Init settings
-    n_rows, n_cols = 2, 1
     widths = [1]
     heights = [surf_to_vol_ratio] + [1]
-    proj_3d = [['3d'], [None]]
 
-    # Setup figures and axes
+    # Setup figures get returned as grid instead of axes
     figure, grid, colorbar_ax =\
-        _setup_fig_axes(figure, axes, subplot_spec, True,
-                        figsize, n_rows, n_cols,
-                        widths, heights, proj_3d, title, title_sz,
-                        colorbar, colorbar_params,
-                        wspace, hspace)
-    
+        _setup_fig_axes(widths=widths,  heights=heights,
+                        figure=figure, subplot_spec=subplot_spec,
+                        get_grid=True, figsize=figsize, title=title,
+                        title_sz=title_sz, title_y=title_y, colorbar=colorbar,
+                        colorbar_params=colorbar_params,
+                        wspace=wspace, hspace=hspace)
+
     # Either multi-index w/ colorbar or just two rows w/o
     if colorbar:
         surf_grid, vol_grid = grid[0, 0], grid[1, 0]
@@ -409,16 +440,15 @@ def plot_surf_vol_collage(surf, vol,
         surf_grid, vol_grid = grid[0], grid[1]
 
     # Plot surf collage in the top grid spot
-    figure, axes, smfz = plot_surf_collage(surf, 
-                                           figure=figure,
-                                           axes=None,
-                                           subplot_spec=surf_grid,
-                                           cmap=cmap,
-                                           threshold=threshold,
-                                           vmin=vmin,
-                                           vmax=vmax,
-                                           colorbar=False,
-                                           **surf_params)
+    figure, _, smfz = plot_surf_collage(surf, 
+                                        figure=figure,
+                                        subplot_spec=surf_grid,
+                                        cmap=cmap,
+                                        threshold=threshold,
+                                        vmin=vmin,
+                                        vmax=vmax,
+                                        colorbar=False, # Fixed False
+                                        **surf_params)
     
     # Keep track of vals for plotting colorbar
     smfs += smfz
@@ -480,6 +510,7 @@ def _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness):
 
     return surf_mesh, bg_map, darkness
 
+
 def _load_data_and_ref(data, space=None, hemi=None, _print=None):
     
     # Process the data + space - returns data as dict
@@ -512,6 +543,7 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
 
     return data, ref
 
+
 def _proc_avg_method(data, rois, avg_method):
 
     # If rois force avg method to median
@@ -535,6 +567,7 @@ def _proc_avg_method(data, rois, avg_method):
             avg_method = 'median'
 
     return avg_method
+
 
 def _prep_auto_defaults(data, space, hemi, rois,
                         symmetric_cbar, threshold,
@@ -566,6 +599,7 @@ def _prep_auto_defaults(data, space, hemi, rois,
     avg_method= _proc_avg_method(data, rois, avg_method)
 
     return data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method
+
 
 def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
                 bg_map=None, rois=False, cmap='default',
@@ -625,11 +659,13 @@ def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
 
     return
 
+
 def _sort_kwargs(kwargs):
 
     # Surface specific
-    surf_args = ['vol_alpha', 'bg_map',
-                 'surf_mash', 'darkness', 'view', 'dist']
+    surf_args = ['alpha', 'bg_map',
+                 'surf_mesh', 'darkness',
+                 'view', 'dist']
     surf_params = {key: kwargs[key] for key in surf_args if key in kwargs}
     
     # Special cases
@@ -643,8 +679,7 @@ def _sort_kwargs(kwargs):
     # Volume specific
     vol_args = ['resampling_interpolation', 'plot_abs',
                 'black_bg', 'display_mode', 'annotate', 'cut_coords',
-                'bg_img', 'draw_cross',
-                'dim', 'view_type', 'linewidths']
+                'bg_img', 'draw_cross', 'dim', 'view_type', 'linewidths']
     vol_params = {key: kwargs[key] for key in vol_args if key in kwargs}
 
     # Special case
@@ -666,6 +701,7 @@ def _sort_kwargs(kwargs):
 
     return surf_params, vol_params, colorbar_params
 
+
 def _proc_cmap(cmap, rois, symmetric_cbar):
     
     # Keep user passed if not user passed
@@ -683,6 +719,7 @@ def _proc_cmap(cmap, rois, symmetric_cbar):
     # Last case is symmetric cbar
     return 'cold_hot'
 
+
 def _plot_surfs_vol(data, space=None, hemi=None,
                    rois=False, cmap='default',
                    vol_plot_type='glass',
@@ -690,13 +727,13 @@ def _plot_surfs_vol(data, space=None, hemi=None,
                    colorbar='default', symmetric_cbar='auto',
                    darkness=None, vmin=None, vmax=None,
                    cbar_vmin=None, cbar_vmax=None,
-                   figure=None, axes=None, subplot_spec=None,
-                   figsize='default', title=None, title_sz=18,
-                   hspace='default', wspace=-.2, surf_alpha=1,
+                   figure=None, subplot_spec=None,
+                   figsize='default', title=None,
+                   title_sz=18, title_y=None,
+                   hspace='default', wspace=-.2, alpha=1,
                    avg_method='default', threshold='auto',
                    surf_to_vol_ratio='default', surf_wspace='default',
-                   bg_on_data=.25,
-                   _print=None, **kwargs):
+                   bg_on_data=.25, _print=None, **kwargs):
 
     # Process default surface and plotting values
     data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method =\
@@ -748,7 +785,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
 
     # Add surface specific to surf_params dict
     surf_params['surf_mesh'], surf_params['bg_map'] = surf_mesh, bg_map
-    surf_params['darkness'], surf_params['alpha'] = darkness, surf_alpha
+    surf_params['darkness'], surf_params['alpha'] = darkness, alpha
     surf_params['ref'], surf_params['avg_method'] = ref, avg_method
     surf_params['wspace'], surf_params['bg_on_data'] = surf_wspace, bg_on_data
     
@@ -761,10 +798,10 @@ def _plot_surfs_vol(data, space=None, hemi=None,
                           vmin=vmin, vmax=vmax,
                           cbar_vmin=cbar_vmin,
                           cbar_vmax=cbar_vmax,
-                          figure=figure, axes=axes,
+                          figure=figure,
                           subplot_spec=subplot_spec,
                           figsize=figsize,
-                          title=title, title_sz=title_sz,
+                          title=title, title_sz=title_sz, title_y=title_y,
                           colorbar=colorbar,
                           symmetric_cbar=symmetric_cbar,
                           hspace=hspace, wspace=wspace,
@@ -872,112 +909,237 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
         - 1 : Information on which steps are automatically decided are shown.
         - >1 : Automatic choices are shown as well as additional helper text.
 
-    kwargs : **kwargs
+    kwargs : keyword arguments
         There are number of different plotting specific arguments
         that can optionally be modified. The default values for these arguments
         may change also depending on different auto-detected settings, i.e.,
         if plotting a single surface vs. surface collage, or if plotting
-        a volumetric image.
+        a volumetric image. The remaining parameters below are these kwargs.
 
-        - surf_mesh : str or 2D array
-            A str indicator specifying a valid surface mesh,
-            with respect to the current space, or a two dimensional array
-            with information about the coordinates and vertex-faces
-            in which to plot the data on. The default for
-            freesurfer spaces is 'inflated' and for fs_LR spaces
-            is 'very_inflated'. If you wish to plot surface
-            data in native subject space, then this argument must be
-            supplied with a loaded 2D array / valid mesh, and data
-            must be passed in dictionary style.
+        - **surf_mesh** : str or array
+        
+          A str indicator specifying a valid surface mesh,
+          with respect to the current space, or a two dimensional array
+          with information about the coordinates and vertex-faces
+          in which to plot the data on. The default for
+          freesurfer spaces is 'inflated' and for fs_LR spaces
+          is 'very_inflated'. If you wish to plot surface
+          data in native subject space, then this argument must be
+          supplied with a loaded 2D array / valid mesh, and data
+          must be passed in dictionary style.
 
-            This parameter is only used when plotting surfaces.
+          This parameter is only relevant when plotting surfaces.
 
-        - bg_map : str or 2D array
-            This argument specifies
-            a background map to be used when plotting. This
-            should be passed as either a str indicator specifying a valid file
-            within the current surface space, or as a valid array of values,
-            again, with respect to the current space. This map is plotted in greyscale
-            underneath the data points, often used for realistic shading.
-            The default for when plotting is 'sulc'.
+        - **bg_map** : str or 2D array
+        
+          This argument specifies a background map to be used when plotting. This
+          should be passed as either a str indicator specifying a valid file
+          within the current surface space, or as a valid array of values,
+          again, with respect to the current space. This map is plotted in greyscale
+          underneath the data points, often used for realistic shading.
+          The default for when plotting is 'sulc'.
 
-            This parameter is only used when plotting surfaces.
+        - **cmap** : str or :class:`matplotlib.colors.Colormap`
+          
+          This should be pass as an instance
+          of :class:`matplotlib.colors.Colormap` or str
+          representing the name of a matplotlib colormap. This will be the color map
+          in which the values are plotted according to. When plotting surface
+          parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
+          if plotting not symmetric statistical maps, and 'cold_hot' if plotting
+          symmetric statistical maps (e.g., values above and below 0).
 
-        - cmap : str or :class:`matplotlib.colors.Colormap`
-            This should be pass as an instance
-            of :class:`matplotlib.colors.Colormap` or str
-            representing the name of a matplotlib colormap. This will be the color map
-            in which the values are plotted according to. When plotting surface
-            parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
-            if plotting not symmetric statistical maps, and 'cold_hot' if plotting
-            symmetric statistical maps (e.g., values above and below 0).
+        - **vol_plot_type** : {'glass', 'stat', 'roi'}
+        
+          This parameter control the type of volumetric plot in which to generate,
+          with valid values as one of 'glass', 'stat' and 'roi'. By default,
+          if detected to be plotting a parcellation, the value 'roi' is used.
+          Otherwise, the default volumetric plotting type is 'glass'.
+          The corresponding back-end nilearn functions used are:
 
-        - vol_plot_type : {'glass', 'stat', 'roi'}
-            This parameter control the type of volumetric plot in which to generate,
-            with valid values as one of 'glass', 'stat' and 'roi'. By default,
-            if detected to be plotting a parcellation, the value 'roi' is used.
-            Otherwise, the default volumetric plotting type is 'glass'.
-            The corresponding back-end nilearn functions used are:
+          - 'glass': :func:`nilearn.plotting.plot_glass_brain`
+          - 'stat': :func:`nilearn.plotting.plot_stat_map`
+          - 'roi': :func:`nilearn.plotting.plot_roi`
 
-            - 'glass': :func:`nilearn.plotting.plot_glass_brain`
-            - 'stat': :func:`nilearn.plotting.plot_stat_map`
-            - 'roi': :func:`nilearn.plotting.plot_roi`
+          *This parameter is only used when plotting volumetric data.*
 
-            This parameter is only used when plotting volumetric data.
+        - **bg_on_data** : bool or float
+          If True, and a bg_map is specified,
+          the data to plot is multiplied by the background image, 
+          so that e.g. sulcal depth is visible beneath the surf_data.
 
-        - bg_on_data : bool or float
-            If True, and a bg_map is specified,
-            the data to plot is multiplied by the background image, 
-            so that e.g. sulcal depth is visible beneath the surf_data.
+          If passed as a float value, then that will trigger multiplying
+          the data to plot by the background image times the passed bg_on_data
+          value. So for example passing True is equivalent to passing 1 and passing
+          False is the same as passing 0.
+          
+          This allows for fine tuning how much the background image
+          is melded with the data shown. The default value is .25.
 
-            If passed as a float value, then that will trigger multiplying
-            the data to plot by the background image times the passed bg_on_data
-            value. So for example passing True is equivalent to passing 1 and passing
-            False is the same as passing 0.
-            This allows for fine tuning how much the background image
-            is melded with the data shown. The default value is .25.
+          *This parameter is only used when plotting surfaces.*
 
-            This parameter is only used when plotting surfaces.
+        - **view** : str
+        
+          If plotting a single surface hemisphere, this
+          parameter must be one of:
 
-        - view : str
-            If plotting a single surface hemisphere, this
-            parameter must be one of:
             {'lateral', 'medial', 'dorsal', 'ventral', 'anterior', 'posterior'}
-            Where 'lateral' is the default view if none is set.
+          
+          Where 'lateral' is the default view if none is set.
 
-            If instead plotting a collage of surface views, then
-            valid view parameters are one of:
+          If instead plotting a collage of surface views, then
+          valid view parameters are one of:
+
             {'standard', 'front back', 'front', 'back'}
-            which correspond to different preset collections of surface views.
-            The default is 'standard'.
-            
-            Note: If plotting a collage of surface and volumetric views,
-            it is reccomended to keep the default collage 'standard' view,
-            as the other views have not yet been properly formatted yet.
+          
+          which correspond to different preset collections of surface views.
+          The default if not specified in this case is 'standard'.
+        
+          Note: If plotting a collage of surface and volumetric views,
+          it is reccomended to keep the default collage 'standard' view,
+          as the other views have not yet been properly formatted yet.
 
-        - figsize : 'default' or (int, int)
-            This parameter is used when axes are not passed, and
-            a new figure is being generated. It represents
-            the size of the underlying matplotlib figure to plot on.
-            The default value for this function varies based on what type of
-            plot is being made (e.g., not the same for surface collage vs. single surface).
+        - **colorbar** : bool
 
-        - darkness : temp
+          This option dictates if a colorbar should be added
+          along with the requested plot, regardless of type.
+          By default a colorbar will be added (True) unless
+          a parcellation is being plotted, in which the default is
+          to not add a colorbar (False).
 
-        - avg_method : temp
+          There are a number of extra more detailed colorbar style
+          kwargs, used in certain cases, with certain plots to
+          customize the look and size of the colorbar. See below.
 
-        - alpha : temp
+        - **avg_method** : 'mean', 'median', 'min', 'max' or  custom function
 
-        - colorbar : temp
+          This option defines how to average vertex values to
+          derive face values, and is only used when plotting surfaces.
 
-        - symmetric_cbar : temp
+          - 'mean': results in smooth boundaries
 
-        - threshold : temp
+          - 'median': results in sharp boundaries
 
-        - wspace : temp
+          - 'min' or 'max': for sparse matrices
 
-        - hspace : temp
+          - custom function: You can also pass a custom function
 
+          If plotting roi's the default will be 'median'. Otherwise, the default
+          will be set based on the ratio between the number of unique values
+          to data points. So if more than 5% of data points are unique, 'mean'
+          will be used, otherwise 'median' will be used. This is to try and accurately detect
+          when parcellations are being plotted.
+
+        - **alpha** : float or 'auto'
+
+          This parameter is only used when plotting surface data. It
+          refers to the alpha level of the mesh. By default, this
+          is left as 'auto', which will default to .5 if no bg_map
+          and 1 if a bg_map is passed. This parameter is just multiplied by
+          the face colors before plotting.
+
+          Note: this keyword is used for plotting surfaces, though alpha is
+          also used as a parameter for plotting the volumetric glass brain.
+          To access this parameter for the volumetric function, see the
+          `vol_alpha` parameter.
+
+        - **vol_alpha** : float between 0 and 1
+        
+          This controls the alpha transparency only when plotting
+          volumetric data according to the vol_plot_type='glass' option.
+          The default value is 0.7.
+        
+        - **darkness** : float between 0 and 1
+
+          This parameter specified the darkness of the background image,
+          when plotting a single or multiple surfaces. Where a value of 1
+          indicates that the original values are used, and .5 would mean the
+          values are halved. If plotting in an fsaverage space the default value is 1,
+          if plotting in an fs_LR space, the default value is .5. 
+
+        - **symmetric_cbar** : bool or 'aut'
+        
+            Specifies whether the colorbar should range from -vmax to vmax or from vmin to vmax.
+            Setting to 'auto' will select the latter if the range of
+            the whole image is either positive or negative. There are some
+            other automatic cases, but in general this parameter
+            can just be used to override any automatic choices.
+
+        - **threshold** : float, None or 'auto'
+
+          If None, the image is not thresholded. If a float,
+          or other numberic value, that value will be used to threshold
+          the image. This threshold is treated as an absolute value in
+          the case of a symmetric_cbar. If 'auto' is passed,
+          it will attempt to automatically set the threshold to
+          a reasonable value. 
+
+          The default is typically 'auto', but in some cases changes,
+          for example if plotting a parcellation the default value will be
+          None.s
+
+        - **figsize** : 'default' or (int, int)
+
+          This parameter is used when axes are not passed, and
+          a new figure is being generated. It represents
+          the size of the underlying matplotlib figure to plot on.
+          The default value for this function varies based on what type of
+          plot is being made (e.g., not the same for surface collage vs. single surface).
+
+        - **wspace** : float
+
+          This parameter refers to the width spacing between items at the top
+          level of whatever collage is being plotted. So, if plotting only a single
+          surface or volume, this parameter will be ignored. Otherwise,
+          for example if plotting a collage of 4 surface views, then this
+          parameter will control the amount of horizontal space between each
+          brain view. Instead, if plotting a combined collage of surface views
+          and volumetric views, then the top level of the collage that this parameter
+          controls the spacing of is the set of all surface views, all volumetric views
+          and colorbar. In this case, to override values between for example just the
+          surface views, you would have to use special extra keyword 'surf_wspace',
+          which let's you set both parameters if desired.
+
+          The default values hover around 0, and vary a great deal based on the type
+          of plot and requested view.
+
+        - **hspace** : float
+
+          This parameter refers to the height spacing between items at the top
+          level of whatever collage is being plotted. So, if plotting only a single
+          surface or volume, this parameter will be ignored. Otherwise,
+          for example if plotting a collage of 4 surface views, then this
+          parameter will control the amount of vertical space between each
+          brain view. Instead, if plotting a combined collage of surface views
+          and volumetric views, then the top level of the collage that this parameter
+          controls the spacing of is the set of all surface views, all volumetric views
+          and colorbar. In this case, to override values between for example just the
+          surface views, you would have to use special extra keyword 'surf_hspace',
+          which let's you set both parameters if desired.
+
+          The default values hover around 0, and vary a great deal based on the type
+          of plot and requested view.
+
+        - **surf_wspace** : float
+          
+          See 'wspace'. This parameter is only used when there
+          are multiple levels of collage and further control is still
+          required for specifically the nested collage of surface plots.
+
+        - **surf_hspace** : float
+          
+          See 'hspace'. This parameter is only used when there
+          are multiple levels of collage and further control is still
+          required for specifically the nested collage of surface plots.
+
+        - **surf_to_vol_ratio** : float or 'default'
+
+          In the case of plotting a collage of both surfaces and
+          volumetric data, this parameter can optionally be set.
+          It defines the size ratio between the grouping of surface collages
+          and the volumetric plots. If left as 'default', will
+          be set to either .9 in base plotting stat volume case
+          and 1.1 when plotting glass brain.
 
     Notes
     -----------

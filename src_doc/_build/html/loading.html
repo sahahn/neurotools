@@ -279,20 +279,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.71732122, 0.41448512],</span>
-<span class="go">       [0.60142094, 0.64240184],</span>
-<span class="go">       [0.76437916, 0.02326401],</span>
-<span class="go">       [0.13533951, 0.24446833],</span>
-<span class="go">       [0.49562484, 0.55685555]])</span>
+<span class="go">array([[0.90380357, 0.32016684],</span>
+<span class="go">       [0.9580834 , 0.25131131],</span>
+<span class="go">       [0.66651038, 0.52396066],</span>
+<span class="go">       [0.89732864, 0.86378418],</span>
+<span class="go">       [0.60027588, 0.89345451]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.71732122, 0.41448512],</span>
-<span class="go">       [0.60142094, 0.64240184],</span>
-<span class="go">       [0.76437916, 0.02326401],</span>
-<span class="go">       [0.13533951, 0.24446833],</span>
-<span class="go">       [0.49562484, 0.55685555]])</span>
+<span class="go">array([[0.90380357, 0.32016684],</span>
+<span class="go">       [0.9580834 , 0.25131131],</span>
+<span class="go">       [0.66651038, 0.52396066],</span>
+<span class="go">       [0.89732864, 0.86378418],</span>
+<span class="go">       [0.60027588, 0.89345451]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -453,7 +453,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>
 <span class="go">Loading from cache_loc: /home/sage/neurotools_cache/_base_load_data/177c2d3dedc0c2e11b5e6f9576b665b9.npy</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0006706714630126953 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0006198883056640625 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -473,7 +473,7 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>
 <span class="go">Loading from cache_loc: /home/sage/neurotools_cache/_base_load_data/8841fae2e1b41b87100395387154b1ec.npy</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0004401206970214844 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0004851818084716797 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -532,10 +532,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.24210789, 0.        , 0.        , 0.25184444]),</span>
-<span class="go"> array([0.49919425, 0.        , 0.        , 0.06445605]),</span>
-<span class="go"> array([0.56217393, 0.        , 0.        , 0.16672854]),</span>
-<span class="go"> array([0.01215213, 0.        , 0.        , 0.87098418])]</span>
+<span class="go">[array([0.29664943, 0.        , 0.        , 0.43199203]),</span>
+<span class="go"> array([0.31156543, 0.        , 0.        , 0.19013772]),</span>
+<span class="go"> array([0.88536612, 0.        , 0.        , 0.55644842]),</span>
+<span class="go"> array([0.8314829 , 0.        , 0.        , 0.67354661])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -551,14 +551,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f5faf2788b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5faf2783d0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5faf278340&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5faf2783a0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f4be2fb9a00&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f4be2fb92e0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f4be2fb9490&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f4be2fb9430&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.24210789, 0.        , 0.        , 0.25184444])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.29664943, 0.        , 0.        , 0.43199203])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -638,7 +638,7 @@ If &gt;= 2, full verbosity will be enabled.</p>
 <span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_cat_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ordinal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_from_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Special ABCD Study specific helper utility to load specific
 columns from a csv saved version of the DEAP release RDS
-file or simmilar ABCD specific csv dataset.</p>
+file or similar ABCD specific csv dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -673,24 +673,47 @@ will be treated as NaN. This is a special ABCD specific consideration.</p>
 <li><p><strong>encode_cat_as</strong> (<em>{'ordinal'</em><em>, </em><em>'one hot'</em><em>, </em><em>'dummy'}</em><em>, </em><em>optional</em>) – <p>The way in which categorical vars, any wrapped in C(),
 should be categorically encoded.</p>
 <ul>
-<li><dl class="simple">
-<dt>’ordinal’:</dt><dd><p>The variables in encoded sequentially in one
+<li><p>’ordinal’
+The variables in encoded sequentially in one
 column with the original name, with values 0 to k-1
 where k is the number of unique categorical values.
-This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p>
-</dd>
-</dl>
+This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p></li>
+<li><p>’one hot’
+The variables is one hot encoded, adding columns
+for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.3.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p></li>
+<li><p>’dummy’
+Same as ‘one hot’, except one of the columns is then dropped.</p></li>
+</ul>
+</p></li>
+<li><p><strong>cache_args</strong> (<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) – <p>There are a number of optional cache arguments that can be set via
+kwargs, as listed below.</p>
+<ul>
+<li><p><strong>cache_dr</strong> : str or None</p>
+<p>The location of where to cache the results of
+this function, for faster loading in the future.</p>
+<p>If None, do not cache. The default if not set is
+‘default’, which will use caching in a location defined
+by the function name in a folder called
+neurotools_cache in the users homes directory.</p>
 </li>
-<li><dl class="simple">
-<dt>’one hot’:</dt><dd><p>The variables is one hot encoded, adding columns
-for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.3.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
-</dd>
-</dl>
+<li><p><strong>cache_max_sz</strong> : str or int</p>
+<p>This parameter defines the maximize size of
+the cache directory. The idea is that if saving a new
+cached function call and it exceeds this cache max size,
+previous saved caches (by oldest in terms of used) will be
+deleted, ensuring the cache directory remains under this size.</p>
+<p>Can either pass in terms of bytes directly as a number,
+or in terms of a str w/ byte marker, e.g., ‘14G’ for
+14 gigabytes, or ‘10 KB’ for 10 kilobytes.</p>
+<p>The default if not set is ‘30G’.</p>
 </li>
-<li><dl class="simple">
-<dt>’dummy’:</dt><dd><p>Same as ‘one hot’, except one of the columns is then dropped.</p>
-</dd>
-</dl>
+<li><p><strong>use_base_name</strong> : bool</p>
+<p>Optionally when any arguments used in the
+caching can be cached based on either their full file
+path, if use_base_name is False, or just the file name itself,
+so for example /some/path/location vs. just location.
+The default if not set is True, as it assumes that maybe
+another file in another location with the same name is the same.</p>
 </li>
 </ul>
 </p></li>

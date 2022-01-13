@@ -1,16 +1,48 @@
 import os
 import warnings
 import numpy as np
-from scipy.stats import ks_2samp
+from scipy.stats import ks_2samp, gaussian_kde
+from scipy.spatial.distance import jensenshannon
 from .parc import merge_parc_hemis
 from ..loading import load
 
-def gen_ks_roi_network(data, labels, vectorize=False, discard_diagonal=False):
-    '''This function is designed to generate a network
-    of 1 - Kolmogorov–Smirnov distances between groups of different ROIs.
+def _get_kde_p(data, n=256):
+    kde = gaussian_kde(data)
+    return kde(np.linspace(np.min(data), np.max(data), n))
 
-    Specifically, this method calls the function :func:`scipy.stats.ks_2samp` between
-    each collection of data points in each pair of ROIs, calculating the
+def _jsd_metric(x, y):
+
+    # Get kde est
+    x_p = _get_kde_p(x)
+    y_p = _get_kde_p(y)
+
+    # Then return 1 - dist
+    return 1 - jensenshannon(x_p, y_p)
+
+def _ks_metric(x,  y):
+    '''1 - kd_2samp metric'''
+
+    return 1 - ks_2samp(x, y).statistic
+
+def _ks_demean_metric(x, y):
+    
+    return _ks_metric(x - np.mean(x),
+                      y - np.mean(y))
+
+def _ks_normalize_metric(x, y):
+    
+    return _ks_metric((x - np.mean(x)) / np.std(x),
+                      (y - np.mean(y)) / np.std(y))
+
+
+def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_diagonal=False):
+    '''This function is designed to generate a network
+    of 1 - distance function between groups of different ROIs.
+    
+
+    Specifically, this method calls the function :func:`scipy.stats.ks_2samp`  or
+    :func:`scipy.spatial.distance.jensenshannon` to calculate the distances
+    between each collection of data points in each pair of ROIs, calculating the
     distance between the two distributions. Values are then subtracted from 1,
     such that exact distribution matches have value 1, i.e., these are the
     strongest connections. 
@@ -31,6 +63,18 @@ def gen_ks_roi_network(data, labels, vectorize=False, discard_diagonal=False):
         corresponding to which vertex or data elements belong
         to different ROIs.
 
+    metric : {'jsd', 'ks', 'ks demean', 'ks normalize'}, optional
+        The type of distance to compute between points.
+
+        - 'jsd' : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.
+        - 'ks' : Use the 1 - Kolmogorov–Smirnov distance between distributions.
+        - 'ks demean' : Same as 'ks', but with each ROI's points de-meaned.
+        - 'ks normalize' : Same as 'ks', but with each ROI's points normalized.
+
+        ::
+
+            default = 'jsd'
+
     vectorize : bool, optional
         If True, matrices are reshaped into 1D arrays and only their
         flattened lower triangular parts are returned.
@@ -50,12 +94,24 @@ def gen_ks_roi_network(data, labels, vectorize=False, discard_diagonal=False):
     Returns
     --------
     matrix : 1/2D numpy array
-        Two dimensional array containing the
-        1 - Kolmogorov–Smirnov statistic / distances between
-        every combination of ROI.
-
-        If vectorize is True, then a 1D array is returned.
+        Base behavior is a two dimensional array containing the
+        distances / statistics between
+        every combination of ROI. If vectorize is True, then
+        a 1D array is returned instead, and if discard_diagonal
+        is set, then the diag will be removed as well.
     '''
+
+    # Get correct metric function
+    if metric == 'jsd':
+        dist_metric = _jsd_metric
+    elif metric == 'ks':
+        dist_metric = _ks_metric
+    elif metric == 'ks demean':
+        dist_metric = _ks_demean_metric
+    elif metric == 'ks normalize':
+        dist_metric = _ks_normalize_metric
+    else:
+        raise RuntimeError(f'Passed metric {metric} invalid!')
 
     # Warn if improper input
     if discard_diagonal is True and vectorize is False:
@@ -74,7 +130,7 @@ def gen_ks_roi_network(data, labels, vectorize=False, discard_diagonal=False):
 
             # If already calculated reverse, skip
             if matrix[j][i] == 0:
-                matrix[i][j] = 1 - ks_2samp(data[labels==u1], data[labels==u2]).statistic
+                matrix[i][j] = dist_metric(data[labels==u1], data[labels==u2])
                 matrix[j][i] = matrix[i][j]
 
     # If vectorize, return just lower triangle
@@ -104,11 +160,12 @@ def _load_fs_subj_data(subj_dr, modality, parc):
     
     return data, labels
 
+
 def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
-                               parc='aparc.a2009s.annot',
+                               parc='aparc.a2009s.annot', metric='jsd',
                                vectorize=False, discard_diagonal=False):
     '''This function is helper function for calling
-    :func:`gen_ks_roi_network`, for data organized in
+    :func:`gen_indv_roi_network`, for data organized in
     freesurfer individual subject directory style.
 
     Parameters
@@ -141,6 +198,18 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
 
             default = 'aparc.a2009s.annot'
 
+     metric : {'jsd', 'ks', 'ks demean', 'ks normalize'}, optional
+        The type of distance to compute between points.
+
+        - 'jsd' : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.
+        - 'ks' : Use the 1 - Kolmogorov–Smirnov distance between distributions.
+        - 'ks demean' : Same as 'ks', but with each ROI's points de-meaned.
+        - 'ks normalize' : Same as 'ks', but with each ROI's points normalized.
+
+        ::
+
+            default = 'jsd'
+
     vectorize : bool, optional
         If True, matrices are reshaped into 1D arrays and only their
         flattened lower triangular parts are returned.
@@ -172,8 +241,9 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
     data, labels = _load_fs_subj_data(subj_dr, modality, parc)
 
     # Call main function
-    return gen_ks_roi_network(data, labels, vectorize=vectorize,
-                              discard_diagonal=discard_diagonal)
+    return gen_indv_roi_network(data, labels, metric=metric,
+                                vectorize=vectorize,
+                                discard_diagonal=discard_diagonal)
   
 
 

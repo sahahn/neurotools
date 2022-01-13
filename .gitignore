@@ -18,3 +18,5 @@ slurm/run_mm/Match_Bader_Repeat/results.pkl
 slurm/run_permuted_v/test_1/h0_vmax.npy
 slurm/run_permuted_v/test_1/original_scores.npy
 slurm/run_permuted_v/test_*
+examples/dev.ipynb
+examples/explore.ipynb

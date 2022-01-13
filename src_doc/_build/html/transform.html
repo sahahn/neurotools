@@ -196,28 +196,25 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfLabels">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract signals from non-overlapping labels.</p>
-<p>This class functions similar to
-<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiLabelsMasker</span></code></a>, except
-it is designed to work for surface, cifti or any arbitrary
-1 or 2D numpy arrays.</p>
+<dd><p>Extract signals from non-overlapping labels for surface data.</p>
+<p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiLabelsMasker</span></code></a>,
+except is designed to work with surface data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em>) – This should represent an array, of the same size as the data
 dimension, as a mask with unique integer values for each ROI.
 You can also pass a str location in which to load in this array.
-Anything accepted by <code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code> is acceptable here.</p></li>
+Anything accepted by <a class="reference internal" href="loading.html#neurotools.loading.load" title="neurotools.loading.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load</span></code></a> is acceptable here.</p></li>
 <li><p><strong>background_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>array-like of int</em><em>, </em><em>optional</em>) – <p>This parameter determines which label, if any,
-in the corresponding
-passed labels, should be treated as ‘background’
-and therefore no ROI
+in the corresponding passed labels,
+should be treated as ‘background’ and therefore no ROI
 calculated for that value or values.
 You may pass either a single interger
 value, an array-like of integer values.</p>
 <p>If not background label is desired, just pass
 a label which doesn’t exist in any of the data,
-e.g., -100.</p>
+e.g., -2.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -254,12 +251,12 @@ options:</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>’min’ or ‘minimum</dt><dd><p>Calculate the min value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.min()</span></code></p>
+<dt>’min’ or ‘minimum</dt><dd><p>Calculate the min value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.ndarray.min()</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>’max’ or ‘maximum</dt><dd><p>Calculate the max value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.max()</span></code></p>
+<dt>’max’ or ‘maximum</dt><dd><p>Calculate the max value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.ndarray.max()</span></code></p>
 </dd>
 </dl>
 </li>
@@ -315,14 +312,9 @@ a different step it may make sense to set to False.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfMaps">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract signals from overlapping labels.</p>
-<p>This class functions similar to
-<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiMapsMasker</span></code></a>, except
-it is designed to work for surface, cifti or any arbitrary
-1 or 2D numpy arrays.</p>
-<p>This object calculates the signal for each of the
-passed maps as extracted from the input during fit,
-and returns for each map a value.</p>
+<dd><p>Extract signals from overlapping labels for surface data.</p>
+<p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiMapsMasker</span></code></a>,
+except it is designed to work with surface projected data, instead of 3D/4D Nifti files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -335,7 +327,8 @@ dimension and the number of maps
 as the second dimension.</p>
 <p>You may pass maps as either an array-like,
 or the str file location of a numpy or other
-valid surface file format array in which to load.</p>
+valid surface file format array in which to load.
+Anything accepted by <a class="reference internal" href="loading.html#neurotools.loading.load" title="neurotools.loading.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load</span></code></a> is acceptable here.</p>
 </p></li>
 <li><p><strong>strategy</strong> (<em>{'auto'</em><em>, </em><em>'ls'</em><em>, </em><em>'average'}</em><em>, </em><em>optional</em>) – <p>The strategy in which the maps are used to extract
 signal. If ‘ls’ is selected, which stands for
