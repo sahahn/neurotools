@@ -365,7 +365,7 @@ def add_collage_colorbar(figure, ax, smfs, vmin, vmax,
 
     # we need to create a proxy mappable
     proxy_mappable = ScalarMappable(cmap=our_cmap, norm=norm)
-    proxy_mappable.set_array(np.concatenate(smfs))
+    proxy_mappable.set_array(smfs)
 
     if multicollage:
 

@@ -6,6 +6,7 @@ import os
 from ..misc.text import get_unique_str_markers
 from ..misc.print import _get_print
 from .. import data_dr as def_data_dr
+from ..loading.from_data import get_surf_loc
 
 def _save_mapping(mapping, loc):
     
@@ -262,32 +263,36 @@ class SurfRef(Ref):
         return lh_plot_vals, rh_plot_vals
     
     def get_surf(self, name, hemi):
-        
-        # If already surf mesh like
-        if not isinstance(name, str):
-            return name
 
         if name is None:
             return None
         
-        if hemi == 'left':
-            hemi = 'lh'
-        if hemi == 'right':
-            hemi = 'rh'
+        # If already surf mesh like
+        if not isinstance(name, str):
+            return name
+        
+        # Assume name is path if exists
+        if os.path.exists(name):
+            loc = name
 
-        loc = os.path.join(self.data_dr, self.space, 'surf',  hemi + '.' + name)
-
-        if os.path.exists(loc):
-            try:
-                return read_geometry(loc)
-            except ValueError:
-                return load_surf_data(loc)
-                
+        # Otherwise find right loc if any
         else:
-            surf = load_surf_data(loc + '.gii')
+            loc = get_surf_loc(space=self.space, hemi=hemi, key=name)
+            if loc is None:
+                raise  RuntimeError(f'Unable to find space={self.space}, hemi={hemi}, name={name}')
+
+        # If gifti
+        if loc.endswith('.gii'):
+            surf = load_surf_data(loc)
             if len(surf) == 2:
                 surf = (surf[0], surf[1])
             return surf
+
+        # Otherwise try geometry first then base surf data
+        try:
+            return read_geometry(loc)
+        except ValueError:
+            return load_surf_data(loc)
 
 class VolRef(Ref):
     

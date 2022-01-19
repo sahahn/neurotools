@@ -1,6 +1,7 @@
 import numpy as np
 from heapq import heappush, heappop
 from .helper_funcs import flatten, get_coord_vec_length, normalize_vector
+import time
 
 
 def get_signed_distance_helper(surf):
@@ -28,6 +29,9 @@ class SignedDistanceHelperBase():
         
         # Keep track of un-flattened
         self.tris = surf.tris.copy()
+        self.n_tris = len(self.tris)
+
+        start = time.time()
         
         # For each triangle
         for tri_indx, tri in enumerate(self.tris):
@@ -43,6 +47,8 @@ class SignedDistanceHelperBase():
             # Add triangle -use bounding box for now as an easy
             # test to capture any chance of the triangle intersecting the Oct
             self.add_triangle(self.root_oct, tri_indx, min_coord, max_coord)
+
+        print(f'Added triangles to signed helper base in {time.time() - start}')
                
     def add_triangle(self, c_oct, tri_indx, min_coord, max_coord):
         

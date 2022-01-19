@@ -2,9 +2,11 @@ from .conv import extract_subcortical_from_cifti
 import nibabel as nib
 import os
 import numpy as np
-from ..loading import load
+from ..loading.funcs import load
+from ..loading.from_data import get_surf_loc
 from .. import data_dr
 from ..misc.print import _get_print
+
 
 def _load(data):
     '''Simple wrapper around load with
@@ -35,6 +37,58 @@ def _load(data):
         return nib.load(data)
     except:
         return loaded_data
+
+def _load_medial_wall(space, hemi):
+
+    # Get location
+    loc = get_surf_loc(space=space, hemi=hemi, key=['medial_mask', 'medialwall'])
+
+    # Error if not found
+    if loc is None:
+        raise RuntimeError(f'No medial wall information found for space={space}, hemi={hemi}')
+
+    # Return loaded as bool
+    return load(loc, dtype='bool')
+
+def _get_space_mapping(hemi):
+
+    # Get options for spaces
+    space_options = os.listdir(data_dr)
+    mapping = {}
+
+    # For each potential space
+    for space in space_options:
+
+        # See if medial wall, skip if isn't
+        try:
+            medial_wall = _load_medial_wall(space, hemi=hemi)
+        except RuntimeError:
+            continue
+        
+        # Add base size first
+        base_sz = len(medial_wall)
+
+        # Check if already exists
+        if base_sz in mapping:
+
+            # In case of duplicates, favor civet, then fsaverage, by skipping
+            # adding new, and keeping current
+            # Note, potential TODO may need more cases in future
+            if 'civet' in mapping[base_sz][0]:
+                continue
+            if 'fsaverage' in mapping[base_sz][0]:
+                continue
+
+        # If here, then add, replacing if already there
+        mapping[base_sz] = (space, False)
+
+        # Add no medial wall version
+        no_medial_sz = int(np.sum(medial_wall))
+        if no_medial_sz in mapping:
+            raise RuntimeError('Should not be overlaps here.')
+        mapping[no_medial_sz] = (space, True)
+
+    return mapping
 
 
 def process_space(data, space=None, hemi=None, verbose=0, _print=None):
@@ -73,40 +127,16 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     assert hemi in ['lh', 'rh', None], 'hemi must be lh, rh or None!'
     
     # Space info- sep by hemi
-    lh_space_mapping = {578: ('fsaverage3', True),
-                        642: ('fsaverage3', False),
-                        2562: ('fsaverage4', False),
-                        2329: ('fsaverage4', True),
-                        10242: ('fsaverage5', False),
-                        9354: ('fsaverage5', True),
-                        163842: ('fsaverage', False),
-                        149955: ('fsaverage', True),
-                        29696: ('32k_fs_LR', True),
-                        32492: ('32k_fs_LR', False),
-                        54216: ('59k_fs_LR', True),
-                        59292: ('59k_fs_LR', False),
-                        149141: ('164k_fs_LR', True)}
-
-    rh_space_mapping = {575: ('fsaverage3', True),
-                        642: ('fsaverage3', False),
-                        2562: ('fsaverage4', False),
-                        2332: ('fsaverage4', True),
-                        10242: ('fsaverage5', False),
-                        9361: ('fsaverage5', True),
-                        163842: ('fsaverage', False),
-                        149926: ('fsaverage', True),
-                        29716: ('32k_fs_LR', True),
-                        32492: ('32k_fs_LR', False),
-                        54225: ('59k_fs_LR', True),
-                        59292: ('59k_fs_LR', False),
-                        149120: ('164k_fs_LR', True)}
+    lh_space_mapping = _get_space_mapping(hemi='lh')
+    rh_space_mapping = _get_space_mapping(hemi='rh')
     
     # Gen combinations of hemi sizes
     hemi_sizes = []
     for lk, rk in zip(lh_space_mapping, rh_space_mapping):
         hemi_sizes.append((lk, rk))
 
-    # TODO add cases for when subcortical is passed
+    # TODO add cases for when just subcortical is passed
+    # Or flattened voxel or something
     # not in cifti form, but in flattened sub-cortical voxel form
     # For now these are just from cifti...
     sub_sizes = [31870, 62053]
@@ -237,6 +267,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
 
     return proc_data, detected_space
 
+
 def proc_hemi_data(hemi_data, hemi, space_mapping):
     
     # If doesn't match any, assume in native space
@@ -248,11 +279,11 @@ def proc_hemi_data(hemi_data, hemi, space_mapping):
     
     # Add medial wall if needs it
     if needs_medial_wall:
-        medial_wall_mask = np.load(os.path.join(data_dr, space, f'{hemi}_medial_mask.npy'))
+        medial_wall_mask = _load_medial_wall(space, hemi)
         to_fill = np.zeros(medial_wall_mask.shape)
 
         # Medial wall saved as 0 in mask so fill in hemi data like this
-        to_fill[medial_wall_mask.astype('bool')] = hemi_data
+        to_fill[medial_wall_mask] = hemi_data
 
         return to_fill, space
     

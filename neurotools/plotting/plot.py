@@ -106,14 +106,10 @@ def _collapse_data(data):
             item = data[key]
         else:
             item = key
-        
-        # Unpack if nifti image
-        if isinstance(item, nib.Nifti1Image):
-            item = item.get_fdata()
 
-        # Add to list - as make sure array and flat
-        collapsed.append(np.array(item).flatten())
-    
+        # Recursive case add
+        collapsed.append(_collapse_data(item))
+
     # Return as concat version
     return np.concatenate(collapsed)
 
@@ -359,6 +355,9 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                            colorbar=False, dist=dist,
                            figure=figure, axes=axes[i], **kwargs)
         smfs.append(smf)
+
+    # Set to concat
+    smfs = np.concatenate(smfs)
     
     # Add color bar
     if colorbar is True:
@@ -440,18 +439,19 @@ def plot_surf_vol_collage(surf, vol,
         surf_grid, vol_grid = grid[0], grid[1]
 
     # Plot surf collage in the top grid spot
-    figure, _, smfz = plot_surf_collage(surf, 
-                                        figure=figure,
-                                        subplot_spec=surf_grid,
-                                        cmap=cmap,
-                                        threshold=threshold,
-                                        vmin=vmin,
-                                        vmax=vmax,
-                                        colorbar=False, # Fixed False
-                                        **surf_params)
+    # The already concatenated smf is returned
+    figure, _, smf = plot_surf_collage(surf, 
+                                       figure=figure,
+                                       subplot_spec=surf_grid,
+                                       cmap=cmap,
+                                       threshold=threshold,
+                                       vmin=vmin,
+                                       vmax=vmax,
+                                       colorbar=False, # Fixed False
+                                       **surf_params)
     
     # Keep track of vals for plotting colorbar
-    smfs += smfz
+    smfs.append(smf)
 
     # Plot volume
     vol_ax = figure.add_subplot(vol_grid)
@@ -483,6 +483,9 @@ def plot_surf_vol_collage(surf, vol,
                   vmax=vmax, colorbar=False,
                   **vol_params)
 
+    # Set to concat
+    smfs = np.concatenate(smfs)
+
     # Add color bar
     if colorbar is True:
         figure, colorbar_ax =\
@@ -494,7 +497,7 @@ def plot_surf_vol_collage(surf, vol,
              colorbar_params=colorbar_params, cmap=cmap,
              threshold=threshold)
 
-    return figure, smfs
+    return figure, grid, smfs
 
 ## Smart Plot Functions ##
 
@@ -546,6 +549,8 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
 
 def _proc_avg_method(data, rois, avg_method):
 
+    # TODO need volumetric case here?
+
     # If rois force avg method to median
     if rois:
         return 'median'
@@ -568,6 +573,44 @@ def _proc_avg_method(data, rois, avg_method):
 
     return avg_method
 
+def _proc_colorbar(colorbar, rois):
+
+    if colorbar == 'default':
+        colorbar = True
+        
+        if rois:
+            colorbar = False
+    
+    return colorbar
+
+
+def _prep_base_auto_defaults(data_as_list, rois,
+                             symmetric_cbar, threshold,
+                             cmap, colorbar, avg_method):
+            
+    # Collapse data
+    flat_data = _collapse_data(data_as_list)
+    
+    # Process automatic symmetric_cbar
+    symmetric_cbar = _get_if_sym_cbar(flat_data,
+                                      symmetric_cbar,
+                                      rois=rois) 
+
+    # Proc threshold if auto
+    threshold = _proc_threshold(flat_data, threshold, rois=rois)
+    
+    # Get cmap based on passed + if rois or not + if sym
+    cmap = _proc_cmap(cmap, rois, symmetric_cbar)
+    
+    # Proc colorbar option - yes if not rois
+    colorbar = _proc_colorbar(colorbar, rois)
+
+    # Proc avg method default
+    avg_method = _proc_avg_method(flat_data, rois, avg_method)
+
+    # Return
+    return symmetric_cbar, threshold, cmap, colorbar, avg_method
+
 
 def _prep_auto_defaults(data, space, hemi, rois,
                         symmetric_cbar, threshold,
@@ -576,27 +619,11 @@ def _prep_auto_defaults(data, space, hemi, rois,
     # Fine passing already proc'ed whatever here
     data, ref = _load_data_and_ref(data, space=space, hemi=hemi, _print=_print)
 
-    # A bunch of funcs use collapse data, so quicker to just
-    # do it once here and pass that to funcs
-    flat_data = _collapse_data(data)
-
-    # Process automatic symmetric_cbar
-    symmetric_cbar = _get_if_sym_cbar(flat_data, symmetric_cbar, rois=rois)
-
-    # Proc threshold if auto
-    threshold = _proc_threshold(flat_data, threshold, rois=rois)
-
-    # Get cmap based on passed + if rois or not + if sym
-    cmap = _proc_cmap(cmap, rois, symmetric_cbar)
-    
-    # Proc colorbar option - yes if not rois
-    if colorbar == 'default':
-        colorbar = True
-        if rois:
-            colorbar = False
-    
-    # Proc avg method default
-    avg_method= _proc_avg_method(data, rois, avg_method)
+    # Process
+    symmetric_cbar, threshold, cmap, colorbar, avg_method =\
+        _prep_base_auto_defaults(data, rois,
+                                 symmetric_cbar, threshold,
+                                 cmap, colorbar, avg_method)
 
     return data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method
 
@@ -620,8 +647,30 @@ def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
 
     # Both hemi's passed case.
     if 'lh' in data and 'rh' in data:
-        plot_surf_collage(data=[data['lh'], data['rh']],
+        return plot_surf_collage(data=[data['lh'], data['rh']],
+                                 ref=ref,
+                                 surf_mesh=surf_mesh,
+                                 bg_map=bg_map,
+                                 cmap=cmap,
+                                 avg_method=avg_method,
+                                 threshold=threshold,
+                                 symmetric_cbar=symmetric_cbar,
+                                 alpha=alpha,
+                                 bg_on_data=bg_on_data,
+                                 darkness=darkness,
+                                 wspace=wspace, hspace=hspace,
+                                 colorbar=colorbar, **kwargs)
+
+    # Just lh/ rh cases
+    if 'lh' in data:
+        hemi_data, hemi = data['lh'], 'left'
+    if 'rh' in data:
+        hemi_data, hemi = data['rh'], 'right'
+    
+    # Plot
+    return plot_surf_hemi(data=hemi_data,
                           ref=ref,
+                          hemi=hemi,
                           surf_mesh=surf_mesh,
                           bg_map=bg_map,
                           cmap=cmap,
@@ -631,34 +680,8 @@ def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
                           alpha=alpha,
                           bg_on_data=bg_on_data,
                           darkness=darkness,
-                          wspace=wspace, hspace=hspace,
-                          colorbar=colorbar, **kwargs)
-        return
-
-    # Just lh/ rh cases
-    if 'lh' in data:
-        hemi_data, hemi = data['lh'], 'left'
-    if 'rh' in data:
-        hemi_data, hemi = data['rh'], 'right'
-    
-    # Plot
-    plot_surf_hemi(data=hemi_data,
-                   ref=ref,
-                   hemi=hemi,
-                   surf_mesh=surf_mesh,
-                   bg_map=bg_map,
-                   cmap=cmap,
-                   avg_method=avg_method,
-                   threshold=threshold,
-                   symmetric_cbar=symmetric_cbar,
-                   alpha=alpha,
-                   bg_on_data=bg_on_data,
-                   darkness=darkness,
-                   colorbar=colorbar,
-                   **kwargs)
-
-    return
-
+                          colorbar=colorbar,
+                          **kwargs)
 
 def _sort_kwargs(kwargs):
 
@@ -721,19 +744,19 @@ def _proc_cmap(cmap, rois, symmetric_cbar):
 
 
 def _plot_surfs_vol(data, space=None, hemi=None,
-                   rois=False, cmap='default',
-                   vol_plot_type='glass',
-                   surf_mesh=None, bg_map=None,
-                   colorbar='default', symmetric_cbar='auto',
-                   darkness=None, vmin=None, vmax=None,
-                   cbar_vmin=None, cbar_vmax=None,
-                   figure=None, subplot_spec=None,
-                   figsize='default', title=None,
-                   title_sz=18, title_y=None,
-                   hspace='default', wspace=-.2, alpha=1,
-                   avg_method='default', threshold='auto',
-                   surf_to_vol_ratio='default', surf_wspace='default',
-                   bg_on_data=.25, _print=None, **kwargs):
+                    rois=False, cmap='default',
+                    vol_plot_type='glass',
+                    surf_mesh=None, bg_map=None,
+                    colorbar='default', symmetric_cbar='auto',
+                    darkness=None, vmin=None, vmax=None,
+                    cbar_vmin=None, cbar_vmax=None,
+                    figure=None, subplot_spec=None,
+                    figsize='default', title=None,
+                    title_sz=18, title_y=None,
+                    hspace='default', wspace=-.2, alpha=1,
+                    avg_method='default', threshold='auto',
+                    surf_to_vol_ratio='default', surf_wspace='default',
+                    bg_on_data=.25, _print=None, **kwargs):
 
     # Process default surface and plotting values
     data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method =\
@@ -789,30 +812,124 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     surf_params['ref'], surf_params['avg_method'] = ref, avg_method
     surf_params['wspace'], surf_params['bg_on_data'] = surf_wspace, bg_on_data
     
-    # Pass arguments to plot surf vol collage
-    plot_surf_vol_collage(surf=[data['lh'], data['rh']],
-                          vol=data['sub'],
-                          vol_plot_type=vol_plot_type,
-                          cmap=cmap,
-                          threshold=threshold,
-                          vmin=vmin, vmax=vmax,
-                          cbar_vmin=cbar_vmin,
-                          cbar_vmax=cbar_vmax,
-                          figure=figure,
-                          subplot_spec=subplot_spec,
-                          figsize=figsize,
-                          title=title, title_sz=title_sz, title_y=title_y,
-                          colorbar=colorbar,
-                          symmetric_cbar=symmetric_cbar,
-                          hspace=hspace, wspace=wspace,
-                          colorbar_params=colorbar_params,
-                          surf_params=surf_params,
-                          vol_params=vol_params,
-                          surf_to_vol_ratio=surf_to_vol_ratio,
-                          _print=_print)
+    # Pass arguments to plot surf vol, and return
+    return plot_surf_vol_collage(surf=[data['lh'], data['rh']],
+                                 vol=data['sub'], vol_plot_type=vol_plot_type,
+                                 cmap=cmap, threshold=threshold, vmin=vmin, vmax=vmax,
+                                 cbar_vmin=cbar_vmin, cbar_vmax=cbar_vmax,
+                                 figure=figure, subplot_spec=subplot_spec,
+                                 figsize=figsize, title=title, title_sz=title_sz, title_y=title_y,
+                                 colorbar=colorbar, symmetric_cbar=symmetric_cbar,
+                                 hspace=hspace, wspace=wspace, colorbar_params=colorbar_params,
+                                 surf_params=surf_params, vol_params=vol_params,
+                                 surf_to_vol_ratio=surf_to_vol_ratio, _print=_print)
+
+def plot_volume(vol,
+                vol_plot_type='glass',
+                cmap=None,
+                colorbar='default',
+                threshold='auto',
+                vmax=None,
+                figure=None,
+                axes=None,
+                **kwargs):
+
+    # Base stat cases
+    rois = False
+    if vol_plot_type == 'glass':
+        vol_plot_func = plot_glass_brain
+    elif vol_plot_type == 'stat':
+        vol_plot_func = plot_stat_map
+    
+    # ROI case
+    elif vol_plot_type == 'roi':
+        vol_plot_func = plot_roi
+        rois = True
+
+    # Proc threshold if auto
+    threshold = _proc_threshold(vol, threshold, rois=rois)
+    
+    # Add or don't add colorbar
+    colorbar = _proc_colorbar(colorbar, rois=rois)
+    
+    # Call vol plot function
+    vol_plot_func(vol, figure=figure,  axes=axes,
+                  cmap=cmap, threshold=threshold,
+                  vmax=vmax, **kwargs)
+    
+    # Set if used by upper level functions to return
+    vol_smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
+
+    return figure, axes, vol_smfs
 
 
-def plot(data, space=None, hemi=None, verbose=0, **kwargs):
+def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
+
+    # Get verbose object
+    _print = _get_print(verbose=verbose)
+    
+    # Load / perform initial auto-detection of data
+    data, _ = _load_data_and_ref(data, space=space, hemi=hemi, _print=_print)
+
+    # If includes surface data -
+    # Get the unique values
+    if 'lh' in data:
+        unique_vals = np.unique(data['lh'])
+    elif 'rh' in data:
+        unique_vals = np.unique(data['rh'])
+    # If no surface data present, subcort case
+    else:
+        unique_vals = np.unique(data['sub'].get_fdata())
+
+    # If all of the data points are interger-like, assume
+    # we are plotting a parcellation and not stat data
+    if all([float(u).is_integer() for u in unique_vals]):
+        
+        # Just surface or surfaces case
+        if 'sub' not in data:
+            return data, _plot_surfs, {'space': space,
+                                       'hemi': hemi,
+                                       'rois': True,
+                                       '_print': _print,
+                                       **kwargs}
+        
+        # Just volume case
+        elif 'lh' not in data and 'rh' not in data:
+           
+            # Override vol_plot_type - force roi
+            return data['sub'], plot_volume, {'vol_plot_type': 'roi', **kwargs}
+            
+        # Last case is vol / surf collage
+
+        return data, _plot_surfs_vol, {'space': None,
+                                       'hemi': None,
+                                       'rois': True,
+                                       '_print': _print,
+                                       **kwargs}
+    
+    # Otherwise - stat values
+
+    # Just surface or surfaces case
+    if 'sub' not in data:
+        return data, _plot_surfs, {'space': space,
+                                   'hemi': hemi,
+                                   'rois': False,
+                                   '_print': _print,
+                                   **kwargs}
+
+    # Just volume case
+    elif 'lh' not in data and 'rh' not in data:
+        return data['sub'], plot_volume, kwargs
+
+    # Last case is vol / surf collage
+    return data, _plot_surfs_vol, {'space': None,
+                                   'hemi': None,
+                                   'rois': False,
+                                   '_print': _print,
+                                   **kwargs}
+
+
+def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     '''The most automated magic plotting function avaliable,
     used to plot a wide range of neuroimaging data (volumes / surfs).
 
@@ -908,6 +1025,14 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
         - 0 : Only warnings are shown.
         - 1 : Information on which steps are automatically decided are shown.
         - >1 : Automatic choices are shown as well as additional helper text.
+
+    returns : bool, optional
+        If the figure, axis / grid and smfs should be returned from the base function
+        calls or not.
+
+        ::
+
+            default = False
 
     kwargs : keyword arguments
         There are number of different plotting specific arguments
@@ -1160,85 +1285,17 @@ def plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
     '''
 
-    # Get verbose object
-    _print = _get_print(verbose=verbose)
-    
-    # Load / perform initial auto-detection of data
-    data, _ = _load_data_and_ref(data, space=space, hemi=hemi, _print=_print)
+    # Setup
+    data, func, args = _setup_auto_plot(data, space=space, hemi=hemi,
+                                        verbose=verbose, **kwargs)
 
-    # If includes surface data -
-    # Get the unique values
-    if 'lh' in data:
-        unique_vals = np.unique(data['lh'])
-    elif 'rh' in data:
-        unique_vals = np.unique(data['rh'])
-    # If no surface data present, subcort case
-    else:
-        unique_vals = np.unique(data['sub'].get_fdata())
+    # Call func
+    r = func(data, **args)
 
-    # If all of the data points are interger-like, assume
-    # we are plotting a parcellation and not stat data
-    if all([float(u).is_integer() for u in unique_vals]):
-        
-        # Just surface or surfaces case
-        if 'sub' not in data:
-            _plot_surfs(data, space=space, hemi=hemi, rois=True,
-                        _print=_print, **kwargs)
-        
-        # Just volume case
-        elif 'lh' not in data and 'rh' not in data:
+    # Optionally return Figure + whatever returned by sub calls
+    if returns:
+        return r
 
-            # Override vol_plot_type - force roi
-            plot_volume(data['sub'], vol_plot_type='roi', **kwargs)
-        
-        # Last case is vol / surf collage
-        else:
-            _plot_surfs_vol(data, space=None, hemi=None, rois=True,
-                            _print=_print, **kwargs)
-    
-    # Otherwise - plot stat values
-    else:
-
-        # Just surface or surfaces case
-        if 'sub' not in data:
-            _plot_surfs(data, space=space, hemi=hemi,
-                        rois=False, _print=_print, **kwargs)
-
-        # Just volume case
-        elif 'lh' not in data and 'rh' not in data:
-            plot_volume(data['sub'], **kwargs)
-
-        # Last case is vol / surf collage
-        else:
-            _plot_surfs_vol(data, space=None, hemi=None,
-                            rois=False, _print=_print, **kwargs)
+    return None
 
 
-def plot_volume(vol,
-                vol_plot_type='glass',
-                cmap=None,
-                threshold='auto',
-                vmax=None,
-                figure=None,
-                axes=None,
-                **kwargs):
-
-    if vol_plot_type == 'glass':
-        vol_plot_func = plot_glass_brain
-    elif vol_plot_type == 'stat':
-        vol_plot_func = plot_stat_map
-    elif vol_plot_type == 'roi':
-        vol_plot_func = plot_roi
-
-    # Proc threshold if auto
-    rois = vol_plot_type == 'roi'
-    threshold = _proc_threshold(vol, threshold, rois=rois)
-    
-    # Call vol plot function
-    vol_plot_func(vol,
-                  figure=figure,
-                  axes=axes, 
-                  cmap=cmap,
-                  threshold=threshold,
-                  vmax=vmax,
-                  **kwargs)

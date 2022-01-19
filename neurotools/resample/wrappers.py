@@ -62,13 +62,11 @@ def gen_cheap_midthickness(fs_subj, hemi, temp_dr=None):
     # Return location
     return mid_thickness_out_loc
 
-
 def _geo_to_gii(in_loc, out_loc):
 
     in_geo = read_geometry(in_loc)
     in_geo_gii = geo_to_gifti(in_geo[0], in_geo[1])
     nib.save(in_geo_gii, out_loc)
-
 
 def _get_curr_new_sphere_locs(fs_subj, hemi, target_res, temp_dr):
     '''Get as gifti - saving to temp dr if needed'''
@@ -121,7 +119,6 @@ def freesurfer_resample_prep(fs_subj, hemi,
             'midthickness_new_out_loc': midthickness_new_out_loc,
             'midthickness_loc': midthickness_loc,
             'new_sphere_loc': new_sphere_loc}
-           
 
 def _save_data_as_gii(data, temp_dr=None, append=''):
 

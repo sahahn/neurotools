@@ -2,6 +2,7 @@ import numpy as np
 import nibabel as nib
 from .distance_helpers import get_signed_distance_helper
 from .surface_file import SurfaceFile
+import time
 
 def make_barycentric_weights(from_s, to_s):
     
@@ -40,7 +41,7 @@ def gen_weights_adap_bary_area(cur_sphere, new_sphere, curAreas, newAreas):
             reverse_gather[key][old_node] = reverse[old_node][key]
 
     # Fill in adap gather
-    adap_gather = [dict() for i in range(n_new_nodes)]
+    adap_gather = [dict() for _ in range(n_new_nodes)]
     for new_node in range(n_new_nodes):
 
         # Build set of all nodes used by forward weights
@@ -119,9 +120,13 @@ def resample_surface(input_surf, cur_sphere, new_sphere, cur_area, new_area):
     newAreas = nib.load(new_area).agg_data()
 
     # Generate weights with area adaption
+    start = time.time()
     weights = gen_weights_adap_bary_area(cur_sphere, new_sphere, curAreas, newAreas)
+    print(f'gen_weights_adap_bary_area in {time.time() - start}')
 
     # Resample according to calculated weights
+    start = time.time()
     new_surf = resample_surface_by_weights(input_surf, weights)
+    print(f'resampled by weights in {time.time() - start}')
 
     return new_surf
