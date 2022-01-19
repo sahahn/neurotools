@@ -814,7 +814,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     
     # Pass arguments to plot surf vol, and return
     return plot_surf_vol_collage(surf=[data['lh'], data['rh']],
-                                 vol=data['sub'], vol_plot_type=vol_plot_type,
+                                 vol=data['vol'], vol_plot_type=vol_plot_type,
                                  cmap=cmap, threshold=threshold, vmin=vmin, vmax=vmax,
                                  cbar_vmin=cbar_vmin, cbar_vmax=cbar_vmax,
                                  figure=figure, subplot_spec=subplot_spec,
@@ -879,14 +879,14 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
         unique_vals = np.unique(data['rh'])
     # If no surface data present, subcort case
     else:
-        unique_vals = np.unique(data['sub'].get_fdata())
+        unique_vals = np.unique(data['vol'].get_fdata())
 
     # If all of the data points are interger-like, assume
     # we are plotting a parcellation and not stat data
     if all([float(u).is_integer() for u in unique_vals]):
         
         # Just surface or surfaces case
-        if 'sub' not in data:
+        if 'vol' not in data:
             return data, _plot_surfs, {'space': space,
                                        'hemi': hemi,
                                        'rois': True,
@@ -897,7 +897,7 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
         elif 'lh' not in data and 'rh' not in data:
            
             # Override vol_plot_type - force roi
-            return data['sub'], plot_volume, {'vol_plot_type': 'roi', **kwargs}
+            return data['vol'], plot_volume, {'vol_plot_type': 'roi', **kwargs}
             
         # Last case is vol / surf collage
 
@@ -910,7 +910,7 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
     # Otherwise - stat values
 
     # Just surface or surfaces case
-    if 'sub' not in data:
+    if 'vol' not in data:
         return data, _plot_surfs, {'space': space,
                                    'hemi': hemi,
                                    'rois': False,
@@ -919,7 +919,7 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
     # Just volume case
     elif 'lh' not in data and 'rh' not in data:
-        return data['sub'], plot_volume, kwargs
+        return data['vol'], plot_volume, kwargs
 
     # Last case is vol / surf collage
     return data, _plot_surfs_vol, {'space': None,
@@ -952,7 +952,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
         - As a dictionary. If passed as a dictionary, this
           allows the user most control over how data is specified.
-          Dictionary keys must be one or more of 'lh', 'rh' and 'sub',
+          Dictionary keys must be one or more of 'lh', 'rh' and 'vol',
           where values can be either array-like, file locations or nibabel
           objects. Note that if you are trying to plot data in native
           subject space, it must be passed in this dictionary style, along
@@ -965,7 +965,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
         - As a list or array-like of length 3, indicating internally
           that the first two passed index are left and right hemisphere
-          surface data, and the last is subcortical data, all to
+          surface data, and the last is subcortical / volumetric data, all to
           be plotted together in a collage.
 
         - As a :class:`Nifti1Image<nibabel.nifti1.Nifti1Image>` to be plotted volumetrically.
@@ -987,11 +987,19 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
         - 'fsaverage3' : freesurfer3 downsampled average standard space.
 
+        - '41k_fsaverage' : Matched to CIVET 41k vertex freesurfer space.
+
+        - '4k_fs_LR' :  HCP standard 4k vertex space. 
+
+        - '8k_fs_LR' :  HCP standard 8k vertex space. 
+
         - '32k_fs_LR' : HCP standard 32k vertex space. 
 
         - '59k_fs_LR' : HCP standard 59k vertex space. 
 
         - '164k_fs_LR' : HCP standard 164k vertex space. Note, while this space has the same number of vertex as fsaverage space, it is not the same.
+
+        - 'civet' : Standard space with 41k vertex used by CIVET.
 
         - 'native' : This is set if the passed number of values don't correspond to any of the saved defaults, and refers to that the space to plot is in some non-standard space.
 

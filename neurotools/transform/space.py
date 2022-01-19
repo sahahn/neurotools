@@ -90,7 +90,6 @@ def _get_space_mapping(hemi):
 
     return mapping
 
-
 def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     '''
     If hemi=None, auto-detect. Or can pass as
@@ -109,10 +108,10 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
 
     Data can be passed as
     
-    1. A single data representing surf, surf+surf, surf+surf+sub or just sub
+    1. A single data representing surf, surf+surf, surf+surf+vol or just vol
     2. A single file location w/ a data array
     3. A list / array-like of length either 2 or 3, if 2 then represents surf+surf
-       if 3 then surf+surf+sub
+       if 3 then surf+surf+vol
     4. A list / array-like same as above, but with file-paths
     '''
 
@@ -135,7 +134,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     for lk, rk in zip(lh_space_mapping, rh_space_mapping):
         hemi_sizes.append((lk, rk))
 
-    # TODO add cases for when just subcortical is passed
+    # TODO add cases for when just subcortical / volumetric is passed
     # Or flattened voxel or something
     # not in cifti form, but in flattened sub-cortical voxel form
     # For now these are just from cifti...
@@ -143,7 +142,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
 
     # Init.
     proc_data = {}
-    lh_data, rh_data, sub_data = None, None, None
+    lh_data, rh_data, vol_data = None, None, None
 
     # If data is passed as str - replace with loaded
     # version here - before main loop with cases
@@ -168,15 +167,17 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
         if 'concat' in data:
             sz = len(data['concat']) // 2
             lh_data, rh_data = _load(data['concat'][:sz]), _load(data['concat'][sz:])
-        if 'sub' in data:
-            sub_data = _load(data['sub'])
 
         if 'vol' in data:
-            sub_data = _load(data['vol'])
+            vol_data = _load(data['vol'])
+        
+        # Also support passing as sub
+        if 'sub' in data:
+            vol_data = _load(data['sub'])
 
-    # Passed just single subcort case
+    # Passed just single subcort case / volumtetric
     elif isinstance(data, nib.Nifti1Image):
-        sub_data = data
+        vol_data = data
 
     # Check if
     # was passed as a list / array-like corresponding
@@ -188,7 +189,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     # Or lh+rh+sub case
     elif len(data) == 3:
         _print('Assuming data passed as [lh, rh, sub].', level=1)
-        lh_data, rh_data, sub_data = _load(data[0]), _load(data[1]), _load(data[2])
+        lh_data, rh_data, vol_data = _load(data[0]), _load(data[1]), _load(data[2])
 
     # Single passed array case
     # Since data is already array if here
@@ -221,16 +222,16 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
                 # lh+rh+sub case
                 if len(data) == lh_sz + rh_sz + sub_sz:
                     lh_data, rh_data = data[:lh_sz], data[lh_sz:lh_sz+rh_sz]
-                    sub_data = data[lh_sz+rh_sz:]
+                    vol_data = data[lh_sz+rh_sz:]
                     break
 
                 # Just sub case
                 elif len(data) == sub_sz:
-                    sub_data = data
+                    vol_data = data
                     break
 
     # Make sure something found, if not error
-    if lh_data is None and rh_data is None and sub_data is None:
+    if lh_data is None and rh_data is None and vol_data is None:
         raise RuntimeError(f'Could not determine the space / hemi of passed data with len={len(data)}')
     
     # Process found data - don't need
@@ -241,15 +242,15 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
         proc_data['lh'], lh_space = proc_hemi_data(lh_data, 'lh', lh_space_mapping)
     if rh_data is not None:
         proc_data['rh'], rh_space = proc_hemi_data(rh_data, 'rh', rh_space_mapping)
-    if sub_data is not None:
-        proc_data['sub'] = proc_sub_data(sub_data)
+    if vol_data is not None:
+        proc_data['vol'] = proc_vol_data(vol_data)
 
     _print(f'Inferred passed data: {list(proc_data)}', level=1)
 
     # Process space combinations
     detected_space = None
     if lh_space is None and rh_space is None:
-        if 'sub' not in proc_data:
+        if 'vol' not in proc_data:
             raise RuntimeError('No valid data found')
     elif lh_space is not None and rh_space is None:
         detected_space = lh_space
@@ -290,18 +291,18 @@ def proc_hemi_data(hemi_data, hemi, space_mapping):
     # If already okay, return as is, with space
     return hemi_data, space
 
-def proc_sub_data(sub_data):
+def proc_vol_data(vol_data):
     
     # If already nifti
-    if isinstance(sub_data, nib.Nifti1Image):
-        return sub_data
+    if isinstance(vol_data, nib.Nifti1Image):
+        return vol_data
 
     # Otherwise, if size for cifti rois
-    if len(sub_data) in [31870, 62053]:
-        sub_data = extract_subcortical_from_cifti(sub_data)
+    if len(vol_data) in [31870, 62053]:
+        vol_data = extract_subcortical_from_cifti(vol_data)
     
     # The other case will be flattened subcort voxel case
     else:
         raise RuntimeError('Not implemented.')
 
-    return sub_data
+    return vol_data
