@@ -2,6 +2,7 @@ import os
 import numpy as np
 
 from .. import data_dr
+from .funcs import load
 
 
 def get_surf_loc(space, hemi, key):
@@ -48,10 +49,33 @@ def _get_surf_loc(space, hemi, key, sub):
 
     # If both a hemi key and the key of interest
     # return that full location
+    match_files = []
     for hemi_key in hemi_keys:
         for file in files:
             if key in file and hemi_key in file:
-                return os.path.join(dr, file)
+                match_files.append(file)
+
+    # None
+    if len(match_files) == 0:
+        return None
+
+    # If more than one valid file found, prefer the
+    # one with the shortest length, as most likely
+    # to match exactly the requested value, if just 1
+    # will select that one
+    match_file = sorted(match_files, key=len)[0]
     
-    # Otherwise, return None for not found
-    return None
+    # Return full path
+    return os.path.join(dr, match_file)
+
+def _load_medial_wall(space, hemi):
+
+    # Get location
+    loc = get_surf_loc(space=space, hemi=hemi, key=['medial_mask', 'medialwall'])
+
+    # Error if not found
+    if loc is None:
+        raise RuntimeError(f'No medial wall information found for space={space}, hemi={hemi}')
+
+    # Return loaded as bool
+    return load(loc, dtype='bool')

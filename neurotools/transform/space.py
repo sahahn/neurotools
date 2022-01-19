@@ -3,10 +3,37 @@ import nibabel as nib
 import os
 import numpy as np
 from ..loading.funcs import load
-from ..loading.from_data import get_surf_loc
+from ..loading.from_data import _load_medial_wall
 from .. import data_dr
 from ..misc.print import _get_print
 
+def _resolve_space_name(space):
+
+    # Base
+    if space is None:
+        return None
+    if space == 'native':
+        return 'native'
+
+    # Check if already okay
+    space_options = os.listdir(data_dr)
+    if space in space_options:
+        return space
+
+    # If not, let's let some things slide
+    if space == '41k_civet':
+        return 'civet'
+
+    # Make some replacements
+    space = space.replace('Civet', 'civet')
+    space = space.replace('_lr', '_LR')
+    space = space.replace('_FS_', '_fs_')
+
+    # Check again
+    if space in space_options:
+        return space
+
+    raise RuntimeError('Invalid space passed!')
 
 def _load(data):
     '''Simple wrapper around load with
@@ -37,18 +64,6 @@ def _load(data):
         return nib.load(data)
     except:
         return loaded_data
-
-def _load_medial_wall(space, hemi):
-
-    # Get location
-    loc = get_surf_loc(space=space, hemi=hemi, key=['medial_mask', 'medialwall'])
-
-    # Error if not found
-    if loc is None:
-        raise RuntimeError(f'No medial wall information found for space={space}, hemi={hemi}')
-
-    # Return loaded as bool
-    return load(loc, dtype='bool')
 
 def _get_space_mapping(hemi):
 
@@ -85,12 +100,14 @@ def _get_space_mapping(hemi):
         # Add no medial wall version
         no_medial_sz = int(np.sum(medial_wall))
         if no_medial_sz in mapping:
+            # If this happens will break later logic
             raise RuntimeError('Should not be overlaps here.')
         mapping[no_medial_sz] = (space, True)
 
     return mapping
 
-def process_space(data, space=None, hemi=None, verbose=0, _print=None):
+def process_space(data, space=None, hemi=None,
+                  verbose=0, _print=None):
     '''
     If hemi=None, auto-detect. Or can pass as
     lh or rh, as this is the only case
@@ -114,6 +131,9 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
        if 3 then surf+surf+vol
     4. A list / array-like same as above, but with file-paths
     '''
+
+    # Resolve user passed space
+    space = _resolve_space_name(space)
 
     _print = _get_print(verbose, _print)
     _print('Calling function process_space on data.', level=2)
@@ -155,6 +175,11 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
         # space information and whatnot. For now, just treat as array
         _print(f'Loading data from cifti as data array.', level=2)
         data = _load(data)
+
+    # Gifti case directly
+    elif isinstance(data, nib.GiftiImage):
+        _print(f'Loading data from gifti as data array.', level=2)
+        data = _load(data)
         
     # Otherwise, if data is already in dict form
     # check from there
@@ -175,7 +200,7 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
         if 'sub' in data:
             vol_data = _load(data['sub'])
 
-    # Passed just single subcort case / volumtetric
+    # Passed just single subcort case / volumetric
     elif isinstance(data, nib.Nifti1Image):
         vol_data = data
 
@@ -266,8 +291,8 @@ def process_space(data, space=None, hemi=None, verbose=0, _print=None):
     else:
         _print(f'Inferred surface space: {detected_space}', level=1)
 
+    # Return proc data + space
     return proc_data, detected_space
-
 
 def proc_hemi_data(hemi_data, hemi, space_mapping):
     

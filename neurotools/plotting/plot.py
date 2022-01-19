@@ -855,7 +855,7 @@ def plot_volume(vol,
     # Call vol plot function
     vol_plot_func(vol, figure=figure,  axes=axes,
                   cmap=cmap, threshold=threshold,
-                  vmax=vmax, **kwargs)
+                  vmax=vmax, colorbar=colorbar, **kwargs)
     
     # Set if used by upper level functions to return
     vol_smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
