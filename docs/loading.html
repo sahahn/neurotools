@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="misc" href="misc.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
 
-    <meta name="generator" content="sphinx-4.4.0, furo 2022.01.02"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.01.02"/>
         <title>loading - neurotools 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
@@ -224,7 +224,7 @@ something like <code class="code highlight python docutils literal notranslate">
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
 If left as None, keep original data type, otherwise
 can pass as a string name of datatype to cast to.
 For example, ‘float32’ to cast to 32 bit floating point
@@ -280,20 +280,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.87895359, 0.5998639 ],</span>
-<span class="go">       [0.0421518 , 0.07754448],</span>
-<span class="go">       [0.08906264, 0.92842711],</span>
-<span class="go">       [0.20349093, 0.95411967],</span>
-<span class="go">       [0.38025768, 0.20815145]])</span>
+<span class="go">array([[0.39513822, 0.90087715],</span>
+<span class="go">       [0.61696753, 0.28228615],</span>
+<span class="go">       [0.38907977, 0.8832038 ],</span>
+<span class="go">       [0.38888696, 0.861386  ],</span>
+<span class="go">       [0.82414583, 0.65043611]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.87895359, 0.5998639 ],</span>
-<span class="go">       [0.0421518 , 0.07754448],</span>
-<span class="go">       [0.08906264, 0.92842711],</span>
-<span class="go">       [0.20349093, 0.95411967],</span>
-<span class="go">       [0.38025768, 0.20815145]])</span>
+<span class="go">array([[0.39513822, 0.90087715],</span>
+<span class="go">       [0.61696753, 0.28228615],</span>
+<span class="go">       [0.38907977, 0.8832038 ],</span>
+<span class="go">       [0.38888696, 0.861386  ],</span>
+<span class="go">       [0.82414583, 0.65043611]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -390,7 +390,7 @@ not also be True.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
 If left as None, keep original data type, otherwise
 can pass as a string name of datatype to cast to.
 For example, ‘float32’ to cast to 32 bit floating point
@@ -455,7 +455,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/37675ecc926da4589dc8b44d2ab5d59b</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.004443168640136719 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.005023956298828125 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -476,7 +476,7 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8effc2a5532e9a8e4f3ff9be0f254d6a</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.00410151481628418 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.004167079925537109 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -535,10 +535,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.29279437, 0.        , 0.        , 0.75991672]),</span>
-<span class="go"> array([0.76944924, 0.        , 0.        , 0.75790918]),</span>
-<span class="go"> array([0.26571422, 0.        , 0.        , 0.76210783]),</span>
-<span class="go"> array([0.40939737, 0.        , 0.        , 0.21363141])]</span>
+<span class="go">[array([0.01196374, 0.        , 0.        , 0.56036799]),</span>
+<span class="go"> array([0.36641185, 0.        , 0.        , 0.87109329]),</span>
+<span class="go"> array([0.34227204, 0.        , 0.        , 0.18176311]),</span>
+<span class="go"> array([0.02380234, 0.        , 0.        , 0.95717082])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -554,14 +554,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7faa3b650310&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7faa3b650460&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7faa3b6506d0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7faa3b650490&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f8b1e15b3d0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8b1e15b8b0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8b1e15b400&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8b1e15b340&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.29279437, 0.        , 0.        , 0.75991672])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.01196374, 0.        , 0.        , 0.56036799])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -656,7 +656,7 @@ with the encode_cat_as option) and saved under the base variable name
 <li><p><strong>csv_loc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The str location of the csv saved version of the DEAP release
 RDS file for the ABCD Study - or any other comma seperated dataset
 with an eventname column.</p></li>
-<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>list-like</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>The single eventname as a str, or multiple eventnames
+<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>list-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The single eventname as a str, or multiple eventnames
 in which to include results by. If passed as None then
 all avaliable data will be kept.</p>
 <p>If a single eventname is specified then the eventname
@@ -754,7 +754,7 @@ according to right now a fixed set of rules:</p>
 RDS file for the ABCD Study. This can also just be any
 other csv as long as it has columns:
 ‘rel_family_id’, ‘rel_relationship’, ‘genetic_zygosity_status_1’</p></li>
-<li><p><strong>subjects</strong> (<em>None</em><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>Can optionally specify that the block structure be created on a subset of subjects,
+<li><p><strong>subjects</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>Can optionally specify that the block structure be created on a subset of subjects,
 though if any missing values are present in rel_relationship or rel_family_id
 within this subset, then those will be further dropped.</p>
 <p>If passed as non-null, this should be a valid array-like
@@ -763,7 +763,7 @@ or <a class="reference external" href="https://pandas.pydata.org/docs/reference/
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>array-like</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>A single eventname as a str in which to specify data by.</p>
+<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>array-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>A single eventname as a str in which to specify data by.</p>
 <p>For now, this method only supports loading data at a single
 time point across subjects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'baseline_year_1_arm_1'</span>

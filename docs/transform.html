@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="stats" href="stats.html" />
 
-    <meta name="generator" content="sphinx-4.4.0, furo 2022.01.02"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.01.02"/>
         <title>transform - neurotools 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
@@ -196,7 +196,7 @@
 <h2>SurfLabels<a class="headerlink" href="#surflabels" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfLabels">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract signals from non-overlapping labels for surface data.</p>
 <p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiLabelsMasker</span></code></a>,
 except is designed to work with surface data.</p>
@@ -220,7 +220,7 @@ e.g., -2.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>mask</strong> (<em>None</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
 which to not calculate ROI values for.
 This can be passed as a str or
 array-like of values (just like labels),
@@ -312,7 +312,7 @@ a different step it may make sense to set to False.</p>
 <h2>SurfMaps<a class="headerlink" href="#surfmaps" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfMaps">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract signals from overlapping labels for surface data.</p>
 <p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiMapsMasker</span></code></a>,
 except it is designed to work with surface projected data, instead of 3D/4D Nifti files.</p>
@@ -379,7 +379,7 @@ of the regions. In general, it depends on
 what signal you are trying to summarize, and
 how you are trying to summarize it.</p>
 </p></li>
-<li><p><strong>mask</strong> (<em>None</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
 which to not calculate ROI values for.
 This can be passed as a str or
 array-like of values (just like maps),
