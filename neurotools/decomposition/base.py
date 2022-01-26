@@ -13,7 +13,6 @@ from sklearn.utils.extmath import randomized_svd, svd_flip
 from nilearn.signal import _row_sum_of_squares
 from ..transform.rois import SurfMaps
 
-
 def fast_svd(X, n_components, random_state=None):
     """ Automatically switch between randomized and lapack SVD (heuristic
         of scikit-learn).
