@@ -121,7 +121,7 @@ def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
     if symmetric_cbar != 'auto':
         return symmetric_cbar
     
-    # If rois, default = False
+    # If rois, default = False, so return
     if rois:
         return False
     
