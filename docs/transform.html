@@ -2,13 +2,14 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="stats" href="stats.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="stats" href="stats.html" />
 
-    <meta name="generator" content="sphinx-4.4.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.01.02"/>
         <title>transform - neurotools 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
     
     
 
@@ -189,9 +190,9 @@
           </label>
         </div>
         <article role="main">
-          <div class="section" id="transform">
+          <section id="transform">
 <h1>transform<a class="headerlink" href="#transform" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="surflabels">
+<section id="surflabels">
 <h2>SurfLabels<a class="headerlink" href="#surflabels" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfLabels">
@@ -306,8 +307,8 @@ a different step it may make sense to set to False.</p>
 </dl>
 </div>
 </dd></dl>
-</div>
-<div class="section" id="surfmaps">
+</section>
+<section id="surfmaps">
 <h2>SurfMaps<a class="headerlink" href="#surfmaps" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfMaps">
@@ -477,15 +478,15 @@ take the least squares solution instead.</p>
 us to reverse the feature transformation (although not always exactly)</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">sm</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">data_trans</span><span class="p">)</span>
 <span class="gh">Out[15]: </span><span class="go"></span>
-<span class="go">array([-1.11022302e-15,  1.00000000e+00,  2.00000000e+00,  3.00000000e+00,</span>
-<span class="go">        4.00000000e+00])</span>
+<span class="go">array([-4.4408921e-16,  1.0000000e+00,  2.0000000e+00,  3.0000000e+00,</span>
+<span class="go">        4.0000000e+00])</span>
 </pre></div>
 </div>
 <p>This can be useful in the say the case of converting back downstream
 calculated feature importance to the original data space.</p>
 </dd></dl>
-</div>
-<div class="section" id="gen-indv-roi-network">
+</section>
+<section id="gen-indv-roi-network">
 <h2>gen_indv_roi_network<a class="headerlink" href="#gen-indv-roi-network" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.transform.network.gen_indv_roi_network">
@@ -548,8 +549,8 @@ is set, then the diag will be removed as well.</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-<div class="section" id="gen-fs-subj-vertex-network">
+</section>
+<section id="gen-fs-subj-vertex-network">
 <h2>gen_fs_subj_vertex_network<a class="headerlink" href="#gen-fs-subj-vertex-network" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.transform.network.gen_fs_subj_vertex_network">
@@ -619,8 +620,8 @@ every combination of ROI.</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-</div>
+</section>
+</section>
 
         </article>
       </div>
@@ -643,11 +644,9 @@ every combination of ROI.</p>
 
         <div class="related-information">
               Copyright &#169; 2021, Sage Hahn |
-            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
-              and
-              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-              <a href="https://github.com/pradyunsg/furo">Furo theme</a>. |
-            <a class="muted-link" href="_sources/transform.rst.txt"
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/transform.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -687,7 +686,7 @@ every combination of ROI.</p>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     </body>
 </html>
