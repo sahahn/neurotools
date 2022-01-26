@@ -69,7 +69,7 @@ class RandomParcellation(BaseEstimator):
         self.mask = None
 
     def get_parc(self, copy=True):
-        '''Get the underlying parcellation.
+        '''Get the underlying parcellation, if avaliable.
 
         Parameters
         -----------
