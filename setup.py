@@ -21,7 +21,6 @@ setup(name='neurotools',
           'statsmodels>=0.12',
           'matplotlib>=3.3.4',
           'nilearn>=0.8.1',
-          'furo',
       ],
       dependency_links = [
      'git+https://github.com/netneurolab/neuromaps@master#egg=neuromaps',

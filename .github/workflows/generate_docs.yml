@@ -33,6 +33,7 @@ jobs:
         pip install numpydoc==1.1.0
         pip install ipython
         pip install nbsphinx
+        pip install furo
         
     # Generate the docs
     - name: Generate docs
