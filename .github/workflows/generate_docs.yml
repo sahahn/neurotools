@@ -24,19 +24,19 @@ jobs:
       with:
         python-version: 3.9
         
-    # Install needed dependencies
+    # Install base lib, then extra dependencies for generating docs
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install .
+        pip install sphinx==4.2.0
+        pip install numpydoc==1.1.0
+        pip install ipython
+        pip install nbsphinx
         
     # Generate the docs
     - name: Generate docs
       run: |
-        pip install sphinx
-        pip install numpydoc
-        pip install ipython
-        pip install nbsphinx
         cd src_doc
         make github
         cd ../
