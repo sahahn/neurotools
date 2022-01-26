@@ -1,4 +1,0 @@
-.. currentmodule:: neurotools.stats
-
-stats
-###########

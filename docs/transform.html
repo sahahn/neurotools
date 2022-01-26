@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="stats" href="stats.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2021.10.09"/>
         <title>transform - neurotools 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
@@ -195,34 +195,31 @@
 <h2>SurfLabels<a class="headerlink" href="#surflabels" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfLabels">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract signals from non-overlapping labels.</p>
-<p>This class functions similar to
-<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiLabelsMasker</span></code></a>, except
-it is designed to work for surface, cifti or any arbitrary
-1 or 2D numpy arrays.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfLabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract signals from non-overlapping labels for surface data.</p>
+<p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiLabelsMasker.html#nilearn.input_data.NiftiLabelsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiLabelsMasker</span></code></a>,
+except is designed to work with surface data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em>) – This should represent an array, of the same size as the data
 dimension, as a mask with unique integer values for each ROI.
 You can also pass a str location in which to load in this array.
-Anything accepted by <code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code> is acceptable here.</p></li>
+Anything accepted by <a class="reference internal" href="loading.html#neurotools.loading.load" title="neurotools.loading.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load</span></code></a> is acceptable here.</p></li>
 <li><p><strong>background_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>array-like of int</em><em>, </em><em>optional</em>) – <p>This parameter determines which label, if any,
-in the corresponding
-passed labels, should be treated as ‘background’
-and therefore no ROI
+in the corresponding passed labels,
+should be treated as ‘background’ and therefore no ROI
 calculated for that value or values.
 You may pass either a single interger
 value, an array-like of integer values.</p>
 <p>If not background label is desired, just pass
 a label which doesn’t exist in any of the data,
-e.g., -100.</p>
+e.g., -2.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+<li><p><strong>mask</strong> (<em>None</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
 which to not calculate ROI values for.
 This can be passed as a str or
 array-like of values (just like labels),
@@ -254,12 +251,12 @@ options:</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>’min’ or ‘minimum</dt><dd><p>Calculate the min value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.min()</span></code></p>
+<dt>’min’ or ‘minimum</dt><dd><p>Calculate the min value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.ndarray.min()</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>’max’ or ‘maximum</dt><dd><p>Calculate the max value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.max()</span></code></p>
+<dt>’max’ or ‘maximum</dt><dd><p>Calculate the max value with <code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.ndarray.max()</span></code></p>
 </dd>
 </dl>
 </li>
@@ -314,15 +311,10 @@ a different step it may make sense to set to False.</p>
 <h2>SurfMaps<a class="headerlink" href="#surfmaps" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="neurotools.transform.rois.SurfMaps">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract signals from overlapping labels.</p>
-<p>This class functions similar to
-<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">nilearn.input_data.NiftiMapsMasker</span></code></a>, except
-it is designed to work for surface, cifti or any arbitrary
-1 or 2D numpy arrays.</p>
-<p>This object calculates the signal for each of the
-passed maps as extracted from the input during fit,
-and returns for each map a value.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neurotools.transform.rois.</span></span><span class="sig-name descname"><span class="pre">SurfMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.rois.SurfMaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract signals from overlapping labels for surface data.</p>
+<p>This class functions similar to <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.input_data.NiftiMapsMasker.html#nilearn.input_data.NiftiMapsMasker" title="(in Nilearn)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NiftiMapsMasker</span></code></a>,
+except it is designed to work with surface projected data, instead of 3D/4D Nifti files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -335,7 +327,8 @@ dimension and the number of maps
 as the second dimension.</p>
 <p>You may pass maps as either an array-like,
 or the str file location of a numpy or other
-valid surface file format array in which to load.</p>
+valid surface file format array in which to load.
+Anything accepted by <a class="reference internal" href="loading.html#neurotools.loading.load" title="neurotools.loading.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load</span></code></a> is acceptable here.</p>
 </p></li>
 <li><p><strong>strategy</strong> (<em>{'auto'</em><em>, </em><em>'ls'</em><em>, </em><em>'average'}</em><em>, </em><em>optional</em>) – <p>The strategy in which the maps are used to extract
 signal. If ‘ls’ is selected, which stands for
@@ -385,7 +378,7 @@ of the regions. In general, it depends on
 what signal you are trying to summarize, and
 how you are trying to summarize it.</p>
 </p></li>
-<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
+<li><p><strong>mask</strong> (<em>None</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>This parameter allows you to optional pass a mask of values in
 which to not calculate ROI values for.
 This can be passed as a str or
 array-like of values (just like maps),
@@ -492,15 +485,16 @@ us to reverse the feature transformation (although not always exactly)</p>
 calculated feature importance to the original data space.</p>
 </dd></dl>
 </div>
-<div class="section" id="gen-ks-roi-network">
-<h2>gen_ks_roi_network<a class="headerlink" href="#gen-ks-roi-network" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="gen-indv-roi-network">
+<h2>gen_indv_roi_network<a class="headerlink" href="#gen-indv-roi-network" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="neurotools.transform.network.gen_ks_roi_network">
-<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_ks_roi_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_ks_roi_network" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="neurotools.transform.network.gen_indv_roi_network">
+<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_indv_roi_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jsd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_indv_roi_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is designed to generate a network
-of 1 - Kolmogorov–Smirnov distances between groups of different ROIs.</p>
-<p>Specifically, this method calls the function <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/reference/generated/scipy.stats.ks_2samp.html#scipy.stats.ks_2samp" title="(in SciPy v1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.stats.ks_2samp()</span></code></a> between
-each collection of data points in each pair of ROIs, calculating the
+of 1 - distance function between groups of different ROIs.</p>
+<p>Specifically, this method calls the function <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/reference/generated/scipy.stats.ks_2samp.html#scipy.stats.ks_2samp" title="(in SciPy v1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.stats.ks_2samp()</span></code></a>  or
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/reference/generated/scipy.spatial.distance.jensenshannon.html#scipy.spatial.distance.jensenshannon" title="(in SciPy v1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.spatial.distance.jensenshannon()</span></code></a> to calculate the distances
+between each collection of data points in each pair of ROIs, calculating the
 distance between the two distributions. Values are then subtracted from 1,
 such that exact distribution matches have value 1, i.e., these are the
 strongest connections.</p>
@@ -517,6 +511,17 @@ data along with corresponding label file in some ROI space.</p>
 as data. This file should contain integer labels
 corresponding to which vertex or data elements belong
 to different ROIs.</p></li>
+<li><p><strong>metric</strong> (<em>{'jsd'</em><em>, </em><em>'ks'</em><em>, </em><em>'ks_demean'</em><em>, </em><em>'ks_normalize'}</em><em>, </em><em>optional</em>) – <p>The type of distance to compute between points.</p>
+<ul>
+<li><p>’jsd’ : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.</p></li>
+<li><p>’ks’ : Use the 1 - Kolmogorov–Smirnov distance between distributions.</p></li>
+<li><p>’ks_demean’ : Same as ‘ks’, but with each ROI’s points de-meaned.</p></li>
+<li><p>’ks_normalize’ : Same as ‘ks’, but with each ROI’s points normalized.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'jsd'</span>
+</pre></div>
+</div>
+</p></li>
 <li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, matrices are reshaped into 1D arrays and only their
 flattened lower triangular parts are returned.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
@@ -532,11 +537,11 @@ discarded.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>matrix</strong> – Two dimensional array containing the
-1 - Kolmogorov–Smirnov statistic / distances between
-every combination of ROI.</p>
-<p>If vectorize is True, then a 1D array is returned.</p>
-</p>
+<dd class="field-even"><p><strong>matrix</strong> – Base behavior is a two dimensional array containing the
+distances / statistics between
+every combination of ROI. If vectorize is True, then
+a 1D array is returned instead, and if discard_diagonal
+is set, then the diag will be removed as well.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>1/2D numpy array</p>
@@ -548,9 +553,9 @@ every combination of ROI.</p>
 <h2>gen_fs_subj_vertex_network<a class="headerlink" href="#gen-fs-subj-vertex-network" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.transform.network.gen_fs_subj_vertex_network">
-<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_fs_subj_vertex_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subj_dr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thickness'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aparc.a2009s.annot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_fs_subj_vertex_network" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.transform.network.</span></span><span class="sig-name descname"><span class="pre">gen_fs_subj_vertex_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subj_dr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thickness'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aparc.a2009s.annot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jsd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_diagonal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.transform.network.gen_fs_subj_vertex_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is helper function for calling
-<a class="reference internal" href="#neurotools.transform.network.gen_ks_roi_network" title="neurotools.transform.network.gen_ks_roi_network"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_ks_roi_network()</span></code></a>, for data organized in
+<a class="reference internal" href="#neurotools.transform.network.gen_indv_roi_network" title="neurotools.transform.network.gen_indv_roi_network"><code class="xref py py-func docutils literal notranslate"><span class="pre">gen_indv_roi_network()</span></code></a>, for data organized in
 freesurfer individual subject directory style.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -565,8 +570,8 @@ be saved in subdirectory surf with names:
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>parc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the label / parcellation file in which
-to use, as found in subdirectory label with names:
+<li><p><strong>parc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <dl>
+<dt>The name of the label / parcellation file in which</dt><dd><p>to use, as found in subdirectory label with names:
 <cite>lh.{parc}</cite> and <cite>rh.{parc}</cite>.</p>
 <p>These are concatenated internally with function
 <code class="xref py py-func docutils literal notranslate"><span class="pre">merge_parc_hemis()</span></code>.</p>
@@ -574,6 +579,19 @@ to use, as found in subdirectory label with names:
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'aparc.a2009s.annot'</span>
 </pre></div>
 </div>
+</dd>
+<dt>metric<span class="classifier">{‘jsd’, ‘ks’, ‘ks_demean’, ‘ks_normalize’}, optional</span></dt><dd><p>The type of distance to compute between points.</p>
+<ul>
+<li><p>’jsd’ : Use the 1 - Jensen Shannon distance between each rois kde estimated distributions.</p></li>
+<li><p>’ks’ : Use the 1 - Kolmogorov–Smirnov distance between distributions.</p></li>
+<li><p>’ks_demean’ : Same as ‘ks’, but with each ROI’s points de-meaned.</p></li>
+<li><p>’ks_normalize’ : Same as ‘ks’, but with each ROI’s points normalized.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'jsd'</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </p></li>
 <li><p><strong>vectorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, matrices are reshaped into 1D arrays and only their
 flattened lower triangular parts are returned.</p>
@@ -652,7 +670,7 @@ every combination of ROI.</p>
 <li><a class="reference internal" href="#">transform</a><ul>
 <li><a class="reference internal" href="#surflabels">SurfLabels</a></li>
 <li><a class="reference internal" href="#surfmaps">SurfMaps</a></li>
-<li><a class="reference internal" href="#gen-ks-roi-network">gen_ks_roi_network</a></li>
+<li><a class="reference internal" href="#gen-indv-roi-network">gen_indv_roi_network</a></li>
 <li><a class="reference internal" href="#gen-fs-subj-vertex-network">gen_fs_subj_vertex_network</a></li>
 </ul>
 </li>

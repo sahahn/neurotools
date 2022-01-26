@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="random" href="random.html" /><link rel="prev" title="misc" href="misc.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2021.10.09"/>
         <title>plotting - neurotools 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
@@ -195,7 +195,7 @@
 <h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.plotting.plot">
-<span class="sig-prename descclassname"><span class="pre">neurotools.plotting.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.plotting.plot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.plotting.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.plotting.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>The most automated magic plotting function avaliable,
 used to plot a wide range of neuroimaging data (volumes / surfs).</p>
 <dl class="field-list simple">
@@ -214,7 +214,7 @@ for any of the above array options. A large number of different
 file formats are accepted.</p></li>
 <li><p>As a dictionary. If passed as a dictionary, this
 allows the user most control over how data is specified.
-Dictionary keys must be one or more of ‘lh’, ‘rh’ and ‘sub’,
+Dictionary keys must be one or more of ‘lh’, ‘rh’ and ‘vol’,
 where values can be either array-like, file locations or nibabel
 objects. Note that if you are trying to plot data in native
 subject space, it must be passed in this dictionary style, along
@@ -225,12 +225,12 @@ or array values of a left hemisphere surface, and in the second index,
 the right hemisphere surface.</p></li>
 <li><p>As a list or array-like of length 3, indicating internally
 that the first two passed index are left and right hemisphere
-surface data, and the last is subcortical data, all to
+surface data, and the last is subcortical / volumetric data, all to
 be plotted together in a collage.</p></li>
 <li><p>As a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> to be plotted volumetrically.</p></li>
 </ul>
 </p></li>
-<li><p><strong>space</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>This argument defines the “space” in which
+<li><p><strong>space</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>This argument defines the “space” in which
 surface data is plotted. If left as default (None),
 the space in which the data to plot is
 in will be automatically inferred,
@@ -242,16 +242,20 @@ Current supported options are:</p>
 <li><p>’fsaverage5’ : freesurfer5 downsampled average standard space.</p></li>
 <li><p>’fsaverage4’ : freesurfer3 downsampled average standard space.</p></li>
 <li><p>’fsaverage3’ : freesurfer3 downsampled average standard space.</p></li>
+<li><p>’41k_fsaverage’ : Matched to CIVET 41k vertex freesurfer space.</p></li>
+<li><p>’4k_fs_LR’ :  HCP standard 4k vertex space.</p></li>
+<li><p>’8k_fs_LR’ :  HCP standard 8k vertex space.</p></li>
 <li><p>’32k_fs_LR’ : HCP standard 32k vertex space.</p></li>
 <li><p>’59k_fs_LR’ : HCP standard 59k vertex space.</p></li>
 <li><p>’164k_fs_LR’ : HCP standard 164k vertex space. Note, while this space has the same number of vertex as fsaverage space, it is not the same.</p></li>
+<li><p>’civet’ : Standard space with 41k vertex used by CIVET.</p></li>
 <li><p>’native’ : This is set if the passed number of values don’t correspond to any of the saved defaults, and refers to that the space to plot is in some non-standard space.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>hemi</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>'lh'</em><em> or </em><em>'rh'</em><em>, </em><em>optional</em>) – <p>This parameter is only used when plotting
+<li><p><strong>hemi</strong> (<em>None</em><em>, </em><em>'lh'</em><em> or </em><em>'rh'</em><em>, </em><em>optional</em>) – <p>This parameter is only used when plotting
 any surface data. Further, this parameter
 is only relevant the surface data being plotted represents
 a single hemispheres data.</p>
@@ -275,14 +279,20 @@ levels are made avaliable:</p>
 <li><p>&gt;1 : Automatic choices are shown as well as additional helper text.</p></li>
 </ul>
 </p></li>
-<li><p><strong>kwargs</strong> (<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) – <p>There are number of different plotting specific arguments
+<li><p><strong>returns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If the figure, axis / grid and smfs should be returned from the base function
+calls or not.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>kwargs</strong> (<em>keyword arguments</em>) – <p>There are number of different plotting specific arguments
 that can optionally be modified. The default values for these arguments
 may change also depending on different auto-detected settings, i.e.,
 if plotting a single surface vs. surface collage, or if plotting
-a volumetric image.</p>
+a volumetric image. The remaining parameters below are these kwargs.</p>
 <ul>
-<li><dl>
-<dt>surf_mesh<span class="classifier">str or 2D array</span></dt><dd><p>A str indicator specifying a valid surface mesh,
+<li><p><strong>surf_mesh</strong> : str or array</p>
+<p>A str indicator specifying a valid surface mesh,
 with respect to the current space, or a two dimensional array
 with information about the coordinates and vertex-faces
 in which to plot the data on. The default for
@@ -291,35 +301,27 @@ is ‘very_inflated’. If you wish to plot surface
 data in native subject space, then this argument must be
 supplied with a loaded 2D array / valid mesh, and data
 must be passed in dictionary style.</p>
-<p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
+<p>This parameter is only relevant when plotting surfaces.</p>
 </li>
-<li><dl>
-<dt>bg_map<span class="classifier">str or 2D array</span></dt><dd><p>This argument specifies
-a background map to be used when plotting. This
+<li><p><strong>bg_map</strong> : str or 2D array</p>
+<p>This argument specifies a background map to be used when plotting. This
 should be passed as either a str indicator specifying a valid file
 within the current surface space, or as a valid array of values,
 again, with respect to the current space. This map is plotted in greyscale
 underneath the data points, often used for realistic shading.
 The default for when plotting is ‘sulc’.</p>
-<p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
 </li>
-<li><dl>
-<dt>cmap<span class="classifier">str or <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a></span></dt><dd><p>This should be pass as an instance
+<li><p><strong>cmap</strong> : str or <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a></p>
+<p>This should be pass as an instance
 of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Colormap.html#matplotlib.colors.Colormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.colors.Colormap</span></code></a> or str
 representing the name of a matplotlib colormap. This will be the color map
 in which the values are plotted according to. When plotting surface
 parcellations, the default cmaps are ‘prism’ if plotting rois, ‘Reds’
 if plotting not symmetric statistical maps, and ‘cold_hot’ if plotting
 symmetric statistical maps (e.g., values above and below 0).</p>
-</dd>
-</dl>
 </li>
-<li><dl>
-<dt>vol_plot_type<span class="classifier">{‘glass’, ‘stat’, ‘roi’}</span></dt><dd><p>This parameter control the type of volumetric plot in which to generate,
+<li><p><strong>vol_plot_type</strong> : {‘glass’, ‘stat’, ‘roi’}</p>
+<p>This parameter control the type of volumetric plot in which to generate,
 with valid values as one of ‘glass’, ‘stat’ and ‘roi’. By default,
 if detected to be plotting a parcellation, the value ‘roi’ is used.
 Otherwise, the default volumetric plotting type is ‘glass’.
@@ -329,57 +331,161 @@ The corresponding back-end nilearn functions used are:</p>
 <li><p>’stat’: <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.plotting.plot_stat_map.html#nilearn.plotting.plot_stat_map" title="(in Nilearn)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nilearn.plotting.plot_stat_map()</span></code></a></p></li>
 <li><p>’roi’: <a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.plotting.plot_roi.html#nilearn.plotting.plot_roi" title="(in Nilearn)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nilearn.plotting.plot_roi()</span></code></a></p></li>
 </ul>
-<p>This parameter is only used when plotting volumetric data.</p>
-</dd>
-</dl>
+<p><em>This parameter is only used when plotting volumetric data.</em></p>
 </li>
-<li><dl>
-<dt>bg_on_data<span class="classifier">bool or float</span></dt><dd><p>If True, and a bg_map is specified,
+<li><p><strong>bg_on_data</strong> : bool or float
+If True, and a bg_map is specified,
 the data to plot is multiplied by the background image,
 so that e.g. sulcal depth is visible beneath the surf_data.</p>
 <p>If passed as a float value, then that will trigger multiplying
 the data to plot by the background image times the passed bg_on_data
 value. So for example passing True is equivalent to passing 1 and passing
-False is the same as passing 0.
-This allows for fine tuning how much the background image
+False is the same as passing 0.</p>
+<p>This allows for fine tuning how much the background image
 is melded with the data shown. The default value is .25.</p>
-<p>This parameter is only used when plotting surfaces.</p>
-</dd>
-</dl>
+<p><em>This parameter is only used when plotting surfaces.</em></p>
 </li>
-<li><dl>
-<dt>view<span class="classifier">str</span></dt><dd><p>If plotting a single surface hemisphere, this
-parameter must be one of:
-{‘lateral’, ‘medial’, ‘dorsal’, ‘ventral’, ‘anterior’, ‘posterior’}
-Where ‘lateral’ is the default view if none is set.</p>
+<li><p><strong>view</strong> : str</p>
+<p>If plotting a single surface hemisphere, this
+parameter must be one of:</p>
+<blockquote>
+<div><p>{‘lateral’, ‘medial’, ‘dorsal’, ‘ventral’, ‘anterior’, ‘posterior’}</p>
+</div></blockquote>
+<p>Where ‘lateral’ is the default view if none is set.</p>
 <p>If instead plotting a collage of surface views, then
-valid view parameters are one of:
-{‘standard’, ‘front back’, ‘front’, ‘back’}
-which correspond to different preset collections of surface views.
-The default is ‘standard’.</p>
+valid view parameters are one of:</p>
+<blockquote>
+<div><p>{‘standard’, ‘front back’, ‘front’, ‘back’}</p>
+</div></blockquote>
+<p>which correspond to different preset collections of surface views.
+The default if not specified in this case is ‘standard’.</p>
 <p>Note: If plotting a collage of surface and volumetric views,
 it is reccomended to keep the default collage ‘standard’ view,
 as the other views have not yet been properly formatted yet.</p>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt>figsize<span class="classifier">’default’ or (int, int)</span></dt><dd><p>This parameter is used when axes are not passed, and
+<li><p><strong>colorbar</strong> : bool</p>
+<p>This option dictates if a colorbar should be added
+along with the requested plot, regardless of type.
+By default a colorbar will be added (True) unless
+a parcellation is being plotted, in which the default is
+to not add a colorbar (False).</p>
+<p>There are a number of extra more detailed colorbar style
+kwargs, used in certain cases, with certain plots to
+customize the look and size of the colorbar. See below.</p>
+</li>
+<li><p><strong>avg_method</strong> : ‘mean’, ‘median’, ‘min’, ‘max’ or  custom function</p>
+<p>This option defines how to average vertex values to
+derive face values, and is only used when plotting surfaces.</p>
+<ul class="simple">
+<li><p>’mean’: results in smooth boundaries</p></li>
+<li><p>’median’: results in sharp boundaries</p></li>
+<li><p>’min’ or ‘max’: for sparse matrices</p></li>
+<li><p>custom function: You can also pass a custom function</p></li>
+</ul>
+<p>If plotting roi’s the default will be ‘median’. Otherwise, the default
+will be set based on the ratio between the number of unique values
+to data points. So if more than 5% of data points are unique, ‘mean’
+will be used, otherwise ‘median’ will be used. This is to try and accurately detect
+when parcellations are being plotted.</p>
+</li>
+<li><p><strong>alpha</strong> : float or ‘auto’</p>
+<p>This parameter is only used when plotting surface data. It
+refers to the alpha level of the mesh. By default, this
+is left as ‘auto’, which will default to .5 if no bg_map
+and 1 if a bg_map is passed. This parameter is just multiplied by
+the face colors before plotting.</p>
+<p>Note: this keyword is used for plotting surfaces, though alpha is
+also used as a parameter for plotting the volumetric glass brain.
+To access this parameter for the volumetric function, see the
+<cite>vol_alpha</cite> parameter.</p>
+</li>
+<li><p><strong>vol_alpha</strong> : float between 0 and 1</p>
+<p>This controls the alpha transparency only when plotting
+volumetric data according to the vol_plot_type=’glass’ option.
+The default value is 0.7.</p>
+</li>
+<li><p><strong>darkness</strong> : float between 0 and 1</p>
+<p>This parameter specified the darkness of the background image,
+when plotting a single or multiple surfaces. Where a value of 1
+indicates that the original values are used, and .5 would mean the
+values are halved. If plotting in an fsaverage space the default value is 1,
+if plotting in an fs_LR space, the default value is .5.</p>
+</li>
+<li><p><strong>symmetric_cbar</strong> : bool or ‘aut’</p>
+<blockquote>
+<div><p>Specifies whether the colorbar should range from -vmax to vmax or from vmin to vmax.
+Setting to ‘auto’ will select the latter if the range of
+the whole image is either positive or negative. There are some
+other automatic cases, but in general this parameter
+can just be used to override any automatic choices.</p>
+</div></blockquote>
+</li>
+<li><p><strong>threshold</strong> : float, None or ‘auto’</p>
+<p>If None, the image is not thresholded. If a float,
+or other numberic value, that value will be used to threshold
+the image. This threshold is treated as an absolute value in
+the case of a symmetric_cbar. If ‘auto’ is passed,
+it will attempt to automatically set the threshold to
+a reasonable value.</p>
+<p>The default is typically ‘auto’, but in some cases changes,
+for example if plotting a parcellation the default value will be
+None.s</p>
+</li>
+<li><p><strong>figsize</strong> : ‘default’ or (int, int)</p>
+<p>This parameter is used when axes are not passed, and
 a new figure is being generated. It represents
 the size of the underlying matplotlib figure to plot on.
 The default value for this function varies based on what type of
 plot is being made (e.g., not the same for surface collage vs. single surface).</p>
-</dd>
-</dl>
 </li>
-<li><p>darkness : temp</p></li>
-<li><p>avg_method : temp</p></li>
-<li><p>alpha : temp</p></li>
-<li><p>colorbar : temp</p></li>
-<li><p>symmetric_cbar : temp</p></li>
-<li><p>threshold : temp</p></li>
-<li><p>wspace : temp</p></li>
-<li><p>hspace : temp</p></li>
+<li><p><strong>wspace</strong> : float</p>
+<p>This parameter refers to the width spacing between items at the top
+level of whatever collage is being plotted. So, if plotting only a single
+surface or volume, this parameter will be ignored. Otherwise,
+for example if plotting a collage of 4 surface views, then this
+parameter will control the amount of horizontal space between each
+brain view. Instead, if plotting a combined collage of surface views
+and volumetric views, then the top level of the collage that this parameter
+controls the spacing of is the set of all surface views, all volumetric views
+and colorbar. In this case, to override values between for example just the
+surface views, you would have to use special extra keyword ‘surf_wspace’,
+which let’s you set both parameters if desired.</p>
+<p>The default values hover around 0, and vary a great deal based on the type
+of plot and requested view.</p>
+</li>
+<li><p><strong>hspace</strong> : float</p>
+<p>This parameter refers to the height spacing between items at the top
+level of whatever collage is being plotted. So, if plotting only a single
+surface or volume, this parameter will be ignored. Otherwise,
+for example if plotting a collage of 4 surface views, then this
+parameter will control the amount of vertical space between each
+brain view. Instead, if plotting a combined collage of surface views
+and volumetric views, then the top level of the collage that this parameter
+controls the spacing of is the set of all surface views, all volumetric views
+and colorbar. In this case, to override values between for example just the
+surface views, you would have to use special extra keyword ‘surf_hspace’,
+which let’s you set both parameters if desired.</p>
+<p>The default values hover around 0, and vary a great deal based on the type
+of plot and requested view.</p>
+</li>
+<li><p><strong>surf_wspace</strong> : float</p>
+<p>See ‘wspace’. This parameter is only used when there
+are multiple levels of collage and further control is still
+required for specifically the nested collage of surface plots.</p>
+</li>
+<li><p><strong>surf_hspace</strong> : float</p>
+<p>See ‘hspace’. This parameter is only used when there
+are multiple levels of collage and further control is still
+required for specifically the nested collage of surface plots.</p>
+</li>
+<li><p><strong>surf_to_vol_ratio</strong> : float or ‘default’</p>
+<p>In the case of plotting a collage of both surfaces and
+volumetric data, this parameter can optionally be set.
+It defines the size ratio between the grouping of surface collages
+and the volumetric plots. If left as ‘default’, will
+be set to either .9 in base plotting stat volume case
+and 1.1 when plotting glass brain.</p>
+</li>
 </ul>
 </p></li>
 </ul>

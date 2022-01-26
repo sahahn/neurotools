@@ -1,6 +1,14 @@
 name: Ubuntu
 
-on: [push, pull_request]
+on:
+
+  # On any push or pull_request request for ubuntu
+  push:
+  pull_request:
+
+  # Automated test every monday
+  schedule:
+      - cron: '0 13 * * 1' 
 
 jobs:
   build:
@@ -19,7 +27,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install wheel
         pip install pytest
-        pip install . --use-feature=in-tree-build
+        pip install .
     - name: Run py tests
       run: |
         pytest

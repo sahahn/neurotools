@@ -1,0 +1,54 @@
+name: Generate Docs
+
+# This action should just run on content based pushed to the master branch
+on:
+  push:
+    branches: ['master']
+    paths:
+     - 'src_doc/**'
+     - 'neurotools/**'
+
+# Run jobs
+jobs:
+  build:  
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Checks-out your repository under $GITHUB_WORKSPACE
+    - uses: actions/checkout@v2
+    
+    # Setup python for the runner
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+        
+    # Install needed dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+        
+    # Generate the docs
+    - name: Generate docs
+      run: |
+        pip install sphinx
+        pip install numpydoc
+        cd src_doc
+        make github
+        cd ../
+    
+    # Next, we need to commit the new files into the repository
+    - name: Commit files
+      run: |
+        git config --local user.name "sahahn"
+        git add ./docs
+        git commit -m "Update HTML docs"
+
+    # Push the change
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: true

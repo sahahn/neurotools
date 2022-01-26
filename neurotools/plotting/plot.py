@@ -135,6 +135,28 @@ def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
     # Otherwise, assume is symmetric
     return True
 
+def _add_plots_to_axes(figure, grid, proj_3d, n_cols, n_rows, widths):
+
+    # If passed as single str,  or None, set for all
+    if isinstance(proj_3d, str) or proj_3d is None:
+        proj_3d = [[proj_3d for _ in range(n_cols)] for _ in range(n_rows)]
+
+    # Otherwise, we use the grid to add_subplots generating axes
+    # with each subplot according to the passed proj_3d if it is
+    # 3D or not. Use the original number of passed n_rows and n_cols
+    axes = []
+    for i in range(n_rows):
+        for j in range(n_cols):
+
+            if n_rows == 1:
+                axes.append(figure.add_subplot(grid[j], projection=proj_3d[i][j]))
+            elif len(widths) == 1:
+                axes.append(figure.add_subplot(grid[i], projection=proj_3d[i][j]))
+            else:
+                axes.append(figure.add_subplot(grid[i, j], projection=proj_3d[i][j]))
+
+    return figure, axes
+
 
 def _setup_fig_axes(widths, heights, 
                     figure=None, subplot_spec=None,
@@ -201,6 +223,7 @@ def _setup_fig_axes(widths, heights,
         else:
             colorbar_ax = figure.add_subplot(grid[:, -1])
         
+        # Make sure to hide axis here
         colorbar_ax.set_axis_off()
 
     # If a title is passed, also add a special title axis
@@ -217,7 +240,7 @@ def _setup_fig_axes(widths, heights,
         else:
             title_ax = figure.add_subplot(grid[:])
             
-        # Set title and axis off
+        # Set title and axis off - (hiding)
         title_ax.set_title(title, fontsize=title_sz, y=title_y)
         title_ax.set_axis_off()
 
@@ -225,24 +248,11 @@ def _setup_fig_axes(widths, heights,
     if get_grid:
         return figure, grid, colorbar_ax
 
-    # If passed as single str,  or None, set for all
-    if isinstance(proj_3d, str) or proj_3d is None:
-        proj_3d = [[proj_3d for _ in range(n_cols)] for _ in range(n_rows)]
+    # Otherwise add plots to axes
+    figure, axes = _add_plots_to_axes(figure, grid, proj_3d,
+                                      n_cols, n_rows, widths)
 
-    # Otherwise, we use the grid to add_subplots generating axes
-    # with each subplot according to the passed proj_3d if it is
-    # 3D or not. Use the original number of passed n_rows and n_cols
-    axes = []
-    for i in range(n_rows):
-        for j in range(n_cols):
-
-            if n_rows == 1:
-                axes.append(figure.add_subplot(grid[j], projection=proj_3d[i][j]))
-            elif len(widths) == 1:
-                axes.append(figure.add_subplot(grid[i], projection=proj_3d[i][j]))
-            else:
-                axes.append(figure.add_subplot(grid[i, j], projection=proj_3d[i][j]))
-
+    # Return each, axes instead of grid
     return figure, axes, colorbar_ax
 
 
@@ -264,6 +274,8 @@ def plot_surf_hemi(data, ref, hemi,
     if hemi == 'rh':
         hemi = 'right'
 
+    # These get surf functions are pretty smart
+    # and tolerant to different inputs
     surf_mesh = ref.get_surf(surf_mesh, hemi)
     bg_map = ref.get_surf(bg_map, hemi)
 
@@ -696,8 +708,9 @@ def _sort_kwargs(kwargs):
         surf_params['hspace'] = kwargs['surf_hspace']
 
     # If also passed directly
+    # Give priority to any if passed in surf_params vs. kwargs
     if 'surf_params' in kwargs:
-        surf_params = {**kwargs['surf_params'], **surf_params}
+        surf_params = {**surf_params, **kwargs['surf_params']}
     
     # Volume specific
     vol_args = ['resampling_interpolation', 'plot_abs',
@@ -710,20 +723,35 @@ def _sort_kwargs(kwargs):
         vol_params['alpha'] = kwargs['vol_alpha']
 
     # If also passed directly
+    # Give priority to any in passed vol params
     if 'vol_params' in kwargs:
-        vol_params = {**kwargs['vol_params'], **vol_params}
+        vol_params = {**vol_params, **kwargs['vol_params']}
     
-    # Colorbar specific
-    colorbar_args = ['fraction', 'shrink', 'aspect',
-                     'pad', 'anchor', 'format', 'cbar_fig_ratio']
-    colorbar_params = {key: kwargs[key] for key in colorbar_args if key in kwargs}
-
-    # If also passed directly
-    if 'colorbar_params' in kwargs:
-        colorbar_params = {**kwargs['colorbar_params'], **colorbar_params}
+    # For color bar params
+    colorbar_params = _sort_colorbar_kwargs(colorbar_params=None, **kwargs)
 
     return surf_params, vol_params, colorbar_params
 
+def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
+
+    # Handle if not passed
+    if colorbar_params is None:
+        if 'colorbar_params' in kwargs:
+            colorbar_params = kwargs.pop('colorbar_params')
+        else:
+            colorbar_params = {}
+
+    # Colorbar specific args
+    colorbar_args = ['fraction', 'shrink', 'aspect',
+                     'pad', 'anchor', 'format', 'cbar_fig_ratio']
+  
+    # Pop these arguments
+    kwargs_colorbar_params = {key: kwargs.pop(key) for key in colorbar_args if key in kwargs}
+
+    # Combine
+    colorbar_params = {**colorbar_params, **kwargs_colorbar_params}
+
+    return colorbar_params
 
 def _proc_cmap(cmap, rois, symmetric_cbar):
     
@@ -1307,3 +1335,253 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     return None
 
 
+def _get_is_roi(args):
+    
+    # Vol case
+    if 'vol_plot_type' in args:
+        if args['vol_plot_type'] == 'roi':
+            return True
+    
+    # Surf case
+    elif 'rois' in args:
+        if args['rois']:
+            return True
+        
+    return False
+
+def _get_data_func_types(data):
+    
+    data_func_types = {}
+    data_as_list = []
+    is_rois = []
+    
+    for key in list(data):
+        loaded, func, args = _setup_auto_plot(data[key], space=None,
+                                              hemi=None, verbose=0)
+        data_func_types[key] = func.__name__
+        data_as_list.append(loaded)
+        is_rois.append(_get_is_roi(args))
+
+    return data_func_types, data_as_list, is_rois
+
+
+def _add_grid_wh(sz, layout_params, max_cols=2):
+    
+    # Return single row, w/ length sz
+    if sz < max_cols:
+        ws = [1 for _ in range(sz)]
+        hs = [1]
+    
+    # Otherwise calc as grid, w/ leave empty any missing
+    else:
+        n_rows = (sz+1) // max_cols
+        ws = [1 for _ in range(max_cols)]
+        hs = [1 for _ in range(n_rows)]
+        
+    # Add to layout params
+    layout_params['widths'] = ws
+    layout_params['heights'] = hs
+    
+    # Return n_rows, n_cols for conv.
+    return len(ws), len(hs)
+
+def _get_def_layout_params(unique_func_types, data_keys, colorbar, colorbar_params):
+
+    # Init dict of layout params
+    layout_params = {}
+
+    # All same cases
+    if len(unique_func_types) == 1:
+        
+        # If all same, then get single type
+        single_type = unique_func_types[0]
+
+        # TODO change max cols maybe based on single_type
+        
+        # Gen base grid based on number of things to plot
+        n_cols, n_rows = _add_grid_wh(len(data_keys), layout_params, max_cols=2)
+
+        # Collage of just surfaces
+        if single_type == '_plot_surfs':
+        
+            # Base colorbar vs. no cbar settings, first default None case
+            layout_params['title_y'] = None
+            layout_params['sub_title_y'] = .9 - ((n_rows-1)/100)
+            layout_params['title_sz'] = 27
+            
+            # Colorbar case
+            if colorbar:
+                layout_params['title_y'] = .95
+                layout_params['sub_title_y'] = .83
+                layout_params['title_sz'] = 24
+            
+            # Set fig size
+            layout_params['figsize'] = (10*n_cols, 10*n_rows)
+            
+            # Adjust title sz
+            layout_params['title_sz'] += (n_rows-1) * 3
+            
+            # Other layout settings
+            layout_params['wspace'] = .15
+            layout_params['sub_wspace'] = .1
+            
+            if colorbar:
+                if n_rows == 1:
+                    layout_params['hspace'] = 0
+                    layout_params['sub_hspace'] = -.5
+                elif n_rows == 2:
+                    layout_params['hspace'] = -.35
+                    layout_params['sub_hspace'] = -.58
+                else:
+                    raise RuntimeError()
+           
+            else:
+                if n_rows == 1:
+                    layout_params['hspace'] = 0
+                    layout_params['sub_hspace'] = -.31
+                elif n_rows == 2:
+                    layout_params['hspace'] = -.185
+                    layout_params['sub_hspace'] = -.390
+                elif n_rows > 2:
+                    layout_params['hspace'] = -.185 - ((n_rows - 2)  * .025)
+                    layout_params['sub_hspace'] = -.390 - ((n_rows - 2) * .02)
+
+            
+            # Only set fraction if one row
+            if n_rows == 1:
+                colorbar_params['fraction'] = 1
+
+        # Surf and vol case
+        elif single_type == '_plot_surfs_vol':
+            
+            layout_params['title_y'] = .95
+            layout_params['sub_title_y'] = .83
+            layout_params['title_sz'] = 24
+
+    return layout_params
+
+def meta_collage(data, title=None, sub_titles=True,
+                 colorbar='default', verbose=0, vmin=None,
+                 vmax=None, colorbar_params=None, threshold='auto',
+                 symmetric_cbar='auto', cmap='default', 
+                 avg_method='default', sub_kwargs=None, **kwargs):
+    
+    # Check explicit sub kwargs
+    if sub_kwargs is None:
+        sub_kwargs = {}
+    
+    # Check initial data
+    data_func_types, data_as_list, is_rois = _get_data_func_types(data)
+    unique_func_types = list(set(data_func_types.values()))
+    data_keys = list(data)
+    
+    # Catch error
+    if len(set(is_rois)) > 1 and colorbar:
+        raise RuntimeError('Cant plot mix of rois and stat maps with colorbar.')
+    
+    # Passes True if all True
+    rois = all(is_rois)
+    
+    # Collapse data
+    flat_data = _collapse_data(data_as_list)
+    
+    # Process some base auto args
+    symmetric_cbar, threshold, cmap, colorbar, avg_method =\
+        _prep_base_auto_defaults(flat_data, rois,
+                                 symmetric_cbar, threshold,
+                                 cmap, colorbar, avg_method)
+
+    
+    # Process vmin / vmax from data and passed args
+    vmin, vmax = _proc_vs(data_as_list, vmin=vmin, vmax=vmax,
+                          symmetric_cbar=symmetric_cbar)
+    
+    # Proc default / add params
+    colorbar_params = _sort_colorbar_kwargs(colorbar_params, **kwargs)
+
+    # Get default layout params
+    layout_params = _get_def_layout_params(unique_func_types, data_keys, colorbar, colorbar_params)
+    
+    # Need to check if any user over rides in layout params
+    for key in layout_params:
+        
+        # If user passed, favor that
+        if key in kwargs:
+            layout_params[key] = kwargs.pop(key)
+            
+    # Fill in sub kwargs
+    def_sub_kwargs = {}
+    def_sub_kwargs['wspace'] = layout_params.pop('sub_wspace')
+    def_sub_kwargs['hspace'] = layout_params.pop('sub_hspace')
+    def_sub_kwargs['title_y'] = layout_params.pop('sub_title_y')
+    
+    if 'sub_title_sz' in kwargs:
+        def_sub_kwargs['title_sz'] = kwargs.pop('sub_title_sz')
+        
+    # Idea here is to give priority to anything passed
+    # explicitly with sub_kwargs, then kwargs, then defaults
+    sub_kwargs = {**kwargs, **def_sub_kwargs, **sub_kwargs}
+                
+    # Setup base collage settings / grid spec
+    figure, grid, colorbar_ax = _setup_fig_axes(get_grid=True,
+                                                title=title,
+                                                colorbar=colorbar,
+                                                colorbar_params=colorbar_params,
+                                                **layout_params)
+    
+ 
+    # Add sub plots
+    smfs = []
+    for i in range(len(layout_params['heights'])):
+        for j in range(len(layout_params['widths'])):
+            key = data_keys[i+j]
+            
+            # Optional sub title
+            if isinstance(sub_titles, bool):
+                if sub_titles:
+                    sub_title = str(key)
+                else:
+                    sub_title = None
+
+            # Otherwise if list
+            elif isinstance(sub_titles, list):
+                sub_title = sub_titles[i+j]
+            
+            # Or dict
+            elif isinstance(sub_titles, dict):
+                sub_title = sub_titles[key]
+            
+            # Last case is just None
+            else:
+                sub_title = None
+
+            # Call plot
+            _, _, smfz = plot(data[key],
+                              figure=figure,
+                              subplot_spec=grid[i, j],
+                              colorbar=False,
+                              title=sub_title,
+                              symmetric_cbar=symmetric_cbar,
+                              threshold=threshold,
+                              cmap=cmap, vmin=vmin, vmax=vmax,
+                              avg_method=avg_method, verbose=verbose,
+                              returns=True,
+                              **sub_kwargs)
+            
+            
+            smfs.append(smfz)
+            
+    # Set to concat
+    smfs = np.concatenate(smfs)
+    
+    # Add collage color bar
+    if colorbar:
+        add_collage_colorbar(figure=figure,
+                             ax=colorbar_ax,
+                             smfs=smfs,
+                             vmin=vmin, vmax=vmax,
+                             multicollage=True,
+                             colorbar_params=colorbar_params,
+                             threshold=threshold,
+                             cmap=cmap,
+                             **kwargs)

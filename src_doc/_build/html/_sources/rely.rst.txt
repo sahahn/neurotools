@@ -1,4 +1,0 @@
-.. currentmodule:: neurotools.rely
-
-rely
-###########
