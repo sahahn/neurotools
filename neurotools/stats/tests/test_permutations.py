@@ -280,7 +280,7 @@ def test_permuted_v_rand_vals_dtype_compare():
 
     # All close, but not equal
     assert np.allclose(original_scores1, original_scores2,
-                        rtol=1e-03, atol=1e-06)
+                        rtol=1e-02, atol=1e-05)
     assert not np.array_equal(original_scores1, original_scores2)
 
 
