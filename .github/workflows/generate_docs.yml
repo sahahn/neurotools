@@ -36,6 +36,7 @@ jobs:
         pip install sphinx
         pip install numpydoc
         pip install ipython
+        pip install nbsphinx
         cd src_doc
         make github
         cd ../
