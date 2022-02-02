@@ -280,20 +280,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.42189243, 0.13574782],</span>
-<span class="go">       [0.77399493, 0.1123744 ],</span>
-<span class="go">       [0.94717988, 0.76961312],</span>
-<span class="go">       [0.88811507, 0.54982902],</span>
-<span class="go">       [0.18151619, 0.37877873]])</span>
+<span class="go">array([[0.88411069, 0.37834909],</span>
+<span class="go">       [0.258154  , 0.21778958],</span>
+<span class="go">       [0.33783021, 0.20768129],</span>
+<span class="go">       [0.36183889, 0.48552444],</span>
+<span class="go">       [0.03083998, 0.46720656]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.42189243, 0.13574782],</span>
-<span class="go">       [0.77399493, 0.1123744 ],</span>
-<span class="go">       [0.94717988, 0.76961312],</span>
-<span class="go">       [0.88811507, 0.54982902],</span>
-<span class="go">       [0.18151619, 0.37877873]])</span>
+<span class="go">array([[0.88411069, 0.37834909],</span>
+<span class="go">       [0.258154  , 0.21778958],</span>
+<span class="go">       [0.33783021, 0.20768129],</span>
+<span class="go">       [0.36183889, 0.48552444],</span>
+<span class="go">       [0.03083998, 0.46720656]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -418,6 +418,38 @@ which are not limited by the number of cores avaliable.</p>
 </pre></div>
 </div>
 </p></li>
+<li><p><strong>cache_args</strong> (<em>keyword arguments</em>) – <p>There are a number of optional cache arguments that can be set via
+kwargs, as listed below.</p>
+<ul>
+<li><p><strong>cache_dr</strong> : str or None</p>
+<p>The location of where to cache the results of
+this function, for faster loading in the future.</p>
+<p>If None, do not cache. The default if not set is
+‘default’, which will use caching in a location defined
+by the function name in a folder called
+neurotools_cache in the users homes directory.</p>
+</li>
+<li><p><strong>cache_max_sz</strong> : str or int</p>
+<p>This parameter defines the maximize size of
+the cache directory. The idea is that if saving a new
+cached function call and it exceeds this cache max size,
+previous saved caches (by oldest in terms of used) will be
+deleted, ensuring the cache directory remains under this size.</p>
+<p>Can either pass in terms of bytes directly as a number,
+or in terms of a str w/ byte marker, e.g., ‘14G’ for
+14 gigabytes, or ‘10 KB’ for 10 kilobytes.</p>
+<p>The default if not set is ‘30G’.</p>
+</li>
+<li><p><strong>use_base_name</strong> : bool</p>
+<p>Optionally when any arguments used in the
+caching can be cached based on either their full file
+path, if use_base_name is False, or just the file name itself,
+so for example /some/path/location vs. just location.
+The default if not set is True, as it assumes that maybe
+another file in another location with the same name is the same.</p>
+</li>
+</ul>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -455,7 +487,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/37675ecc926da4589dc8b44d2ab5d59b</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0032148361206054688 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.00442051887512207 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -476,7 +508,7 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8effc2a5532e9a8e4f3ff9be0f254d6a</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0030670166015625 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.003728628158569336 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -535,10 +567,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.60540959, 0.        , 0.        , 0.83557076]),</span>
-<span class="go"> array([0.21393835, 0.        , 0.        , 0.3594404 ]),</span>
-<span class="go"> array([0.85520115, 0.        , 0.        , 0.02407885]),</span>
-<span class="go"> array([0.93751368, 0.        , 0.        , 0.17637431])]</span>
+<span class="go">[array([0.18243114, 0.        , 0.        , 0.71027787]),</span>
+<span class="go"> array([0.75094821, 0.        , 0.        , 0.53105498]),</span>
+<span class="go"> array([0.79527157, 0.        , 0.        , 0.77770012]),</span>
+<span class="go"> array([0.2754887 , 0.        , 0.        , 0.02143596])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -554,14 +586,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fc0487c63a0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fc0487c6100&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fc0487c6310&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fc0487c61f0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f413a80d760&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f413a80da00&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f413a80d3a0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f413a80d820&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.60540959, 0.        , 0.        , 0.83557076])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.18243114, 0.        , 0.        , 0.71027787])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -630,6 +662,37 @@ If &gt;= 2, full verbosity will be enabled.</p>
 </div>
 </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+</section>
+<section id="from-data-get-surf-loc">
+<h2>from_data.get_surf_loc<a class="headerlink" href="#from-data-get-surf-loc" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.from_data.get_surf_loc">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.from_data.</span></span><span class="sig-name descname"><span class="pre">get_surf_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.from_data.get_surf_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the saved surface file based
+on space, hemi and key, with tolerance
+to different naming schemes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The space of the data, where space refers to a valid surface
+space, e.g., ‘fsaverage’.</p></li>
+<li><p><strong>hemi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The hemisphere to find, can pass as ‘lh’ / ‘rh’ or
+some alternate formats, e.g., ‘left’ / ‘right’.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>list of str</em>) – The identifying key of the surface to load. If passing
+a list of keys, will try to find the correct surface in the
+order of the passed list, e.g., you should pass the most
+specific option first, then potentially more general options.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>path</strong> – The path of the saved requested surface file, or
+None if not found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -797,6 +860,71 @@ this returned structure.</p>
 </dl>
 </dd></dl>
 </section>
+<section id="outliers-drop-top-x-outliers">
+<h2>outliers.drop_top_x_outliers<a class="headerlink" href="#outliers-drop-top-x-outliers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.outliers.drop_top_x_outliers">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.outliers.</span></span><span class="sig-name descname"><span class="pre">drop_top_x_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.outliers.drop_top_x_outliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop a fixed number of outliers from a set of loaded subjects data,
+based on the absolute mean of each subject’s data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array</em>) – Loaded 2D numpy array with shape # of subjects x data points,
+representing the loaded data in which to drop outliers from.</p></li>
+<li><p><strong>subjects</strong> (<em>numpy array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>A corresponding list or array like of subjects with the same
+length as the first dimension of the passed data. If passed,
+then will return as a modified subject array representing
+the new subject list with dropped outliers excluded.
+If not passed, i.e., left as default None,
+will only return the modified data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>top</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>The number of subjects to drop.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array</em>) – The loaded 2D data, but with <cite>top</cite> subjects data removed.</p></li>
+<li><p><strong>subjects</strong> (<em>numpy array</em>) – If passed originally as None, only data will be returned,
+otherwise this will represent the new list of kept subjects,
+with <cite>top</cite> removed.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+<section id="parcels-load-32k-fs-lr-concat">
+<h2>parcels.load_32k_fs_LR_concat<a class="headerlink" href="#parcels-load-32k-fs-lr-concat" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.parcels.load_32k_fs_LR_concat">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.parcels.</span></span><span class="sig-name descname"><span class="pre">load_32k_fs_LR_concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parcel_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.parcels.load_32k_fs_LR_concat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dedicated loader function for saved parcels as generated in
+parc_scaling project. These parcellations are all in space 32k_fs_LR,
+and are left, right hemisphere concatenated. The parcel will be
+downloaded to parcels directory in the default data dr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parcel_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the parcel to load,
+see <a class="reference external" href="https://github.com/sahahn/parc_scaling/tree/main/parcels">https://github.com/sahahn/parc_scaling/tree/main/parcels</a>
+for valid options.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>parcel</strong> – The loaded concat LR parcellation as a numpy array is returned.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
 </section>
 
         </article>
@@ -855,8 +983,11 @@ this returned structure.</p>
 <li><a class="reference internal" href="#load-data">load_data</a></li>
 <li><a class="reference internal" href="#reverse-mask-data">reverse_mask_data</a></li>
 <li><a class="reference internal" href="#get-overlap-subjects">get_overlap_subjects</a></li>
+<li><a class="reference internal" href="#from-data-get-surf-loc">from_data.get_surf_loc</a></li>
 <li><a class="reference internal" href="#abcd-load-from-csv">abcd.load_from_csv</a></li>
 <li><a class="reference internal" href="#abcd-load-family-block-structure">abcd.load_family_block_structure</a></li>
+<li><a class="reference internal" href="#outliers-drop-top-x-outliers">outliers.drop_top_x_outliers</a></li>
+<li><a class="reference internal" href="#parcels-load-32k-fs-lr-concat">parcels.load_32k_fs_LR_concat</a></li>
 </ul>
 </li>
 </ul>
