@@ -5,8 +5,9 @@ on:
   push:
     branches: ['master']
     paths:
-     - 'src_doc/**'
-     - 'neurotools/**'
+     - None
+     #- 'src_doc/**'
+     #- 'neurotools/**'
 
 # Run jobs
 jobs:
