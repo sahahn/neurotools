@@ -470,6 +470,43 @@ def load_data(subjects, template_path, contrast=None, mask=None,
 
             default = 1
 
+    cache_args : keyword arguments
+        There are a number of optional cache arguments that can be set via
+        kwargs, as listed below.
+
+        - **cache_dr** : str or None
+        
+          The location of where to cache the results of
+          this function, for faster loading in the future.
+
+          If None, do not cache. The default if not set is
+          'default', which will use caching in a location defined
+          by the function name in a folder called
+          neurotools_cache in the users homes directory.
+
+        - **cache_max_sz** : str or int
+        
+          This parameter defines the maximize size of
+          the cache directory. The idea is that if saving a new
+          cached function call and it exceeds this cache max size,
+          previous saved caches (by oldest in terms of used) will be
+          deleted, ensuring the cache directory remains under this size.
+
+          Can either pass in terms of bytes directly as a number,
+          or in terms of a str w/ byte marker, e.g., '14G' for
+          14 gigabytes, or '10 KB' for 10 kilobytes.
+
+          The default if not set is '30G'.
+
+        - **use_base_name** : bool
+            
+          Optionally when any arguments used in the
+          caching can be cached based on either their full file
+          path, if use_base_name is False, or just the file name itself,
+          so for example /some/path/location vs. just location.
+          The default if not set is True, as it assumes that maybe
+          another file in another location with the same name is the same.
+
     Returns
     --------
     data : :class:`array<numpy.ndarray>`

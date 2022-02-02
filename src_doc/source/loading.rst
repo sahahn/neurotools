@@ -38,3 +38,19 @@ abcd.load_from_csv
 abcd.load_family_block_structure
 ==================================
 .. autofunction:: load_family_block_structure
+
+
+
+.. currentmodule:: neurotools.loading.outliers
+
+outliers.drop_top_x_outliers
+============================
+.. autofunction:: drop_top_x_outliers
+
+
+
+.. currentmodule:: neurotools.loading.parcels
+
+parcels.load_32k_fs_LR_concat
+==============================
+.. autofunction:: load_32k_fs_LR_concat
