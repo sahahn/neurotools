@@ -1,13 +1,36 @@
 import os
-import numpy as np
 
 from .. import data_dr
 from .funcs import load
 
 
 def get_surf_loc(space, hemi, key):
-    '''Find the right file based on space, hemi and key,
-    with tolerance to different naming schemes'''
+    '''Find the saved surface file based
+    on space, hemi and key, with tolerance
+    to different naming schemes.
+
+    Parameters
+    ----------
+    space : str
+        The space of the data, where space refers to a valid surface
+        space, e.g., 'fsaverage'.
+    
+    hemi : str
+        The hemisphere to find, can pass as 'lh' / 'rh' or
+        some alternate formats, e.g., 'left' / 'right'.
+
+    key : str or list of str
+        The identifying key of the surface to load. If passing
+        a list of keys, will try to find the correct surface in the
+        order of the passed list, e.g., you should pass the most
+        specific option first, then potentially more general options.
+
+    Returns
+    -------
+    path : str or None
+        The path of the saved requested surface file, or
+        None if not found.
+    '''
 
     # If passed list of keys, try each
     # in order, until loc is found

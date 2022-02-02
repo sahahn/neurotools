@@ -21,6 +21,14 @@ get_overlap_subjects
 
 
 
+.. currentmodule:: neurotools.loading.from_data
+
+from_data.get_surf_loc
+=======================
+.. autofunction:: get_surf_loc
+
+
+
 .. currentmodule:: neurotools.loading.abcd
 
 abcd.load_from_csv
