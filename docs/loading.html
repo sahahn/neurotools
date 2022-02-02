@@ -2,7 +2,7 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="misc" href="misc.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2022.01.02"/>
@@ -280,20 +280,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.35115346, 0.11742634],</span>
-<span class="go">       [0.07745325, 0.51884311],</span>
-<span class="go">       [0.20712808, 0.52613897],</span>
-<span class="go">       [0.40910719, 0.04397407],</span>
-<span class="go">       [0.59780999, 0.333137  ]])</span>
+<span class="go">array([[0.48564882, 0.43512266],</span>
+<span class="go">       [0.0682976 , 0.51700239],</span>
+<span class="go">       [0.38897448, 0.94445422],</span>
+<span class="go">       [0.6631877 , 0.86560667],</span>
+<span class="go">       [0.74672935, 0.31610203]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.35115346, 0.11742634],</span>
-<span class="go">       [0.07745325, 0.51884311],</span>
-<span class="go">       [0.20712808, 0.52613897],</span>
-<span class="go">       [0.40910719, 0.04397407],</span>
-<span class="go">       [0.59780999, 0.333137  ]])</span>
+<span class="go">array([[0.48564882, 0.43512266],</span>
+<span class="go">       [0.0682976 , 0.51700239],</span>
+<span class="go">       [0.38897448, 0.94445422],</span>
+<span class="go">       [0.6631877 , 0.86560667],</span>
+<span class="go">       [0.74672935, 0.31610203]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -441,7 +441,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">subjs</span>
-<span class="gh">Out[4]: </span><span class="go">['subj2', 'subj3', 'subj1']</span>
+<span class="gh">Out[4]: </span><span class="go">['subj3', 'subj2', 'subj1']</span>
 
 <span class="go"># Within each subject's directory is single data file</span>
 <span class="go"># E.g., loading the first subjects data</span>
@@ -453,9 +453,9 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/37675ecc926da4589dc8b44d2ab5d59b</span>
-<span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.004563331604003906 seconds.</span>
+<span class="go">Saving loaded data to cache_loc: /home/sage/neurotools_cache/_base_load_data/d979ba9986e1329e3432deaf4eba36e1</span>
+<span class="go">Current saved size is: 9168 / 32212254720 (cache_max_sz)</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.01042938232421875 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -474,9 +474,9 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8effc2a5532e9a8e4f3ff9be0f254d6a</span>
-<span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.004227399826049805 seconds.</span>
+<span class="go">Saving loaded data to cache_loc: /home/sage/neurotools_cache/_base_load_data/8eb50c99450c6c614c51e060d2631bbe</span>
+<span class="go">Current saved size is: 9344 / 32212254720 (cache_max_sz)</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.01192021369934082 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -535,10 +535,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.81138357, 0.        , 0.        , 0.06758303]),</span>
-<span class="go"> array([0.46143871, 0.        , 0.        , 0.12097266]),</span>
-<span class="go"> array([0.2418181 , 0.        , 0.        , 0.69626278]),</span>
-<span class="go"> array([0.4063124 , 0.        , 0.        , 0.17009039])]</span>
+<span class="go">[array([0.71266539, 0.        , 0.        , 0.95757655]),</span>
+<span class="go"> array([0.61468982, 0.        , 0.        , 0.94001778]),</span>
+<span class="go"> array([0.90973649, 0.        , 0.        , 0.49274793]),</span>
+<span class="go"> array([0.29061034, 0.        , 0.        , 0.91533812])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -554,14 +554,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f0295612730&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f0295612b50&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f0295612850&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f02955ad040&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f281f1f3e90&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f281f1f39d0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f281f1f3f10&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f281f1f3fd0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.81138357, 0.        , 0.        , 0.06758303])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.71266539, 0.        , 0.        , 0.95757655])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>

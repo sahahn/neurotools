@@ -5,6 +5,10 @@ from scipy.stats import ks_2samp, gaussian_kde
 from scipy.spatial.distance import jensenshannon
 from .parc import merge_parc_hemis
 from ..loading import load
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import MinMaxScaler
+import itertools
 
 def _get_kde_p(data, n=256):
     kde = gaussian_kde(data)
@@ -146,6 +150,7 @@ def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_di
     # Otherwise, return full matrix
     return matrix
 
+
 def _load_fs_subj_data(subj_dr, modality, parc):
     
     # Path to their thickness file
@@ -246,6 +251,155 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
                                 discard_diagonal=discard_diagonal)
   
 
+class GroupDifNetwork(BaseEstimator, TransformerMixin):
 
+    _needs_fit_index = True
+    
+    def __init__(self, signed=True, fit_intercept=True,
+                 vectorize=True, scale_weights=True,
+                 fit_only_group_index=None, verbose=0):
+        
+        self.signed = signed
+        self.fit_intercept = fit_intercept
+        self.vectorize = vectorize
+        self.scale_weights = scale_weights
+        self.fit_only_group_index = fit_only_group_index
+        self.verbose = verbose
 
+    def fit(self, X, y=None, fit_index=None):
 
+        # More efficient to call fit transform
+        # directly, but should still support calling
+        # separate
+
+        # Need to call fit transform
+        # for fit, if scale weights is True
+        if self.scale_weights:
+            self.fit_transform(X=X, y=y, fit_index=fit_index)
+        
+        # Otherwise can just call base fit
+        else:
+            self._fit(X=X, y=y, fit_index=fit_index)
+        
+        return self
+        
+    def _fit(self, X, y=None, fit_index=None):
+
+        if self.verbose > 1:
+            print(f'Passed X shape={X.shape} to fit')
+
+        if self.fit_only_group_index is not None:
+
+            if fit_index is None:
+                raise RuntimeError('Since using fit_only_group_index, need fit_index here!')
+
+            # Set inds to only group
+            inds = fit_index.isin(self.fit_only_group_index)
+            X_s = X[inds]
+        
+        # Otherwise use all subjects to fit reference group
+        else:
+            X_s = X
+
+        if self.verbose > 1:
+            print('Fitting with shape:', X_s.shape, flush=True)
+        
+        # Store fitted estimators here
+        self.estimators_ = []
+        self.pairs_ = list(itertools.combinations(range(X.shape[1]), 2))
+
+        # Fit linear for each combination of regions
+        for i, j in self.pairs_:
+            
+            # Fit estimator
+            model = LinearRegression(fit_intercept=self.fit_intercept).fit(X_s[:, [i]], X_s[:, j])
+            
+            # Keep track in estimators_
+            self.estimators_.append(model)
+        
+        return self
+
+    def _proc_scale(self, X_trans, fit):
+
+        # If scale weights is True
+        if self.scale_weights:
+            
+            # Fit case, init scaler and fit
+            if fit:
+            
+                # Init scaler between 0 and 1 or -1 and 1
+                if self.signed:
+                    feature_range = (-1, 1)
+                else:
+                    feature_range = (0, 1)
+                self.scaler_ = MinMaxScaler(feature_range=feature_range, clip=True)
+
+                # Fit to X_trans
+                self.scaler_.fit(X_trans)
+            
+            # Always transform
+            X_trans = self.scaler_.transform(X_trans)
+
+        return X_trans
+    
+    def _transform(self, X, fit=False):
+        
+        # Go through each fitted, and get the residuals
+        X_trans = []
+        for estimator, ij in zip(self.estimators_, self.pairs_):
+            
+            # Unpack
+            i, j = ij
+            
+            # Get difference between real feat j and predicted
+            resid = X[:, j] - estimator.predict(X[:, [i]])
+            
+            # Add intercept if fit with intercept
+            if self.fit_intercept:
+                resid += estimator.intercept_
+            
+            # resid now represents the residuals
+            # for all subjects for connection ij
+            X_trans.append(resid)
+        
+        # Set as # of subjects x number of edge combos
+        X_trans = np.stack(X_trans, axis=-1)
+
+        # If not signed, convert to absolute
+        if not self.signed:
+            X_trans = np.abs(X_trans)
+
+        # Process if scale weights
+        X_trans = self._proc_scale(X_trans, fit)
+
+        if self.verbose > 1:
+            print(f'Base transformed shape: {X_trans.shape}', flush=True)
+                
+        # Return as is, if default
+        if self.vectorize:
+            return X_trans
+        
+        # Otherwise, cast X_trans to full network matrix
+        return self._to_matrix(X, X_trans)
+    
+    def transform(self, X):
+ 
+        # Base transform w/o fit
+        return self._transform(X, fit=False)
+    
+    def _to_matrix(self, X, X_trans):
+        
+        # Init empty network to fill, where 0's represent
+        # same pair connections
+        as_matrix = np.zeros((X.shape[0], X.shape[1], X.shape[1]))
+        for feat, ij in enumerate(self.pairs_):
+            i, j = ij
+            as_matrix[:, i, j] = X_trans[:, feat]
+            
+        return as_matrix
+    
+    def fit_transform(self, X, y=None, fit_index=None):
+        
+        # Fit transform, calling base fit and base transform _transform
+        return self._fit(X=X, y=y, fit_index=fit_index)._transform(X=X, fit=True)
+    
