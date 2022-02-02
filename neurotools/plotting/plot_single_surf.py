@@ -6,10 +6,13 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colorbar import make_axes
 from matplotlib.cm import ScalarMappable, get_cmap
 from matplotlib.colors import Normalize, LinearSegmentedColormap
-
-from nilearn.surface import load_surf_data, load_surf_mesh
 from matplotlib.colors import Normalize, LinearSegmentedColormap
-from nilearn.plotting.img_plotting import _crop_colorbar
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.surface import load_surf_data, load_surf_mesh
+    from nilearn.plotting.img_plotting import _crop_colorbar
 
 
 def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,

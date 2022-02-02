@@ -7,8 +7,6 @@ from joblib import Memory
 from sklearn.utils.extmath import randomized_svd
 
 from .base import BaseDecomposition
-from nilearn._utils import fill_doc
-
 
 class MultiPCA(BaseDecomposition):
 

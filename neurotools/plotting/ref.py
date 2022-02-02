@@ -1,5 +1,4 @@
 from nibabel.freesurfer.io import read_annot, read_geometry
-from nilearn.surface import load_surf_data
 import numpy as np
 import nibabel as nib
 import os
@@ -7,6 +6,11 @@ from ..misc.text import get_unique_str_markers
 from ..misc.print import _get_print
 from .. import data_dr as def_data_dr
 from ..loading.from_data import get_surf_loc
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.surface import load_surf_data
 
 def _save_mapping(mapping, loc):
     

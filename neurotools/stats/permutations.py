@@ -5,9 +5,13 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_random_state
 from joblib import Parallel, delayed
-from nilearn.mass_univariate import permuted_ols
 
 from ..random.permute_blocks import block_permutation, get_auto_vg
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.mass_univariate import permuted_ols
 
 def _self_inverse(arr):
     return arr @ np.linalg.pinv(arr)

@@ -1,7 +1,11 @@
 from funcs import setup_and_run_permuted_v, load_and_setup_data
-from nilearn.masking import compute_brain_mask
 import numpy as np
 import nibabel as nib
+
+import warnings
+with warnings.catch_warnings():
+    from nilearn.masking import compute_brain_mask
+
 
 # Save dr / name for folder where results will be saved
 results_dr = 'temp'

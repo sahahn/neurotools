@@ -1,7 +1,11 @@
 from nibabel.gifti import gifti
 import numpy as np
 from nibabel.freesurfer.io import read_geometry
-from nilearn.surface import load_surf_mesh
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.surface import load_surf_mesh
 
 def geo_to_gifti(geo_coords, geo_faces):
 

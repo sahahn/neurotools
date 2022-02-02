@@ -10,8 +10,14 @@ from joblib import Memory, Parallel, delayed
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import check_random_state
 from sklearn.utils.extmath import randomized_svd, svd_flip
-from nilearn.signal import _row_sum_of_squares
+
 from ..transform.rois import SurfMaps
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.signal import _row_sum_of_squares
+
 
 def fast_svd(X, n_components, random_state=None):
     """ Automatically switch between randomized and lapack SVD (heuristic

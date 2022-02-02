@@ -16,7 +16,11 @@ from joblib import Memory, delayed, Parallel
 from sklearn.utils import check_random_state
 
 from .multi_pca import MultiPCA
-from nilearn._utils import fill_doc
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn._utils import fill_doc
 
 
 @fill_doc

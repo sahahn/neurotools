@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from ...loading.funcs import load
 from ..funcs import run_rely, _test_split
+import shutil
 
 file_dr = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,6 +34,8 @@ def test_rely_basic():
     run_rely(covars_df,
              template_path=os.path.join(fake_dr, 'SUBJECT.npy'),
              max_size=30, verbose=-1)
+
+    shutil.rmtree(os.path.join(file_dr, 'test_data'))
 
 
 def test_rely_basic_data_df():

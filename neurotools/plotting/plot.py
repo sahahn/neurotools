@@ -1,14 +1,17 @@
-from typing import Type
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from .plot_single_surf import plot_single_surf, add_collage_colorbar
-from nilearn.plotting import plot_glass_brain, plot_stat_map, plot_roi
 from .ref import SurfRef
 from ..transform.space import process_space
 from scipy.stats import scoreatpercentile
 import nibabel as nib
 from ..misc.print import _get_print
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    from nilearn.plotting import plot_glass_brain, plot_stat_map, plot_roi
 
 def _proc_vs(data, vmin, vmax, symmetric_cbar):
     

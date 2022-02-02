@@ -7,10 +7,8 @@ setup(name='neurotools',
       author='Sage Hahn',
       author_email='sahahn@uvm.edu',
       license='MIT',
+      python_requires=">=3.7",
       packages=find_packages(),
-      include_package_data=True,
-      package_data={'neurotools': ['*/tests/test_data/*']},
-      package_dir={'neurotools': 'neurotools'},
       install_requires=[
           'scikit-learn>=0.24.0',
           'scipy',
@@ -23,4 +21,7 @@ setup(name='neurotools',
           'nilearn>=0.8.1',
           'neuromaps @ https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip',
           'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.zip'
-      ])
+      ],
+      test_suite='pytest',
+      tests_require=['pytest', 'coverage'],
+      zip_safe=False)

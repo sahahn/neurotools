@@ -2,6 +2,7 @@ from neuromaps import transforms
 from ..loading.from_data import get_surf_loc, _load_medial_wall
 from ..loading.funcs import load
 from ..transform.space import _resolve_space_name
+import warnings
 
 
 def vol_to_surf(vol, target_space='32k_fs_LR',
@@ -46,7 +47,9 @@ def vol_to_surf(vol, target_space='32k_fs_LR',
 
 def _nilearn_vol_to_surf(vol, target_space, ref_key, **kwargs):
 
-    from nilearn.surface import vol_to_surf
+    with warnings.catch_warnings():
+        warnings.simplefilter(action='ignore', category=FutureWarning)
+        from nilearn.surface import vol_to_surf
 
     projected = {}
     for hemi in ['lh', 'rh']:
