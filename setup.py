@@ -7,7 +7,7 @@ setup(name='neurotools',
       author='Sage Hahn',
       author_email='sahahn@uvm.edu',
       license='MIT',
-      python_requires=">=3.7",
+      python_requires=">=3.6",
       packages=find_packages(),
       install_requires=[
           'scikit-learn>=0.24.0',
