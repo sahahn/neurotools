@@ -1,4 +1,9 @@
-import os
+import neurotools_data
 from pathlib import Path
 
-data_dr = os.path.join(Path(__file__).parent.absolute(), 'data')
+# Use data from sep neurotools_data repo which
+# is installed as req
+data_dr = Path(neurotools_data.__file__).parent.absolute()
+
+# Set version
+__version__ = '0.2'

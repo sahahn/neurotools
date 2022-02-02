@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='neurotools',
-      version='0.1',
+      version='0.2',
       description='General helper functions for working with neuroimaging data.',
       url='http://github.com/sahahn/neurotools',
       author='Sage Hahn',
@@ -9,7 +9,7 @@ setup(name='neurotools',
       license='MIT',
       packages=find_packages(),
       include_package_data=True,
-      package_data={'neurotools': ['data/*/*/*', 'data/*/*', '*/tests/test_data/*']},
+      package_data={'neurotools': ['*/tests/test_data/*']},
       package_dir={'neurotools': 'neurotools'},
       install_requires=[
           'scikit-learn>=0.24.0',
@@ -21,7 +21,6 @@ setup(name='neurotools',
           'statsmodels>=0.12',
           'matplotlib>=3.3.4',
           'nilearn>=0.8.1',
-      ],
-      dependency_links = [
-     'git+https://github.com/netneurolab/neuromaps@master#egg=neuromaps',
-    ])
+          'neuromaps @ https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip',
+          'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.zip'
+      ])
