@@ -40,6 +40,7 @@ jobs:
       run: |
         cd src_doc
         make github
+        python ensure_no_j.py
         cd ../
     
     # Next, we need to commit the new files into the repository
