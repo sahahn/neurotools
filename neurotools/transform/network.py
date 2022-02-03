@@ -257,13 +257,15 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
     
     def __init__(self, signed=True, fit_intercept=True,
                  vectorize=True, scale_weights=True,
-                 fit_only_group_index=None, verbose=0):
+                 fit_only_group_index=None, passthrough=False,
+                 verbose=0):
         
         self.signed = signed
         self.fit_intercept = fit_intercept
         self.vectorize = vectorize
         self.scale_weights = scale_weights
         self.fit_only_group_index = fit_only_group_index
+        self.passthrough = passthrough
         self.verbose = verbose
 
     def fit(self, X, y=None, fit_index=None):
@@ -377,6 +379,11 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
                 
         # Return as is, if default
         if self.vectorize:
+
+            # If passthrough and vectorize, then combine
+            if self.passthrough:
+                return np.hstack([X_trans, X])
+
             return X_trans
         
         # Otherwise, cast X_trans to full network matrix
