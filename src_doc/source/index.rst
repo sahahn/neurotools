@@ -18,6 +18,8 @@ The library is split up into a few different core modules:
    stats
    transform
 
+More full examples are also provided for some cases:
+
 .. toctree::
    :maxdepth: 1
    :caption: Examples:
