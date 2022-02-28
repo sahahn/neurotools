@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="transform" href="transform.html" /><link rel="prev" title="resample" href="resample.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2022.01.02"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.02.23"/>
         <title>stats - neurotools 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=3c656993158f05539f962c5cea52a5e6c184bb8c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
 
@@ -41,17 +41,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -60,14 +56,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -82,7 +78,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -90,7 +86,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -134,7 +130,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -168,6 +164,7 @@
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -175,8 +172,13 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -184,14 +186,241 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
           <section id="stats">
-<h1>stats<a class="headerlink" href="#stats" title="Permalink to this headline">¶</a></h1>
+<h1>stats<a class="headerlink" href="#stats" title="Permalink to this headline">#</a></h1>
+<section id="get-resid">
+<h2>get_resid<a class="headerlink" href="#get-resid" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.stats.get_resid">
+<span class="sig-prename descclassname"><span class="pre">neurotools.stats.</span></span><span class="sig-name descname"><span class="pre">get_resid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.stats.get_resid" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the simple linear residualized version of a set of data according
+to a passed set of covariates. This fits a linear regression from covariates to data
+and then returns the difference between the predicted values and the true values for
+the data.</p>
+<p>In this case of missing data, within the data portion of the input,
+this method will operate on only the the subset of subject’s with
+non-missing data per feature, any NaN data will be propegated to
+the returned residualized data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covars</strong> (<em>numpy array</em>) – The covariates in which to use to residualize
+the passed data, seperate per feature. This
+input must have shape number of subjects x number of
+covariates.</p></li>
+<li><p><strong>data</strong> (<em>numpy array</em>) – The data in which to residualize. This
+input muct have shape number of subjects x number of
+data features</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>resid_data</strong> – A residualized version, with the same shape,
+of the passed data is returned. Any NaN values
+in the original input data are preserved.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+<section id="permutations-permuted-v">
+<h2>permutations.permuted_v<a class="headerlink" href="#permutations-permuted-v" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.stats.permutations.permuted_v">
+<span class="sig-prename descclassname"><span class="pre">neurotools.stats.permutations.</span></span><span class="sig-name descname"><span class="pre">permuted_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tested_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confounding_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">within_grp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_perm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sided_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_confounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_vg_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.stats.permutations.permuted_v" title="Permalink to this definition">#</a></dt>
+<dd><p>This function is used to perform a permutation based statistical test
+on data with an underlying exchangability-block type structure.</p>
+<p>In the case that no permutation structure is passed, i.e., value of None,
+then the original function will NOT be called. Instead,
+<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.mass_univariate.permuted_ols.html#nilearn.mass_univariate.permuted_ols" title="(in Nilearn)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nilearn.mass_univariate.permuted_ols()</span></code></a> will be used instead, and
+t-statistics calculated!</p>
+<p>In the case that the passed tested_vars are a single group only, e.g., all
+1’s, then any passed permutation_structure will only be used to generate variance groups,
+as instead of permutations based on swapping data, permutations will be performed
+through random sign flips of the data.</p>
+<p>This code is based to a large degree upon matlab code from
+program PALM, as well as influence by the permutation function in python
+library nilearn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tested_vars</strong> (<em>numpy array</em><em> or </em><em>pandas DataFrame</em>) – <p>Pass as an array or DataFrame, with shape
+either 1D or 2D as subjects x 1, and containing the
+values of interest in which to calculate the v-statistic
+against the passed <cite>target_vars</cite>, and as corrected for
+any passed <cite>confounding_vars</cite>.</p>
+<p>Note: The subject / data point order and length should match exactly
+between the first dimensions of <cite>tested_vars</cite>, ‘target_vars`,
+<cite>confounding_vars</cite> and <cite>permutation_structure</cite>.</p>
+</p></li>
+<li><p><strong>target_vars</strong> (<em>numpy array</em>) – <p>A 2D numpy array with shape subjects x features, containing
+the typically imaging features per subject to univariately
+calculate v-stats for.</p>
+<p>Note: The subject / data point order and length should match exactly
+between the first dimensions of <cite>tested_vars</cite>, ‘target_vars`,
+<cite>confounding_vars</cite> and <cite>permutation_structure</cite>.</p>
+</p></li>
+<li><p><strong>confounding_vars</strong> (<em>numpy array</em><em>, </em><em>pandas DataFrame</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>Confounding variates / covariates, passed as a 2D numpy array
+with shape subjects x number of confounding variables, or as None.
+If None, no variates are added, except maybe a constant column according to the
+value of parameter <cite>model_intercept</cite>. Otherwise, the passed variables influence
+will be removed from <cite>tested_vars</cite> before calculating the relationship between
+<cite>tested_vars</cite> and <cite>target_vars</cite>.</p>
+<p>Note: The subject / data point order and length should match exactly
+between the first dimensions of <cite>tested_vars</cite>, ‘target_vars`,
+<cite>confounding_vars</cite> and <cite>permutation_structure</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>permutation_structure</strong> (<em>numpy array</em><em>, </em><em>pandas DataFrame</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>This parameter represents the underlying exchangability-block
+structure of the data passed. It is also used in order to automatically determine
+the underlying variance structure of the passed data.</p>
+<p>See PALM’s documentation for an introduction on how to format ExchangeabilityBlocks:
+<a class="reference external" href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM/ExchangeabilityBlocks">https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM/ExchangeabilityBlocks</a></p>
+<p>This parameter accepts the same style input as PALM, except it is passed
+here as an array or DataFrame instead of as a file. The main requirement
+is that the shape of the structure match the number of subjects / data points
+in the first dimension.</p>
+<p>In this case that no permutation structure is passed, i.e., value of None,
+then the original function will NOT be called. Instead,
+<a class="reference external" href="https://nilearn.github.io/modules/generated/nilearn.mass_univariate.permuted_ols.html#nilearn.mass_univariate.permuted_ols" title="(in Nilearn)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nilearn.mass_univariate.permuted_ols()</span></code></a> will be used instead, and
+t-statistics calculated!</p>
+<p>Note: The subject / data point order and length should match exactly
+between the first dimensions of <cite>tested_vars</cite>, ‘target_vars`,
+<cite>confounding_vars</cite> and <cite>permutation_structure</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>within_grp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>This parameter is only relevant when a permutation structure is passed, in that
+case it describes how the left-most exchanability / permutation structure column should act.
+Specifically, if True, then it specifies that the left-most column should be treated as groups
+to act in a within group swap only manner. If False, then it will consider the left-most column
+groups to only be able to swap at the group level with other groups of the same size.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>n_perm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>The number of permutations to perform. Permutations are costly but the more are performed,
+the more precision one gets in the p-values estimation.</p>
+<p>If passed 0, this a valid option, and can be used to calculate just the original scores.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">500</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>two_sided_test</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, performs an unsigned v-test, where
+both positive and negative effects are considered.
+If False, only positive effects are considered as relevant.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>demean_targets</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, then the passed <cite>target_vars</cite> are demeaned across passed
+subjects (i.e., each single feature scaled to have mean 0 across subjects).</p>
+<p>Note: If performing an intercept based test (i.e., the tested vars are all 1’s)
+then this parameter should be left True, as sign flips to data that are not de-meaned
+might cause strange issues.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>demean_confounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, then the passed <cite>confounding_vars</cite> are demeaned across passed
+subjects (i.e., each single variable / column scaled to have mean 0 across subjects).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>model_intercept</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, a constant column is added to the confounding variates
+unless the tested variate is already the intercept.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>min_vg_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>If None, this parameter is ignored. Otherwise,
+if passed as int, this defines the smallest sized unique variance
+group allowed. Specifically, variance groups are calculated automatically
+from the passed permutation structure, and like-wise some statistics are calculated
+seperately per variance group, so that it can be a group idea to set a filter here
+that will drop any subject’s data that are below that threshold.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>If left as default of None, then the original
+datatypes for all passed data will be used.
+Alternatively, you may specify either ‘float32’ or ‘float64’
+and all data and calculations will be cast to that datatype.</p>
+<p>It can be very beneficial in practice to specify ‘float32’
+and perform less precise calculations. This can greatly improve
+memory and will also provide a speedup (a significant speed up when
+<cite>use_tf</cite> is set, otherwise a modest one).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>use_tf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>This flag specifies if permutations should be
+run on a special optimized version of the code
+designed to use a GPU, written in tensorflow.</p>
+<p>Note: If True, then this parameter requires that you have
+tensorflow installed and working. Ideally, also setup with a gpu,
+as using tensorflow with a cpu will not provide any benefit relative to using
+the base numpy version of the code.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>use_z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>v-statstics can optionally be converted into z-statstics. If
+passed True, then the returned <cite>original_scores</cite> will be z-statstics
+instead of v-statstics, and likewise, the permutation test will be performed
+by comparing max z-stats instead of v-stats.</p>
+<p>Note: This parameter cannot be used with use_tf.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The random seed for random number generator. This
+can be set by passing an int to specify the same permutations, or
+by passing None a random seed will be used.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Number of parallel workers. If 0 is provided, all CPUs are used.
+A negative number indicates that all the CPUs except (abs(n_jobs) - 1) ones will be used.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>verbosity level (0 means no message).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pvals</strong> (<em>numpy array</em>) – Negative log10 p-values associated with the significance test of the
+explanatory variates against the target variates. Family-wise corrected p-values.</p></li>
+<li><p><strong>original_scores</strong> (<em>numpy array</em>) – Either v (default), z or t statistics associated with the
+significance test of the explanatory variates against the target variates.
+The ranks of the scores into the h0 distribution correspond to the p-values.</p></li>
+<li><p><strong>h0_vmax</strong> (<em>numpy array</em>) – Distribution of the (max) v/z/t-statistic under the null hypothesis
+(obtained from the permutations). Array is sorted.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
 </section>
 
         </article>
@@ -220,21 +449,47 @@
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021, Sage Hahn |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
-            | <a class="muted-link" href="_sources/stats.rst.txt"
-               rel="nofollow">
-              Show Source
-            </a>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, Sage Hahn
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">stats</a><ul>
+<li><a class="reference internal" href="#get-resid">get_resid</a></li>
+<li><a class="reference internal" href="#permutations-permuted-v">permutations.permuted_v</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
