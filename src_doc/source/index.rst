@@ -18,6 +18,12 @@ The library is split up into a few different core modules:
    stats
    transform
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Examples:
+
+   test.ipynb
+
 Indices and tables
 ==================
 
