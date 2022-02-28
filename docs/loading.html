@@ -280,20 +280,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.76445784, 0.06620901],</span>
-<span class="go">       [0.95913959, 0.3581918 ],</span>
-<span class="go">       [0.85048587, 0.1722957 ],</span>
-<span class="go">       [0.43781038, 0.69485713],</span>
-<span class="go">       [0.92711654, 0.26402979]])</span>
+<span class="go">array([[0.29014615, 0.53174873],</span>
+<span class="go">       [0.21217359, 0.37853952],</span>
+<span class="go">       [0.41668585, 0.40224761],</span>
+<span class="go">       [0.82542704, 0.12976168],</span>
+<span class="go">       [0.68097868, 0.49591838]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.76445784, 0.06620901],</span>
-<span class="go">       [0.95913959, 0.3581918 ],</span>
-<span class="go">       [0.85048587, 0.1722957 ],</span>
-<span class="go">       [0.43781038, 0.69485713],</span>
-<span class="go">       [0.92711654, 0.26402979]])</span>
+<span class="go">array([[0.29014615, 0.53174873],</span>
+<span class="go">       [0.21217359, 0.37853952],</span>
+<span class="go">       [0.41668585, 0.40224761],</span>
+<span class="go">       [0.82542704, 0.12976168],</span>
+<span class="go">       [0.68097868, 0.49591838]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -473,7 +473,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">subjs</span>
-<span class="gh">Out[4]: </span><span class="go">['subj2', 'subj3', 'subj1']</span>
+<span class="gh">Out[4]: </span><span class="go">['subj2', 'subj1', 'subj3']</span>
 
 <span class="go"># Within each subject's directory is single data file</span>
 <span class="go"># E.g., loading the first subjects data</span>
@@ -485,9 +485,9 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/37675ecc926da4589dc8b44d2ab5d59b</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/b8ac647c9dac9f19e3a6477c7af740f5</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.003539562225341797 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0035152435302734375 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -506,9 +506,9 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8effc2a5532e9a8e4f3ff9be0f254d6a</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/3e03f164d98a6818d297534e0ad8b036</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0032706260681152344 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.003043651580810547 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -567,10 +567,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.74477517, 0.        , 0.        , 0.92262479]),</span>
-<span class="go"> array([0.95074962, 0.        , 0.        , 0.17984112]),</span>
-<span class="go"> array([0.50065795, 0.        , 0.        , 0.80184875]),</span>
-<span class="go"> array([0.99876511, 0.        , 0.        , 0.03988735])]</span>
+<span class="go">[array([0.75148894, 0.        , 0.        , 0.62079931]),</span>
+<span class="go"> array([0.8289839 , 0.        , 0.        , 0.48180181]),</span>
+<span class="go"> array([0.40959854, 0.        , 0.        , 0.5416252 ]),</span>
+<span class="go"> array([0.37147489, 0.        , 0.        , 0.02449873])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -586,14 +586,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fd8fd149580&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd8fd1497c0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd8fd1490a0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd8fd1495b0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb11f0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb1820&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb10a0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb1640&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.74477517, 0.        , 0.        , 0.92262479])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.75148894, 0.        , 0.        , 0.62079931])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
