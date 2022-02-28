@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="misc" href="misc.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2022.01.02"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.02.23"/>
         <title>loading - neurotools 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=3c656993158f05539f962c5cea52a5e6c184bb8c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
 
@@ -41,17 +41,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -60,14 +56,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -82,7 +78,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -90,7 +86,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -168,6 +164,7 @@
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -175,8 +172,13 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -191,12 +193,12 @@
         </div>
         <article role="main">
           <section id="loading">
-<h1>loading<a class="headerlink" href="#loading" title="Permalink to this headline">¶</a></h1>
+<h1>loading<a class="headerlink" href="#loading" title="Permalink to this headline">#</a></h1>
 <section id="load">
-<h2>load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h2>
+<h2>load<a class="headerlink" href="#load" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.load">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load" title="Permalink to this definition">#</a></dt>
 <dd><p>Smart loading function for neuro-imaging type data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -280,29 +282,29 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.29014615, 0.53174873],</span>
-<span class="go">       [0.21217359, 0.37853952],</span>
-<span class="go">       [0.41668585, 0.40224761],</span>
-<span class="go">       [0.82542704, 0.12976168],</span>
-<span class="go">       [0.68097868, 0.49591838]])</span>
+<span class="go">array([[0.63077457, 0.7197454 ],</span>
+<span class="go">       [0.761637  , 0.79559961],</span>
+<span class="go">       [0.4906808 , 0.73679205],</span>
+<span class="go">       [0.42863902, 0.32446707],</span>
+<span class="go">       [0.50486349, 0.2036979 ]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.29014615, 0.53174873],</span>
-<span class="go">       [0.21217359, 0.37853952],</span>
-<span class="go">       [0.41668585, 0.40224761],</span>
-<span class="go">       [0.82542704, 0.12976168],</span>
-<span class="go">       [0.68097868, 0.49591838]])</span>
+<span class="go">array([[0.63077457, 0.7197454 ],</span>
+<span class="go">       [0.761637  , 0.79559961],</span>
+<span class="go">       [0.4906808 , 0.73679205],</span>
+<span class="go">       [0.42863902, 0.32446707],</span>
+<span class="go">       [0.50486349, 0.2036979 ]])</span>
 </pre></div>
 </div>
 </dd></dl>
 </section>
 <section id="load-data">
-<h2>load_data<a class="headerlink" href="#load-data" title="Permalink to this headline">¶</a></h2>
+<h2>load_data<a class="headerlink" href="#load-data" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.load_data">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_as_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_as_zero</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_as_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_as_zero</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load_data" title="Permalink to this definition">#</a></dt>
 <dd><p>This method is designed to load data saved in a particular way,
 specifically where each subject / participants data is saved seperately.</p>
 <dl class="field-list simple">
@@ -487,7 +489,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/b8ac647c9dac9f19e3a6477c7af740f5</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0035152435302734375 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0034208297729492188 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -508,16 +510,16 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/3e03f164d98a6818d297534e0ad8b036</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.003043651580810547 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0029523372650146484 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
 </section>
 <section id="reverse-mask-data">
-<h2>reverse_mask_data<a class="headerlink" href="#reverse-mask-data" title="Permalink to this headline">¶</a></h2>
+<h2>reverse_mask_data<a class="headerlink" href="#reverse-mask-data" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.reverse_mask_data">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">reverse_mask_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.reverse_mask_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">reverse_mask_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.reverse_mask_data" title="Permalink to this definition">#</a></dt>
 <dd><p>This function is used to reverse the application of a mask
 to a data array.</p>
 <dl class="field-list simple">
@@ -532,14 +534,14 @@ of single <a class="reference external" href="https://numpy.org/doc/stable/refer
 <li><p><strong>mask</strong> (loc or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>) – The location of, or a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> mask, where
 (1/True=keep, 0/False=discard) in which to reverse the
 application of. If the passed mask is either
-a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> with an affine, or saved as a nifti,
+a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> with an affine, or saved as a nifti,
 then as a part of the reverse mask process, the data
-will be converted into a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> image.</p></li>
+will be converted into a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> image.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p><strong>reversed_data</strong> – In the case that the mask is passed in a format that
-provides an affine, data will be returned in <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>
+provides an affine, data will be returned in <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>
 format. If instead the mask is passed as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> or
 location of a saved data array without affine information,
 then the data will be returned as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code></a>.</p>
@@ -550,7 +552,7 @@ to each passed subject’s reversed data.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> or list of</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> or list of</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -567,16 +569,16 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.75148894, 0.        , 0.        , 0.62079931]),</span>
-<span class="go"> array([0.8289839 , 0.        , 0.        , 0.48180181]),</span>
-<span class="go"> array([0.40959854, 0.        , 0.        , 0.5416252 ]),</span>
-<span class="go"> array([0.37147489, 0.        , 0.        , 0.02449873])]</span>
+<span class="go">[array([0.63364732, 0.        , 0.        , 0.68726743]),</span>
+<span class="go"> array([0.57914039, 0.        , 0.        , 0.93059988]),</span>
+<span class="go"> array([0.07755755, 0.        , 0.        , 0.08162576]),</span>
+<span class="go"> array([0.68586835, 0.        , 0.        , 0.31528884])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
 </pre></div>
 </div>
-<p>Or in the case where the mask is a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.1+100.g9fdf5e3e)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>:</p>
+<p>Or in the case where the mask is a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 
 <span class="go"># Convert mask to nifti</span>
@@ -586,14 +588,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb11f0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb1820&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb10a0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f73f1eb1640&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f7c1ff80490&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f7c1ff806a0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f7c1ff800d0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f7c1ff80250&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.75148894, 0.        , 0.        , 0.62079931])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.63364732, 0.        , 0.        , 0.68726743])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -606,17 +608,17 @@ to each passed subject’s reversed data.</p>
 </dd></dl>
 </section>
 <section id="get-overlap-subjects">
-<h2>get_overlap_subjects<a class="headerlink" href="#get-overlap-subjects" title="Permalink to this headline">¶</a></h2>
+<h2>get_overlap_subjects<a class="headerlink" href="#get-overlap-subjects" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.get_overlap_subjects">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">get_overlap_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.get_overlap_subjects" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">get_overlap_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.get_overlap_subjects" title="Permalink to this definition">#</a></dt>
 <dd><p>Helper function to be used when working with template_path style saved
 data in order to compute an overlapping set of subjects between a dataframe
 and a template path, or alternatively between two dataframes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
+<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
 subjects in which to overlap.
 Where the names correspond in some way to the
 way the way the subject’s data is saved.</p></li>
@@ -644,7 +646,7 @@ be ignored! This parameter is used only with the template_path option.</p>
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
+<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
 to overlap with <cite>df</cite>, INSTEAD of a template_path and / or contrast set of arguments.
 Explicitly, if specifying a data_df, a template_path should not be passed!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
@@ -667,10 +669,10 @@ If &gt;= 2, full verbosity will be enabled.</p>
 </dd></dl>
 </section>
 <section id="from-data-get-surf-loc">
-<h2>from_data.get_surf_loc<a class="headerlink" href="#from-data-get-surf-loc" title="Permalink to this headline">¶</a></h2>
+<h2>from_data.get_surf_loc<a class="headerlink" href="#from-data-get-surf-loc" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.from_data.get_surf_loc">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.from_data.</span></span><span class="sig-name descname"><span class="pre">get_surf_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.from_data.get_surf_loc" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.from_data.</span></span><span class="sig-name descname"><span class="pre">get_surf_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.from_data.get_surf_loc" title="Permalink to this definition">#</a></dt>
 <dd><p>Find the saved surface file based
 on space, hemi and key, with tolerance
 to different naming schemes.</p>
@@ -698,10 +700,10 @@ None if not found.</p>
 </dd></dl>
 </section>
 <section id="abcd-load-from-csv">
-<h2>abcd.load_from_csv<a class="headerlink" href="#abcd-load-from-csv" title="Permalink to this headline">¶</a></h2>
+<h2>abcd.load_from_csv<a class="headerlink" href="#abcd-load-from-csv" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.abcd.load_from_csv">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_cat_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ordinal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_from_csv" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_cat_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ordinal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_from_csv" title="Permalink to this definition">#</a></dt>
 <dd><p>Special ABCD Study specific helper utility to load specific
 columns from a csv saved version of the DEAP release RDS
 file or similar ABCD specific csv dataset.</p>
@@ -747,7 +749,7 @@ This method uses <a class="reference external" href="https://scikit-learn.org/st
 </li>
 <li><p>’one hot’ :</p>
 <p>The variables is one hot encoded, adding columns
-for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
+for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.4.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
 </li>
 <li><p>’dummy’ :</p>
 <p>Same as ‘one hot’, except one of the columns is then dropped.</p>
@@ -789,20 +791,20 @@ another file in another location with the same name is the same.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
+<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
 column <cite>src_subject_id</cite> within the original csv.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 </section>
 <section id="abcd-load-family-block-structure">
-<h2>abcd.load_family_block_structure<a class="headerlink" href="#abcd-load-family-block-structure" title="Permalink to this headline">¶</a></h2>
+<h2>abcd.load_family_block_structure<a class="headerlink" href="#abcd-load-family-block-structure" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.abcd.load_family_block_structure">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_family_block_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_neg_ones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_max_sz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30G'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_family_block_structure" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_family_block_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_neg_ones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_max_sz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30G'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_family_block_structure" title="Permalink to this definition">#</a></dt>
 <dd><p>This helper utility loads PALM-style exchanability blocks for ABCD study specific data
 according to right now a fixed set of rules:</p>
 <ul class="simple">
@@ -821,7 +823,7 @@ other csv as long as it has columns:
 though if any missing values are present in rel_relationship or rel_family_id
 within this subset, then those will be further dropped.</p>
 <p>If passed as non-null, this should be a valid array-like
-or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
+or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
@@ -855,16 +857,16 @@ this returned structure.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 </section>
 <section id="outliers-drop-top-x-outliers">
-<h2>outliers.drop_top_x_outliers<a class="headerlink" href="#outliers-drop-top-x-outliers" title="Permalink to this headline">¶</a></h2>
+<h2>outliers.drop_top_x_outliers<a class="headerlink" href="#outliers-drop-top-x-outliers" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.outliers.drop_top_x_outliers">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.outliers.</span></span><span class="sig-name descname"><span class="pre">drop_top_x_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.outliers.drop_top_x_outliers" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.outliers.</span></span><span class="sig-name descname"><span class="pre">drop_top_x_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.outliers.drop_top_x_outliers" title="Permalink to this definition">#</a></dt>
 <dd><p>Drop a fixed number of outliers from a set of loaded subjects data,
 based on the absolute mean of each subject’s data.</p>
 <dl class="field-list simple">
@@ -902,10 +904,10 @@ with <cite>top</cite> removed.</p></li>
 </dd></dl>
 </section>
 <section id="parcels-load-32k-fs-lr-concat">
-<h2>parcels.load_32k_fs_LR_concat<a class="headerlink" href="#parcels-load-32k-fs-lr-concat" title="Permalink to this headline">¶</a></h2>
+<h2>parcels.load_32k_fs_LR_concat<a class="headerlink" href="#parcels-load-32k-fs-lr-concat" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.parcels.load_32k_fs_LR_concat">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.parcels.</span></span><span class="sig-name descname"><span class="pre">load_32k_fs_LR_concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parcel_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.parcels.load_32k_fs_LR_concat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.parcels.</span></span><span class="sig-name descname"><span class="pre">load_32k_fs_LR_concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parcel_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.parcels.load_32k_fs_LR_concat" title="Permalink to this definition">#</a></dt>
 <dd><p>Dedicated loader function for saved parcels as generated in
 parc_scaling project. These parcellations are all in space 32k_fs_LR,
 and are left, right hemisphere concatenated. The parcel will be
@@ -953,15 +955,21 @@ for valid options.</p>
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021, Sage Hahn |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
-            | <a class="muted-link" href="_sources/loading.rst.txt"
-               rel="nofollow">
-              Show Source
-            </a>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, Sage Hahn
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
