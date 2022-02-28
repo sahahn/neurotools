@@ -82,6 +82,7 @@ def _run_permutation_chunks(run_perm_func, original_scores,
     for i in range(n_perm_chunk):
         
         # Generate permutation on the fly
+        print(permutation_structure)
         p_set = _get_perm_matrix(permutation_structure, random_state+i, intercept_test)
 
         # Get v stats for this permutation
@@ -314,7 +315,7 @@ def _process_permuted_v_base(tested_vars,
     if min_vg_size is not None:
         confounding_vars, tested_vars, target_vars, permutation_structure, variance_groups =\
             _proc_min_vg_size(min_vg_size, confounding_vars, tested_vars,
-                             target_vars, permutation_structure, variance_groups)
+                              target_vars, permutation_structure, variance_groups)
 
     # De-mean target variable
     if demean_targets:
