@@ -1,3 +1,4 @@
+from locale import normalize
 import os
 import warnings
 import numpy as np
@@ -5,10 +6,11 @@ from scipy.stats import ks_2samp, gaussian_kde
 from scipy.spatial.distance import jensenshannon
 from .parc import merge_parc_hemis
 from ..loading import load
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MinMaxScaler
 import itertools
+import pandas as pd
 
 def _get_kde_p(data, n=256):
     kde = gaussian_kde(data)
@@ -249,26 +251,89 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
     return gen_indv_roi_network(data, labels, metric=metric,
                                 vectorize=vectorize,
                                 discard_diagonal=discard_diagonal)
-  
+
+
+from sklearn.base import BaseEstimator
+class OrthRegression(BaseEstimator):
+    
+    def __init__(self):
+        pass
+    
+    def fit(self, X, y):
+        
+        # Work with 1D
+        x = np.squeeze(X)
+        
+        # Concat
+        Z  = np.c_[x, y]
+        
+        # Compute SVD
+        meanZ = np.tile(Z.mean(axis=0), (Z.shape[0], 1))
+        V = np.linalg.svd(Z - meanZ)[2]
+
+        # Slope
+        self.a = -V[1][0] / V[1][1]
+
+        # Coef
+        self.b = np.mean(np.matmul(Z, V[1]) / V[1, 1])
+
+        # Save normal for use w/ get orth dist
+        self.normal = V[1]
+
+        return self
+        
+    def predict(self, X):
+        
+        # Work with 1D x
+        x = np.squeeze(X)
+        
+        # Get resid
+        resid = (x * self.a) + self.b
+        
+        # Return as len(x) x 1
+        return np.expand_dims(resid, -1)
+        
+    def get_orth_dist(self, X, y):
+
+        # Get z
+        x = np.squeeze(X)
+        Z  = np.c_[x, y]
+        meanZ = np.tile(Z.mean(axis=0), (Z.shape[0], 1))
+
+        # Compute orth distance
+        return np.abs(np.matmul((Z - meanZ), self.normal))
+
 
 class GroupDifNetwork(BaseEstimator, TransformerMixin):
 
     _needs_fit_index = True
     
-    def __init__(self, signed=True, fit_intercept=True,
-                 vectorize=True, scale_weights=True,
+    def __init__(self, vectorize=True, scale_weights=False,
                  fit_only_group_index=None, passthrough=False,
                  verbose=0):
         
-        self.signed = signed
-        self.fit_intercept = fit_intercept
         self.vectorize = vectorize
         self.scale_weights = scale_weights
         self.fit_only_group_index = fit_only_group_index
         self.passthrough = passthrough
         self.verbose = verbose
 
+    def proc_X(self, X, fit_index=None):
+        
+        # Use method from sklearn base estimator
+        self._check_feature_names(X, reset=True)
+
+        # If df, get fit_index, but convert to numpy array
+        # internally, so easier to work with, i.e., consistent indexing.
+        if isinstance(X, pd.DataFrame):
+            fit_index = X.index
+            X = np.array(X)
+
+        return X, fit_index
+
     def fit(self, X, y=None, fit_index=None):
+
+        X, fit_index  = self.proc_X(X, fit_index=fit_index)
 
         # More efficient to call fit transform
         # directly, but should still support calling
@@ -314,8 +379,8 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         for i, j in self.pairs_:
             
             # Fit estimator
-            model = LinearRegression(fit_intercept=self.fit_intercept).fit(X_s[:, [i]], X_s[:, j])
-            
+            model = OrthRegression().fit(X_s[:, i], X_s[:, j])
+
             # Keep track in estimators_
             self.estimators_.append(model)
         
@@ -328,15 +393,9 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
             
             # Fit case, init scaler and fit
             if fit:
-            
-                # Init scaler between 0 and 1 or -1 and 1
-                if self.signed:
-                    feature_range = (-1, 1)
-                else:
-                    feature_range = (0, 1)
-                self.scaler_ = MinMaxScaler(feature_range=feature_range, clip=True)
 
-                # Fit to X_trans
+                # Fit to X_trans between 0 and 1
+                self.scaler_ = MinMaxScaler(feature_range=(0, 1), clip=True)
                 self.scaler_.fit(X_trans)
             
             # Always transform
@@ -352,24 +411,13 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
             
             # Unpack
             i, j = ij
-            
-            # Get difference between real feat j and predicted
-            resid = X[:, j] - estimator.predict(X[:, [i]])
-            
-            # Add intercept if fit with intercept
-            if self.fit_intercept:
-                resid += estimator.intercept_
-            
-            # resid now represents the residuals
-            # for all subjects for connection ij
-            X_trans.append(resid)
+
+            # Get the orth distance between estimate
+            # and current point - this estimate is symmetric
+            X_trans.append(estimator.get_orth_dist(X[:, i], X[:, j]))
         
         # Set as # of subjects x number of edge combos
         X_trans = np.stack(X_trans, axis=-1)
-
-        # If not signed, convert to absolute
-        if not self.signed:
-            X_trans = np.abs(X_trans)
 
         # Process if scale weights
         X_trans = self._proc_scale(X_trans, fit)
@@ -395,6 +443,7 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         return self._transform(X, fit=False)
     
     def _to_matrix(self, X, X_trans):
+        '''Transforms to full matrix, w/ redundancy'''
         
         # Init empty network to fill, where 0's represent
         # same pair connections
@@ -402,10 +451,13 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         for feat, ij in enumerate(self.pairs_):
             i, j = ij
             as_matrix[:, i, j] = X_trans[:, feat]
+            as_matrix[:, j, i] = X_trans[:, feat]
             
         return as_matrix
     
     def fit_transform(self, X, y=None, fit_index=None):
+
+        X, fit_index  = self.proc_X(X, fit_index=fit_index)
         
         # Fit transform, calling base fit and base transform _transform
         return self._fit(X=X, y=y, fit_index=fit_index)._transform(X=X, fit=True)

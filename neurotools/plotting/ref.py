@@ -113,7 +113,7 @@ class Ref():
     def _get_ref_vals(self, hemi=None):
         pass
 
-    def _proc_keys_input(keys):
+    def _proc_keys_input(self, keys):
 
         if keys is None:
             keys = []
@@ -134,6 +134,7 @@ class Ref():
     def _clean_key(self, key):
         '''Applies lowercase, and some common str replacements, "cleaning" the key.'''
         
+        # TODO use regex
         key = key.lower()
         key = key.replace('.', ' ')
         key = key.replace('-', ' ')

@@ -2,8 +2,36 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 
 def get_resid(covars, data):
-    '''Get residualized data with two function versions, with or without
-    missing data.'''
+    '''Compute the simple linear residualized version of a set of data according
+    to a passed set of covariates. This fits a linear regression from covariates to data
+    and then returns the difference between the predicted values and the true values for
+    the data.
+
+    In this case of missing data, within the data portion of the input,
+    this method will operate on only the the subset of subject's with
+    non-missing data per feature, any NaN data will be propegated to
+    the returned residualized data.
+
+    Parameters
+    ------------
+    covars : numpy array
+        The covariates in which to use to residualize
+        the passed data, seperate per feature. This
+        input must have shape number of subjects x number of
+        covariates.
+
+    data : numpy array
+        The data in which to residualize. This
+        input muct have shape number of subjects x number of
+        data features
+
+    Returns
+    ---------
+    resid_data : numpy array
+        A residualized version, with the same shape,
+        of the passed data is returned. Any NaN values
+        in the original input data are preserved.
+    '''
 
     if np.isnan(data).any():
         return _get_resid_with_nans(covars, data)
@@ -36,10 +64,7 @@ def _get_resid_with_nans(covars, data):
             model = LinearRegression().fit(covars[mask], data[mask, i])
             
             # Compute difference of real value - predicted
-            dif_i = data[mask, i] - model.predict(covars[mask])
-            
-            # Set resid as diff + intercept
-            resid_i = model.intercept_ + dif_i
+            resid_i = data[mask, i] - model.predict(covars[mask])
             
             # Fill in NaN mask
             resid[mask, i] = resid_i
@@ -58,10 +83,7 @@ def _get_resid_without_nans(covars, data):
     model = LinearRegression().fit(covars, data)
 
     # The difference is the real value of the voxel, minus the predicted value
-    dif = data - model.predict(covars)
-
-    # Set the residualized data to be, the intercept of the model + the difference
-    resid = model.intercept_ + dif
+    resid = data - model.predict(covars)
 
     return resid
 
