@@ -12,6 +12,9 @@ def get_resid(covars, data):
     non-missing data per feature, any NaN data will be propegated to
     the returned residualized data.
 
+    Note that the intercept information from the linear model
+    is re-added to the residuals. 
+
     Parameters
     ------------
     covars : numpy array
@@ -63,8 +66,8 @@ def _get_resid_with_nans(covars, data):
             # Fit model
             model = LinearRegression().fit(covars[mask], data[mask, i])
             
-            # Compute difference of real value - predicted
-            resid_i = data[mask, i] - model.predict(covars[mask])
+            # Compute difference of real value - predicted, then add intercept
+            resid_i = data[mask, i] - model.predict(covars[mask]) + model.intercept_
             
             # Fill in NaN mask
             resid[mask, i] = resid_i
@@ -82,8 +85,8 @@ def _get_resid_without_nans(covars, data):
     # Fit a linear regression with covars as predictors, each voxel as target variable
     model = LinearRegression().fit(covars, data)
 
-    # The difference is the real value of the voxel, minus the predicted value
-    resid = data - model.predict(covars)
+    # The difference is the real value of the voxel, minus the predicted value, + intercepts
+    resid = data - model.predict(covars) + model.intercept_
 
     return resid
 

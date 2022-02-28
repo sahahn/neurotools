@@ -261,6 +261,8 @@ def _process_permuted_v_base(tested_vars,
     # If passed as DataFrame or Series cast to array
     if isinstance(tested_vars, (pd.DataFrame, pd.Series)):
         tested_vars = np.array(tested_vars)
+    if isinstance(target_vars, (pd.DataFrame, pd.Series)):
+        target_vars = np.array(target_vars)
     if isinstance(confounding_vars, (pd.DataFrame, pd.Series)):
         confounding_vars = np.array(confounding_vars)
     if isinstance(permutation_structure, (pd.DataFrame, pd.Series)):
@@ -601,11 +603,11 @@ def permuted_v(tested_vars,
 
     use_z : bool, optional
         v-statstics can optionally be converted into z-statstics. If
-        passed True, then the returned `original_scores` will be z-statstics
+        passed True, then the returned `original_scores` will be z-statistics
         instead of v-statstics, and likewise, the permutation test will be performed
         by comparing max z-stats instead of v-stats.
 
-        Note: This parameter cannot be used with use_tf.
+        Note: This option cannot be used with use_tf.
 
         ::
 
