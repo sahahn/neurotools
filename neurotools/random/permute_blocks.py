@@ -64,7 +64,7 @@ def _between_grp_permute(blocks, rng):
 def _proc_block_input(in_blocks, within_grp=True):
 
     # If passed as df, convert to array
-    if isinstance(in_blocks, pd.DataFrame):
+    if isinstance(in_blocks, (pd.DataFrame, pd.Series)):
         in_blocks = np.array(in_blocks)
 
     # Passed 1D array case - expand

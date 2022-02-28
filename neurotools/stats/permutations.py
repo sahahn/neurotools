@@ -28,7 +28,7 @@ def _get_contrast(tested_vars, confounding_vars):
     
     return contrast
 
-def _get_perm_matrix(permutation_structure, random_state, intercept_test=False):
+def _get_perm_matrix(permutation_structure, random_state, intercept_test=False, within_grp=True):
 
     # If intercept test, ignore permutation structure,
     # and the permutation is just eye with random 1's and -1's.
@@ -36,19 +36,11 @@ def _get_perm_matrix(permutation_structure, random_state, intercept_test=False):
         flip_vals = (check_random_state(random_state).randint(2, size=(len(permutation_structure))) * 2) - 1
         return np.eye(len(permutation_structure)) * flip_vals
     
-    # If passed in variance group 1D form
-    if len(permutation_structure.shape) == 1:
-        neg_ones = -np.ones(len(permutation_structure))
-        p_struc = np.stack([neg_ones, permutation_structure], axis=1)
-    
-    # If passed as blocks
-    else:
-        p_struc = permutation_structure
-    
     # Gen permutation
-    p_set = block_permutation(np.eye(len(p_struc), dtype='bool'),
-                              blocks=p_struc,
-                              random_state=random_state)
+    p_set = block_permutation(np.eye(len(permutation_structure), dtype='bool'),
+                              blocks=permutation_structure,
+                              random_state=random_state,
+                              within_grp=within_grp)
 
     return p_set
 
@@ -59,7 +51,8 @@ def _run_permutation_chunks(run_perm_func, original_scores,
                             permutation_structure=None, verbose=0,
                             use_z=False, two_sided_test=True,
                             intercept_test=False,
-                            use_special_tf=False):
+                            use_special_tf=False,
+                            within_grp=True):
 
     # If the special tensorflow case, and the first job
     if use_special_tf and thread_id == 1:
@@ -82,8 +75,10 @@ def _run_permutation_chunks(run_perm_func, original_scores,
     for i in range(n_perm_chunk):
         
         # Generate permutation on the fly
-        print(permutation_structure)
-        p_set = _get_perm_matrix(permutation_structure, random_state+i, intercept_test)
+        p_set = _get_perm_matrix(permutation_structure=permutation_structure,
+                                 random_state=random_state+i,
+                                 intercept_test=intercept_test,
+                                 within_grp=within_grp)
 
         # Get v stats for this permutation
         perm_scores = run_perm_func(
@@ -717,7 +712,8 @@ def permuted_v(tested_vars,
         permutation_structure=permutation_structure,
         verbose=verbose, use_z=use_z, two_sided_test=two_sided_test,
         intercept_test=intercept_test,
-        use_special_tf=use_special_tf)
+        use_special_tf=use_special_tf,
+        within_grp=within_grp)
         for thread_id, n_perm_chunk in enumerate(n_perm_chunks))
 
     # Collect returned results together
