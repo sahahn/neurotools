@@ -207,6 +207,8 @@ the data.</p>
 this method will operate on only the the subset of subject’s with
 non-missing data per feature, any NaN data will be propegated to
 the returned residualized data.</p>
+<p>Note that the intercept information from the linear model
+is re-added to the residuals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -378,10 +380,10 @@ the base numpy version of the code.</p>
 </div>
 </p></li>
 <li><p><strong>use_z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>v-statstics can optionally be converted into z-statstics. If
-passed True, then the returned <cite>original_scores</cite> will be z-statstics
+passed True, then the returned <cite>original_scores</cite> will be z-statistics
 instead of v-statstics, and likewise, the permutation test will be performed
 by comparing max z-stats instead of v-stats.</p>
-<p>Note: This parameter cannot be used with use_tf.</p>
+<p>Note: This option cannot be used with use_tf.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
 </pre></div>
 </div>
