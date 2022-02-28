@@ -1,6 +1,9 @@
 from sklearn.preprocessing import OrdinalEncoder
-import statsmodels.api as sm
-import time
+
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    import statsmodels.api as sm
 
 def run_mixed_model(df, fixed_effects_vars, random_effects_vars):
     '''Wrapper code for running a mixed linear model with either one random effect
