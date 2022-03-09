@@ -19,6 +19,7 @@ setup(name='neurotools',
           'statsmodels>=0.12',
           'matplotlib>=3.3.4',
           'nilearn>=0.8.1',
+          'networkx',
           'neuromaps @ https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip',
           'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.zip'
       ],
