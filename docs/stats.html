@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="transform" href="transform.html" /><link rel="prev" title="resample" href="resample.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2022.02.23"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.03.04"/>
         <title>stats - neurotools 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=3c656993158f05539f962c5cea52a5e6c184bb8c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
@@ -20,16 +20,18 @@
   --color-code-foreground: black;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
     }
   }
 </style></head>
@@ -240,7 +242,7 @@ in the original input data are preserved.</p>
 <h2>permutations.permuted_v<a class="headerlink" href="#permutations-permuted-v" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.stats.permutations.permuted_v">
-<span class="sig-prename descclassname"><span class="pre">neurotools.stats.permutations.</span></span><span class="sig-name descname"><span class="pre">permuted_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tested_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confounding_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">within_grp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_perm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sided_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_confounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_vg_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.stats.permutations.permuted_v" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">neurotools.stats.permutations.</span></span><span class="sig-name descname"><span class="pre">permuted_v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tested_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confounding_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">within_grp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_perm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sided_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demean_confounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_vg_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.stats.permutations.permuted_v" title="Permalink to this definition">#</a></dt>
 <dd><p>This function is used to perform a permutation based statistical test
 on data with an underlying exchangability-block type structure.</p>
 <p>In the case that no permutation structure is passed, i.e., value of None,
@@ -319,6 +321,12 @@ groups to only be able to swap at the group level with other groups of the same 
 the more precision one gets in the p-values estimation.</p>
 <p>If passed 0, this a valid option, and can be used to calculate just the original scores.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">500</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>variance_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><em>numpy array / pandas DataFrame</em><em>, </em><em>optional</em>) – <p>By default these are automatically computed from the passed permutation structure.
+Otherwise, this parameter can be overriden by passing a custom set of variance groups.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 </p></li>
@@ -414,7 +422,7 @@ A negative number indicates that all the CPUs except (abs(n_jobs) - 1) ones will
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>pvals</strong> (<em>numpy array</em>) – Negative log10 p-values associated with the significance test of the
+<li><p><strong>pvals</strong> (<em>numpy array</em>) – The p-values associated with the significance test of the
 explanatory variates against the target variates. Family-wise corrected p-values.</p></li>
 <li><p><strong>original_scores</strong> (<em>numpy array</em>) – Either v (default), z or t statistics associated with the
 significance test of the explanatory variates against the target variates.
