@@ -1,16 +1,17 @@
-from locale import normalize
 import os
 import warnings
 import numpy as np
 from scipy.stats import ks_2samp, gaussian_kde
 from scipy.spatial.distance import jensenshannon
 from .parc import merge_parc_hemis
-from ..loading import load
-from sklearn.base import BaseEstimator, TransformerMixin, clone
-from sklearn.linear_model import LinearRegression
+
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler
 import itertools
 import pandas as pd
+
+from ..loading import load
+from ..stats.orth import OrthRegression
 
 def _get_kde_p(data, n=256):
     kde = gaussian_kde(data)
@@ -39,7 +40,6 @@ def _ks_normalize_metric(x, y):
     
     return _ks_metric((x - np.mean(x)) / np.std(x),
                       (y - np.mean(y)) / np.std(y))
-
 
 def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_diagonal=False):
     '''This function is designed to generate a network
@@ -152,7 +152,6 @@ def gen_indv_roi_network(data, labels, metric='jsd', vectorize=False, discard_di
     # Otherwise, return full matrix
     return matrix
 
-
 def _load_fs_subj_data(subj_dr, modality, parc):
     
     # Path to their thickness file
@@ -166,7 +165,6 @@ def _load_fs_subj_data(subj_dr, modality, parc):
     labels = merge_parc_hemis(lh_labels, rh_labels)
     
     return data, labels
-
 
 def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
                                parc='aparc.a2009s.annot', metric='jsd',
@@ -251,57 +249,6 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
     return gen_indv_roi_network(data, labels, metric=metric,
                                 vectorize=vectorize,
                                 discard_diagonal=discard_diagonal)
-
-
-from sklearn.base import BaseEstimator
-class OrthRegression(BaseEstimator):
-    
-    def __init__(self):
-        pass
-    
-    def fit(self, X, y):
-        
-        # Work with 1D
-        x = np.squeeze(X)
-        
-        # Concat
-        Z  = np.c_[x, y]
-        
-        # Compute SVD
-        meanZ = np.tile(Z.mean(axis=0), (Z.shape[0], 1))
-        V = np.linalg.svd(Z - meanZ)[2]
-
-        # Slope
-        self.a = -V[1][0] / V[1][1]
-
-        # Coef
-        self.b = np.mean(np.matmul(Z, V[1]) / V[1, 1])
-
-        # Save normal for use w/ get orth dist
-        self.normal = V[1]
-
-        return self
-        
-    def predict(self, X):
-        
-        # Work with 1D x
-        x = np.squeeze(X)
-        
-        # Get resid
-        resid = (x * self.a) + self.b
-        
-        # Return as len(x) x 1
-        return np.expand_dims(resid, -1)
-        
-    def get_orth_dist(self, X, y):
-
-        # Get z
-        x = np.squeeze(X)
-        Z  = np.c_[x, y]
-        meanZ = np.tile(Z.mean(axis=0), (Z.shape[0], 1))
-
-        # Compute orth distance
-        return np.abs(np.matmul((Z - meanZ), self.normal))
 
 
 class GroupDifNetwork(BaseEstimator, TransformerMixin):
@@ -461,4 +408,5 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         
         # Fit transform, calling base fit and base transform _transform
         return self._fit(X=X, y=y, fit_index=fit_index)._transform(X=X, fit=True)
-    
+
+

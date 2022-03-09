@@ -6,11 +6,15 @@ from ..misc.text import get_unique_str_markers
 from ..misc.print import _get_print
 from .. import data_dr as def_data_dr
 from ..loading.from_data import get_surf_loc
+from difflib import SequenceMatcher
 
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     from nilearn.surface import load_surf_data
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 def _save_mapping(mapping, loc):
     
@@ -158,13 +162,25 @@ class Ref():
                 name = name.replace(trans_key, self._clean_key(self.mapping[key]))
 
         # Find the ind
+        inds = []
         for label in self.label_2_int:
             trans_label = self._clean_key(label)
 
+            # Try to find name, if found keep track
             if trans_label in name:
                 ind = int(self.label_2_int[label])
-                self._print(f'Mapping: {original_name} -> {label}.', level=1)
-                return ind
+
+                # Append ind, label and simmilarity
+                inds.append((ind, label, similar(trans_label, name)))
+
+        # If more than one, sort so first is highest simmilarity
+        if len(inds) > 1:
+            inds = sorted(inds, key=lambda i : i[2], reverse=True)
+
+        #  Return first
+        if len(inds) > 0:
+            self._print(f'Mapping: {original_name} -> {inds[0][1]}.', level=1)
+            return inds[0][0]
 
         # First pass if doesn't find is to try again, but with all i_keys removed
         if i_keys is not None:

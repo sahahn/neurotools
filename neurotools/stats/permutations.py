@@ -212,6 +212,7 @@ def _process_permuted_v_base(tested_vars,
                              confounding_vars,
                              permutation_structure,
                              n_perm=100,
+                             variance_groups=None,
                              two_sided_test=True,
                              within_grp=True,
                              random_state=None,
@@ -303,8 +304,18 @@ def _process_permuted_v_base(tested_vars,
     if model_intercept and not intercept_test:
         confounding_vars = np.hstack((confounding_vars, np.ones((len(tested_vars), 1))))
 
-    # Calculate variance groups from passed permutation structure
-    variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
+    # Custom variance groups passed
+    if variance_groups is not None:
+        
+        # Checks
+        if isinstance(variance_groups, (pd.DataFrame, pd.Series)):
+            variance_groups = np.array(variance_groups)
+        
+        _nan_check(variance_groups)
+
+    # Otherwise calculate from permutation structure
+    else:
+        variance_groups = get_auto_vg(permutation_structure, within_grp=within_grp)
 
     # Optionally, remove some data points based on too small unique variance group
     if min_vg_size is not None:
@@ -404,6 +415,7 @@ def permuted_v(tested_vars,
                permutation_structure=None,
                within_grp=True,
                n_perm=100,
+               variance_groups=None,
                two_sided_test=True,
                demean_targets=True,
                demean_confounds=True,
@@ -517,6 +529,14 @@ def permuted_v(tested_vars,
         ::
 
             default = 500
+
+    variance_groups : None or numpy array / pandas DataFrame, optional
+        By default these are automatically computed from the passed permutation structure.
+        Otherwise, this parameter can be overriden by passing a custom set of variance groups.
+
+        ::
+
+            default = None
 
     two_sided_test : bool, optional
 
@@ -637,7 +657,7 @@ def permuted_v(tested_vars,
     Returns
     --------
     pvals : numpy array
-        Negative log10 p-values associated with the significance test of the
+        The p-values associated with the significance test of the
         explanatory variates against the target variates. Family-wise corrected p-values.
     
     original_scores : numpy array
@@ -674,6 +694,7 @@ def permuted_v(tested_vars,
                                  confounding_vars=confounding_vars,
                                  permutation_structure=permutation_structure,
                                  n_perm=n_perm,
+                                 variance_groups=variance_groups,
                                  two_sided_test=two_sided_test,
                                  within_grp=within_grp,
                                  random_state=random_state,
