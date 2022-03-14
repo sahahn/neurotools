@@ -12,6 +12,7 @@ import pandas as pd
 
 from ..loading import load
 from ..stats.orth import OrthRegression
+from scipy.stats import pearsonr
 
 def _get_kde_p(data, n=256):
     kde = gaussian_kde(data)
@@ -256,12 +257,13 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
     _needs_fit_index = True
     
     def __init__(self, vectorize=True, scale_weights=False,
-                 fit_only_group_index=None, passthrough=False,
-                 verbose=0):
+                 fit_only_group_index=None, pval_thresh=None,
+                 passthrough=False, verbose=0):
         
         self.vectorize = vectorize
         self.scale_weights = scale_weights
         self.fit_only_group_index = fit_only_group_index
+        self.pval_thresh = pval_thresh
         self.passthrough = passthrough
         self.verbose = verbose
 
@@ -318,11 +320,11 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         if self.verbose > 1:
             print('Fitting with shape:', X_s.shape, flush=True)
         
-        # Store fitted estimators here
-        self.estimators_ = []
+        # Gen each possible pair        
         self.pairs_ = list(itertools.combinations(range(X.shape[1]), 2))
 
-        # Fit linear for each combination of regions
+        # Fit orth regression for each combination of regions
+        self.estimators_, self.skip_mask_ = [], []
         for i, j in self.pairs_:
             
             # Fit estimator
@@ -330,7 +332,15 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
 
             # Keep track in estimators_
             self.estimators_.append(model)
-        
+
+            # If non-null pval thresh, add also if
+            # base pearson pval is over threshold, add to skip mask
+            if self.pval_thresh is not None:
+                corr_sig = pearsonr(X_s[:, i], X_s[:, j]).pvalue
+                self.skip_mask_.append(corr_sig > self.pval_thresh)
+            else:
+                self.skip_mask_.append(False)
+
         return self
 
     def _proc_scale(self, X_trans, fit):
@@ -354,7 +364,12 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         
         # Go through each fitted, and get the residuals
         X_trans = []
-        for estimator, ij in zip(self.estimators_, self.pairs_):
+        for estimator, skip, ij in zip(self.estimators_, self.skip_mask_, self.pairs_):
+
+            # Just add as NaN if skip
+            if skip:
+                X_trans.append(np.nan)
+                continue
             
             # Unpack
             i, j = ij

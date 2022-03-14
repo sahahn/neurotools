@@ -21,7 +21,7 @@ setup(name='neurotools',
           'nilearn>=0.8.1',
           'networkx',
           'neuromaps @ https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip',
-          'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.zip'
+          'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.2.tar.gz'
       ],
       test_suite='pytest',
       tests_require=['pytest', 'coverage'],
