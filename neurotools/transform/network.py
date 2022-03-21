@@ -324,23 +324,24 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         self.pairs_ = list(itertools.combinations(range(X.shape[1]), 2))
 
         # Fit orth regression for each combination of regions
-        self.estimators_, self.skip_mask_ = [], []
+        self.estimators_ = []
         for i, j in self.pairs_:
-            
-            # Fit estimator
-            model = OrthRegression().fit(X_s[:, i], X_s[:, j])
-
-            # Keep track in estimators_
-            self.estimators_.append(model)
 
             # If non-null pval thresh, add also if
             # base pearson pval is over threshold, add to skip mask
             if self.pval_thresh is not None:
-                corr_sig = pearsonr(X_s[:, i], X_s[:, j]).pvalue
-                self.skip_mask_.append(corr_sig > self.pval_thresh)
-            else:
-                self.skip_mask_.append(False)
+                corr_sig = pearsonr(X_s[:, i], X_s[:, j])[1]
 
+                # If doesn't pass, skip
+                if corr_sig > self.pval_thresh:
+                    self.estimators_.append(None)
+                    continue
+            
+            # Otherwise, fit OrthRegression
+            model = OrthRegression().fit(X_s[:, i], X_s[:, j])
+            self.estimators_.append(model)
+
+        
         return self
 
     def _proc_scale(self, X_trans, fit):
@@ -364,11 +365,13 @@ class GroupDifNetwork(BaseEstimator, TransformerMixin):
         
         # Go through each fitted, and get the residuals
         X_trans = []
-        for estimator, skip, ij in zip(self.estimators_, self.skip_mask_, self.pairs_):
+        for estimator, ij in zip(self.estimators_, self.pairs_):
 
-            # Just add as NaN if skip
-            if skip:
-                X_trans.append(np.nan)
+            # Just add as NaNs for all if skip
+            if estimator is None:
+                nans = np.empty(len(X))
+                nans[:] = np.nan
+                X_trans.append(nans)
                 continue
             
             # Unpack

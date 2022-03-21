@@ -48,5 +48,5 @@ class OrthRegression(BaseEstimator):
         Z  = np.c_[x, y]
         meanZ = np.tile(Z.mean(axis=0), (Z.shape[0], 1))
 
-        # Compute orth distance
+        # Compute orth distances
         return np.abs(np.matmul((Z - meanZ), self.normal))

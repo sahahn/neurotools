@@ -200,7 +200,9 @@ class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
         is special in that it can interact with :class:`BPt.Loader`,
         passing along feature name information.
         '''
-        return self._feat_names
+        if hasattr(self, '_feat_names'):
+            return self._feat_names
+        return None
 
     @feat_names_.setter
     def feat_names_(self, feat_names):
