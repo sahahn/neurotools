@@ -1,12 +1,14 @@
 from nibabel.freesurfer.io import read_annot, read_geometry
 import numpy as np
 import nibabel as nib
+import pandas as pd
 import os
 from ..misc.text import get_unique_str_markers
 from ..misc.print import _get_print
 from .. import data_dr as def_data_dr
 from ..loading.from_data import get_surf_loc
 from difflib import SequenceMatcher
+from ..misc.text import clean_key
 
 import warnings
 with warnings.catch_warnings():
@@ -49,6 +51,63 @@ def _get_col_names(df):
 
     return name_col, value_col
 
+def _data_to_dict(data):
+
+    # If series convert to dict directly
+    if isinstance(data, pd.Series):
+        return data.to_dict()
+        
+    # If df
+    elif isinstance(data, pd.DataFrame):
+
+        # If only 1 col, use index as name col
+        if len(list(data)) == 1:
+            return data[list(data)[0]].to_dict()
+
+        # If 2 col DF proc
+        as_dict = {}
+        name_col, value_col = _get_col_names(data)
+
+        for i in data.index:
+            name = data[name_col].loc[i]
+            as_dict[name] = data[value_col].loc[i]
+
+        return as_dict
+
+    elif isinstance(data, dict):
+        return data
+
+    raise RuntimeError('Invalid format passed for data, must be dict, pd.Series or pd.DataFrame')
+
+def auto_determine_lh_rh_keys(data):
+
+    # Use static key patterns to search for
+    from ..loading.from_data import LH_KEYS, RH_KEYS
+    
+    # Get feat names as list from data
+    feat_names = list(_data_to_dict(data).keys())
+
+    # Compute tolerance
+    tol = .15
+    tol_n = len(feat_names) * tol
+    tol_upper = len(feat_names) // 2 + tol_n
+    tol_lower = len(feat_names) // 2 - tol_n
+
+    # Search  through each option
+    for lh, rh in zip(LH_KEYS, RH_KEYS):
+        
+        # Count number in each
+        n_lh = len([f for f in feat_names if lh in f])
+        n_rh = len([f for f in feat_names if rh in f])
+        
+        # Should be around same size, but 
+        # doesn't have to be exactly equal if
+        # extending to other ROIs in future
+        if n_lh > tol_lower and n_lh < tol_upper and n_rh > tol_lower and n_rh < tol_upper:
+            return lh, rh
+
+    raise RuntimeError('Could not auto determine lh and rh unique keys.')
+
 def _get_roi_dict(data, i_keys=None, d_keys=None):
     '''If data is a df, with assume that the data is stored in two columns
     with name of ROI in one, and value in the other. Otherwise, if data is 
@@ -58,19 +117,9 @@ def _get_roi_dict(data, i_keys=None, d_keys=None):
     in the name of the roi for it to be kept, d_keys is a list / single item
     where if any of the d_keys are present in an roi it will be dropped.
     '''
-        
-    # If not dict, assume pandas dataframe with 2 columns
-    # and convert to dictionary
-    if not isinstance(data, dict):
 
-        as_dict = {}
-        name_col, value_col = _get_col_names(data)
-
-        for i in data.index:
-            name = data[name_col].loc[i]
-            as_dict[name] = data[value_col].loc[i]
-
-        data = as_dict
+    # Get as dict
+    data = _data_to_dict(data)
 
     # Make a dict processing the passed i and d keys
     spec_data = {}
@@ -135,36 +184,25 @@ class Ref():
 
         return keys
 
-    def _clean_key(self, key):
-        '''Applies lowercase, and some common str replacements, "cleaning" the key.'''
-        
-        # TODO use regex
-        key = key.lower()
-        key = key.replace('.', ' ')
-        key = key.replace('-', ' ')
-        key = key.replace('_', ' ')
-        
-        return key
-
     def _find_ref_ind(self, name, alt_name=None, i_keys=None):
 
         # Keep copy of original name for verbose print
         original_name = name
 
         # Base transform roi name
-        name = self._clean_key(name)
+        name = clean_key(name)
 
         # Apply the mapping
         for key in self.mapping:
-            trans_key = self._clean_key(key)
+            trans_key = clean_key(key)
 
             if trans_key in name:
-                name = name.replace(trans_key, self._clean_key(self.mapping[key]))
+                name = name.replace(trans_key, clean_key(self.mapping[key]))
 
         # Find the ind
         inds = []
         for label in self.label_2_int:
-            trans_label = self._clean_key(label)
+            trans_label = clean_key(label)
 
             # Try to find name, if found keep track
             if trans_label in name:
@@ -218,6 +256,8 @@ class Ref():
         # Init plot vals
         plot_vals = np.zeros(np.shape(ref_vals))
 
+        # Keep track of already found inds
+        used_inds = set()
         for name, alt_name in zip(roi_dict, roi_alt_names):
 
             # Get plot value
@@ -225,6 +265,15 @@ class Ref():
 
             # Try to find the name in the reference values
             ind = self._find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
+
+            # Check to see if this ROI is mapping to 
+            # one another has already mapped to,
+            # if so, trigger an error.
+            if ind in used_inds:
+                raise RuntimeError(f'Error: mapping {name} failed, as another ROI already mapped to the same referece (ind={ind}). '\
+                                   'Set verbose>=1 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
+            else:
+                used_inds.add(ind)
 
             # Set the proper values based on the found index
             plot_vals = np.where(ref_vals == ind, value, plot_vals)
@@ -237,6 +286,9 @@ class SurfRef(Ref):
                  data_dr='default', surf_mesh=None,
                  bg_map=None, verbose=0):
 
+        if space == 'default':
+            space = 'fsaverage5'
+
         super().__init__(space, parc, data_dr, verbose=verbose)
 
         self.surf_mesh = surf_mesh
@@ -247,6 +299,7 @@ class SurfRef(Ref):
         ref_loc = os.path.join(self.data_dr, self.space, 'label')
         self._print(f'Using base ref_loc = {ref_loc}', level=2)
 
+        # Try to load lh
         lh_loc = os.path.join(ref_loc, 'lh.' + self.parc)
         if os.path.exists(lh_loc + '.annot'):
             self.lh_ref = read_annot(lh_loc + '.annot')[0]
@@ -254,7 +307,10 @@ class SurfRef(Ref):
             self.lh_ref = load_surf_data(lh_loc + '.gii')
         elif os.path.exists(lh_loc + '.npy'):
             self.lh_ref = np.load(lh_loc + '.npy')
+        else:
+            raise RuntimeError('Could not find lh ref parcel for this space')
 
+        # Try to load rh
         rh_loc = os.path.join(ref_loc, 'rh.' + self.parc)
         if os.path.exists(rh_loc + '.annot'):
             self.rh_ref = read_annot(rh_loc + '.annot')[0]
@@ -262,6 +318,8 @@ class SurfRef(Ref):
             self.rh_ref = load_surf_data(rh_loc + '.gii')
         elif os.path.exists(rh_loc + '.npy'):
             self.rh_ref = np.load(rh_loc + '.npy')
+        else:
+            raise RuntimeError('Could not find rh ref parcel for this space')
 
     def _get_ref_vals(self, hemi):
         
@@ -272,7 +330,21 @@ class SurfRef(Ref):
     
         return ref_vals
     
-    def get_hemis_plot_vals(self, data, lh_key, rh_key, i_keys=None, d_keys=None):
+    def get_hemis_plot_vals(self, data, lh_key='auto', rh_key='auto', i_keys=None, d_keys=None):
+
+
+        # Check  to see if either lh_key or rh_key is passed as auto
+        if lh_key == 'auto' or rh_key == 'auto':
+            
+            # Get auto determined
+            lh_a_key, rh_a_key = auto_determine_lh_rh_keys(data)
+            self._print(f'Auto determined lh and rh keys as {lh_a_key, rh_a_key}', level=1)
+
+            # Only override passed value for one if auto
+            if lh_key == 'auto':
+                lh_key = lh_a_key
+            if rh_key == 'auto':
+                rh_key = rh_a_key
 
         # Process input
         i_keys, d_keys = self._proc_keys_input(i_keys), self._proc_keys_input(d_keys)
@@ -281,8 +353,8 @@ class SurfRef(Ref):
         lh_plot_vals = self.get_plot_vals(data, 'lh', i_keys+[lh_key], d_keys)
         rh_plot_vals = self.get_plot_vals(data, 'rh', i_keys+[rh_key], d_keys)
         
-        return lh_plot_vals, rh_plot_vals
-    
+        return {'lh': lh_plot_vals, 'rh': rh_plot_vals}
+
     def get_surf(self, name, hemi):
 
         if name is None:
@@ -318,6 +390,10 @@ class SurfRef(Ref):
 class VolRef(Ref):
     
     def __init__(self, space='mni_1mm', parc='aseg', data_dr='default', verbose=0):
+
+        if space == 'default':
+            space = 'mni_1mm'
+
         super().__init__(space, parc, data_dr, verbose=verbose)
     
     @property
@@ -338,7 +414,7 @@ class VolRef(Ref):
 
         # If doesn't exist, help user
         except ValueError:
-            print(f'Note valid parc options for {self.space} are: ', options_no_ext)
+            self._print(f'Note valid parc options for {self.space} are:', options_no_ext, level=0)
             raise RuntimeError(f'Space: {self.space} does not have parc {self.parc}.')
 
         # Load with nibabel, since need affine

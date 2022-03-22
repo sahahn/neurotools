@@ -17,6 +17,10 @@ def _get_print(verbose, _print=None):
         else:
             level = 1
 
+        # Skip any print if the verbose is under 0
+        if verbose < 0:
+            return
+
         # Use warnings for level = 0
         if level == 0:
 

@@ -1,9 +1,11 @@
 from .conv import extract_subcortical_from_cifti
 import nibabel as nib
 import os
+import pandas as pd
 import numpy as np
 from ..loading.funcs import load
-from ..loading.from_data import _load_medial_wall
+from ..loading.from_data import _load_medial_wall, auto_load_rois
+from ..loading.space import get_space_options
 from .. import data_dr
 from ..misc.print import _get_print
 
@@ -68,7 +70,7 @@ def _load(data):
 def _get_space_mapping(hemi):
 
     # Get options for spaces
-    space_options = os.listdir(data_dr)
+    space_options = get_space_options()
     mapping = {}
 
     # For each potential space
@@ -105,6 +107,26 @@ def _get_space_mapping(hemi):
         mapping[no_medial_sz] = (space, True)
 
     return mapping
+
+def _check_rois(data):
+
+    # The idea here is that if data is passed
+    # as a pandas Series or DataFrame, then definetly
+    # ROIs
+    if isinstance(data, (pd.Series, pd.DataFrame)):
+        return True
+
+    # If dict ... check to make sure not space dict
+    if isinstance(data, dict):
+        bad_keys = ['lh', 'rh', 'concat', 'vol', 'sub']
+        for key in bad_keys:
+            if key in data:
+                return False
+
+        return True
+
+    # Return false otherwise
+    return False
 
 def process_space(data, space=None, hemi=None,
                   verbose=0, _print=None):
@@ -144,6 +166,12 @@ def process_space(data, space=None, hemi=None,
     if hemi == 'right':
         hemi = 'rh'
     assert hemi in ['lh', 'rh', None], 'hemi must be lh, rh or None!'
+
+    # Check to see if the data was passed as a list of ROIs + values
+    # or atleast try ... 
+    is_rois = _check_rois(data)
+    if is_rois:
+        return auto_load_rois(data, space=space, hemi=hemi)
     
     # Space info- sep by hemi
     lh_space_mapping = _get_space_mapping(hemi='lh')

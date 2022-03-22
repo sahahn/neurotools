@@ -2,6 +2,12 @@ import os
 
 from .. import data_dr
 from .funcs import load
+from ..misc.text import clean_key
+from .space import get_space_options
+
+# Order determined by chance of false positive and frequency
+LH_KEYS = ['lh.', 'hemi-L_', 'left', 'hemi-L', 'lh_', 'lh-', 'lh',  'L_', 'L', 'l']
+RH_KEYS = ['rh.', 'hemi-R_', 'right', 'hemi-R', 'rh_', 'rh-', 'rh', 'R_', 'R', 'r']
 
 
 def get_surf_loc(space, hemi, key):
@@ -58,14 +64,11 @@ def _get_surf_loc(space, hemi, key, sub):
     if not os.path.exists(dr):
         return None
 
-    # Order determined by chance of false positive and frequency
-    lh_keys = ['lh.', 'hemi-L_', 'left', 'hemi-L', 'lh',  'L_', 'L']
-    rh_keys = ['rh.', 'hemi-R_', 'right', 'hemi-R', 'rh', 'R_', 'R']
-
-    if hemi in lh_keys:
-        hemi_keys = lh_keys
-    elif hemi in rh_keys:
-        hemi_keys = rh_keys
+    # Get correct hemis to searchs
+    if hemi in LH_KEYS:
+        hemi_keys = LH_KEYS.copy()
+    elif hemi in RH_KEYS:
+        hemi_keys = RH_KEYS.copy()
 
     # Get list of file in this directory
     files = os.listdir(dr)
@@ -102,3 +105,92 @@ def _load_medial_wall(space, hemi):
 
     # Return loaded as bool
     return load(loc, dtype='bool')
+
+def auto_load_rois(data, space=None, hemi=None):
+
+    from ..plotting.ref import SurfRef, VolRef
+
+    # Standerdize hemi if not None
+    if hemi is not None:
+        if hemi in LH_KEYS:
+            hemi = 'lh'
+        elif hemi in RH_KEYS:
+            hemi = 'rh'
+    
+    # Get most likely parcel
+    parc = _get_most_likely_parcel(data)
+
+    # Grab space options, starting w/ default or user passed
+    if space is None:
+        space = 'default'
+    space_options = [space] + get_space_options()
+
+    # Try each
+    for space in space_options:
+        
+        try:
+            sr = SurfRef(space=space, parc=parc, verbose=-1)
+            vals = sr.get_hemis_plot_vals(data)
+
+            # Apply hemi if not None
+            if hemi is not None:
+                vals = hemi[vals]
+
+            return vals, space
+        except (RuntimeError, FileNotFoundError):
+            pass
+
+        try:
+            ref = VolRef(space=space, parc=parc, verbose=-1)
+            return ref.get_plot_vals(data), space
+        except (RuntimeError, FileNotFoundError):
+            pass
+
+    raise RuntimeError(f'Could not find matching space for detected parc: {parc}')
+        
+def _get_most_likely_parcel(data):
+
+    # Get some helpful tools from ref
+    from ..plotting.ref import _load_mapping, _data_to_dict
+
+    # Load all mappings
+    mappings_dr = os.path.join(data_dr, 'mappings')
+    files = [f for f in os.listdir(mappings_dr) if '.mapping.txt' in f]
+    mappings = {f.replace('.mapping.txt', ''): _load_mapping(os.path.join(mappings_dr, f)) for f in files}
+
+    # Get clean name versions of passed data
+    feat_names = list(_data_to_dict(data).keys())
+    clean_names = [clean_key(name) for name in feat_names]
+
+    def get_basic_overlap(parcel, mappings):
+        
+        # Get set of clean refs
+        clean_refs = set([clean_key(k) for k in mappings[parcel].keys()] +\
+                         [clean_key(v) for v in mappings[parcel].values()])
+        clean_refs = list(clean_refs)
+        
+        # Do a simple check for each parcel to try and
+        # figure which one has the most
+        n_found = 0
+        
+        # Go through each of the actual passed ROI names
+        for name in clean_names:
+            
+            # For each one, cycle through all of the
+            # possible reference keys until either one is found
+            # incr and stop, or none are found
+            for ref in clean_refs:
+                if ref in name:
+                    n_found += 1
+                    continue
+                    
+        return n_found
+    
+    cnts = {parcel: get_basic_overlap(parcel, mappings) for parcel in mappings}
+    mx = max(cnts.items(), key=lambda x:x[1])
+    if mx[1] == 0:
+        raise RuntimeError('Could not find reference parcellation to match ROI names to.')
+
+    return mx[0]
+
+

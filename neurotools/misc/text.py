@@ -174,3 +174,16 @@ def get_unique_str_markers(strs):
         unique_strs.append(piece)
 
     return unique_strs
+
+def clean_key(key):
+    '''Applies lowercase, and some common str replacements, "cleaning" the key.'''
+    
+    # TODO use regex ? 
+    key = key.lower()
+    key = key.replace('.', ' ')
+    key = key.replace('-', ' ')
+    key = key.replace('_', ' ')
+
+    key = key.replace('&', ' and ')
+    
+    return key
