@@ -539,7 +539,7 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
         return data, None
 
     # Otherwise generate SurfRef with defaults
-    ref = SurfRef(space=space)
+    ref = SurfRef(space=space, parc=None)
     
     # If assumed native space, then assume user will pass mesh + bg_map
     if space == 'native':

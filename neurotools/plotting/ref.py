@@ -150,6 +150,10 @@ class Ref():
         
     def _load_mappings(self):
 
+        if self.parc is None:
+            self.mapping, self.label_2_int = None, None
+            return
+
         map_loc = os.path.join(self.data_dr, 'mappings', self.parc + '.')
 
         try:
@@ -157,8 +161,7 @@ class Ref():
             self.label_2_int = _load_mapping(map_loc + 'label_2_int.txt')
             self._print('Loaded mapping and label_2_int dicts.', level=2)
         except FileNotFoundError:
-            self.mapping = None
-            self.label_2_int = None
+            self.mapping, self.label_2_int = None, None
     
     def _load_ref(self):
         pass
@@ -295,12 +298,17 @@ class SurfRef(Ref):
         self.bg_map = bg_map
     
     def _load_ref(self):
+        
+        # If no parc, skip
+        if self.parc is None:
+            return
 
         ref_loc = os.path.join(self.data_dr, self.space, 'label')
         self._print(f'Using base ref_loc = {ref_loc}', level=2)
 
         # Try to load lh
         lh_loc = os.path.join(ref_loc, 'lh.' + self.parc)
+
         if os.path.exists(lh_loc + '.annot'):
             self.lh_ref = read_annot(lh_loc + '.annot')[0]
         elif os.path.exists(lh_loc + '.gii'):
@@ -331,7 +339,6 @@ class SurfRef(Ref):
         return ref_vals
     
     def get_hemis_plot_vals(self, data, lh_key='auto', rh_key='auto', i_keys=None, d_keys=None):
-
 
         # Check  to see if either lh_key or rh_key is passed as auto
         if lh_key == 'auto' or rh_key == 'auto':
