@@ -327,7 +327,9 @@ representing the name of a matplotlib colormap. This will be the color map
 in which the values are plotted according to. When plotting surface
 parcellations, the default cmaps are ‘prism’ if plotting rois, ‘Reds’
 if plotting not symmetric statistical maps, and ‘cold_hot’ if plotting
-symmetric statistical maps (e.g., values above and below 0).</p>
+symmetric statistical maps (e.g., values above and below 0). In case of
+not sym plotting, and plotting  negative numbers, will switch from ‘Reds’
+to ‘Blues_r’.</p>
 </li>
 <li><p><strong>vol_plot_type</strong> : {‘glass’, ‘stat’, ‘roi’}</p>
 <p>This parameter control the type of volumetric plot in which to generate,
@@ -381,6 +383,12 @@ to not add a colorbar (False).</p>
 <p>There are a number of extra more detailed colorbar style
 kwargs, used in certain cases, with certain plots to
 customize the look and size of the colorbar. See below.</p>
+</li>
+<li><p><strong>rois</strong> : bool</p>
+<p>If passed, can force plot either is rois case or stat map case.
+Ussually the auto settings will be fine, but this exists if need to override
+without overriding all of the other little settings. Default is just automatically
+detected based on percent of unique values being plotted.</p>
 </li>
 <li><p><strong>avg_method</strong> : ‘mean’, ‘median’, ‘min’, ‘max’ or  custom function</p>
 <p>This option defines how to average vertex values to
