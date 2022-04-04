@@ -15,6 +15,39 @@ with warnings.catch_warnings():
     from nilearn.plotting.img_plotting import _crop_colorbar
 
 
+VALID_VIEWS = "anterior", "posterior", "medial", "lateral", "dorsal", "ventral"
+VALID_HEMISPHERES = "left", "right"
+
+MATPLOTLIB_VIEWS = {"right": {"lateral": (0, 0),
+                              "medial": (0, 180),
+                              "dorsal": (90, 0),
+                              "ventral": (270, 0),
+                              "anterior": (0, 90),
+                              "posterior": (0, 270)
+                              },
+                    "left": {"medial": (0, 0),
+                             "lateral": (0, 180),
+                             "dorsal": (90, 0),
+                             "ventral": (270, 0),
+                             "anterior": (0, 90),
+                             "posterior": (0, 270)
+                             }
+                    }
+
+def _set_view_plot_surf_matplotlib(hemi, view):
+    """Helper function for plot_surf with matplotlib engine.
+    This function checks the selected hemisphere and view, and
+    returns elev and azim.
+    """
+    if hemi not in VALID_HEMISPHERES:
+        raise ValueError(f"hemi must be one of {VALID_HEMISPHERES}")
+    if view not in MATPLOTLIB_VIEWS[hemi]:
+        raise ValueError(f"view must be one of {VALID_VIEWS}")
+    return MATPLOTLIB_VIEWS[hemi][view]
+
+
+
+
 def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
                      hemi='left', view='lateral', cmap=None, colorbar=False,
                      avg_method='mean', threshold=None, alpha='auto',
@@ -30,45 +63,8 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
     coords, faces = mesh[0], mesh[1]
     limits = [coords.min(), coords.max()]
 
-    # set view
-    if hemi == 'right':
-        if view == 'lateral':
-            elev, azim = 0, 0
-        elif view == 'medial':
-            elev, azim = 0, 180
-        elif view == 'dorsal':
-            elev, azim = 90, 0
-        elif view == 'ventral':
-            elev, azim = 270, 0
-        elif view == 'anterior':
-            elev, azim = 0, 90
-        elif view == 'posterior':
-            elev, azim = 0, 270
-        elif len(view) == 2:
-            elev, azim = view
-        else:
-            raise ValueError('view must be one of lateral, medial, '
-                             'dorsal, ventral, anterior, or posterior')
-    elif hemi == 'left':
-        if view == 'medial':
-            elev, azim = 0, 0
-        elif view == 'lateral':
-            elev, azim = 0, 180
-        elif view == 'dorsal':
-            elev, azim = 90, 0
-        elif view == 'ventral':
-            elev, azim = 270, 0
-        elif view == 'anterior':
-            elev, azim = 0, 90
-        elif view == 'posterior':
-            elev, azim = 0, 270
-        elif len(view) == 2:
-            elev, azim = view
-        else:
-            raise ValueError('view must be one of lateral, medial, '
-                             'dorsal, ventral, anterior, or posterior')
-    else:
-        raise ValueError('hemi must be one of right or left')
+    # Get elev and azim from view
+    elev, azim = _set_view_plot_surf_matplotlib(hemi, view)
 
     # set alpha if in auto mode
     if alpha == 'auto':
@@ -84,23 +80,6 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
         # if cmap is given as string, translate to matplotlib cmap
         if isinstance(cmap, str):
             cmap = plt.cm.get_cmap(cmap)
-
-    # initiate figure and 3d axes
-    if axes is None:
-        if figure is None:
-            figure = plt.figure()
-        axes = Axes3D(figure, rect=[0, 0, 1, 1],
-                      xlim=limits, ylim=limits,
-                      auto_add_to_figure=False)
-        figure.add_axes(axes) 
-    else:
-        if figure is None:
-            figure = axes.get_figure()
-        axes.set_xlim(*limits)
-        axes.set_ylim(*limits)
-
-    axes.view_init(elev=elev, azim=azim)
-    axes.set_axis_off()
 
     figsize = _default_figsize
     
