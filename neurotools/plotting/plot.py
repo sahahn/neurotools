@@ -54,7 +54,7 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
         
         # Otherwise, vmin is just the min value in the data
         else:
-            np.nanmin(flat_data) - s
+            vmin = np.nanmin(flat_data) - s
 
     # If vmax not set, same cases as above but flipped
     if vmax is None:
@@ -615,7 +615,7 @@ def _prep_base_auto_defaults(data_as_list, rois,
     threshold = _proc_threshold(flat_data, threshold, rois=rois)
     
     # Get cmap based on passed + if rois or not + if sym
-    cmap = _proc_cmap(cmap, rois, symmetric_cbar)
+    cmap = _proc_cmap(cmap, rois, symmetric_cbar, flat_data=flat_data)
     
     # Proc colorbar option - yes if not rois
     colorbar = _proc_colorbar(colorbar, rois)
@@ -756,7 +756,7 @@ def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
 
     return colorbar_params
 
-def _proc_cmap(cmap, rois, symmetric_cbar):
+def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
     
     # Keep user passed if not user passed
     if cmap != 'default':
@@ -766,8 +766,14 @@ def _proc_cmap(cmap, rois, symmetric_cbar):
     if rois:
         return 'prism'
     
-    # If not symmetric, then just do Reds
+    # If not symmetric, then just do Reds or Blues
     if symmetric_cbar is False:
+
+        # If max value is 0 or less, use Blues
+        if np.nanmax(flat_data)  <= 0:
+            return 'Blues_r'
+
+        # Otherwise, reds
         return 'Reds'
 
     # Last case is symmetric cbar
@@ -912,9 +918,18 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
     else:
         unique_vals = np.unique(data['vol'].get_fdata())
 
+    # Check for passed rois value
+    if 'rois' in kwargs:
+        rois = kwargs.pop('rois')
+    else:
+        rois = None
+
     # If all of the data points are interger-like, assume
     # we are plotting a parcellation and not stat data
-    if all([float(u).is_integer() for u in unique_vals]):
+    is_ints = all([float(u).is_integer() for u in unique_vals])
+
+    # If either passed rois True, or is all is ints and not rois is False
+    if rois is True or (is_ints and rois is not False):
         
         # Just surface or surfaces case
         if 'vol' not in data:
@@ -938,7 +953,7 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
                                        '_print': _print,
                                        **kwargs}
     
-    # Otherwise - stat values
+    # Otherwise - stat values / not ROIs
 
     # Just surface or surfaces case
     if 'vol' not in data:
@@ -1111,7 +1126,9 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           in which the values are plotted according to. When plotting surface
           parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
           if plotting not symmetric statistical maps, and 'cold_hot' if plotting
-          symmetric statistical maps (e.g., values above and below 0).
+          symmetric statistical maps (e.g., values above and below 0). In case of
+          not sym plotting, and plotting  negative numbers, will switch from 'Reds'
+          to 'Blues_r'.
 
         - **vol_plot_type** : {'glass', 'stat', 'roi'}
         
@@ -1174,6 +1191,13 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           There are a number of extra more detailed colorbar style
           kwargs, used in certain cases, with certain plots to
           customize the look and size of the colorbar. See below.
+
+        - **rois** : bool
+          
+          If passed, can force plot either is rois case or stat map case.
+          Ussually the auto settings will be fine, but this exists if need to override
+          without overriding all of the other little settings. Default is just automatically
+          detected based on percent of unique values being plotted.
 
         - **avg_method** : 'mean', 'median', 'min', 'max' or  custom function
 
