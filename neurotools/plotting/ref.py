@@ -93,20 +93,47 @@ def auto_determine_lh_rh_keys(data):
     tol_upper = len(feat_names) // 2 + tol_n
     tol_lower = len(feat_names) // 2 - tol_n
 
-    # Search  through each option
+    # Search through each option
     for lh, rh in zip(LH_KEYS, RH_KEYS):
+
+        # Check startswith, then endswith, then just is in
+        for key_type in ['start', 'end', None]: 
+
+            # Count number in each, depending on key type
+            if key_type is None:
+                n_lh = len([f for f in feat_names if lh in f])
+                n_rh = len([f for f in feat_names if rh in f])
+            elif key_type == 'start':
+                n_lh = len([f for f in feat_names if f.startswith(lh)])
+                n_rh = len([f for f in feat_names if f.startswith(rh)])
+            elif key_type == 'end':
+                n_lh = len([f for f in feat_names if f.endswith(lh)])
+                n_rh = len([f for f in feat_names if f.endswith(rh)])
         
-        # Count number in each
-        n_lh = len([f for f in feat_names if lh in f])
-        n_rh = len([f for f in feat_names if rh in f])
-        
-        # Should be around same size, but 
-        # doesn't have to be exactly equal if
-        # extending to other ROIs in future
-        if n_lh > tol_lower and n_lh < tol_upper and n_rh > tol_lower and n_rh < tol_upper:
-            return lh, rh
+            # Should be around same size, but 
+            # doesn't have to be exactly equal if
+            # extending to other ROIs in future
+            if n_lh > tol_lower and n_lh < tol_upper and n_rh > tol_lower and n_rh < tol_upper:
+                return (lh, key_type), (rh, key_type)
 
     raise RuntimeError('Could not auto determine lh and rh unique keys.')
+
+
+def _is_in(name, key):
+
+    # Unpack tuple key
+    k, k_type = key
+
+    # Base is in
+    if k_type is None:
+        return k in name
+    elif k_type == 'start':
+        return name.startswith(k)
+    elif k_type == 'end':
+        return name.endswith(k)
+    else:
+        raise RuntimeError('Invalid key type.')
+
 
 def _get_roi_dict(data, i_keys=None, d_keys=None):
     '''If data is a df, with assume that the data is stored in two columns
@@ -124,8 +151,10 @@ def _get_roi_dict(data, i_keys=None, d_keys=None):
     # Make a dict processing the passed i and d keys
     spec_data = {}
     for name in data:
-        if all([key in name for key in i_keys]) and not any([key in name for key in d_keys]):
-                spec_data[name] = data[name]
+
+        # In order to add, must qualify for all i_keys, and not any d_keys
+        if all([_is_in(name, key) for key in i_keys]) and not any([_is_in(name, key) for key in d_keys]):
+            spec_data[name] = data[name]
 
     # Generate list of alt names
     u_markers = get_unique_str_markers(list(spec_data))
@@ -134,11 +163,13 @@ def _get_roi_dict(data, i_keys=None, d_keys=None):
 
 class Ref():
     
-    def __init__(self, space, parc, data_dr='default', verbose=0):
+    def __init__(self, space, parc, data_dr='default', verbose=0, _print=None):
                
         self.space = space
         self.parc = parc
-        self._print = _get_print(verbose)
+
+        # Get verbose print object
+        self._print = _get_print(verbose, _print=_print)
 
         if data_dr == 'default':
             data_dr = def_data_dr
@@ -159,7 +190,7 @@ class Ref():
         try:
             self.mapping = _load_mapping(map_loc + 'mapping.txt')
             self.label_2_int = _load_mapping(map_loc + 'label_2_int.txt')
-            self._print('Loaded mapping and label_2_int dicts.', level=2)
+            self._print(f'Loaded mapping and label_2_int dicts, from: {map_loc}', level=2)
         except FileNotFoundError:
             self.mapping, self.label_2_int = None, None
     
@@ -177,13 +208,27 @@ class Ref():
         elif isinstance(keys, str):
             keys = [keys]
 
+        elif isinstance(keys, tuple):
+            if len(keys) != 2:
+                raise RuntimeError(f'Invalid passed for keys={keys}')
+            keys = [keys]
+
         elif isinstance(keys, list):
-            for key in keys:
-                if not isinstance(key, str):
+            for i, key in enumerate(keys):
+
+                if isinstance(key, tuple) and len(key) == 2:
+                    if key[1] not in [None, 'start', 'end']:
+                        raise RuntimeError(f'Passed {key} if tuple, 2nd element must be None, start or end.')
+                
+                elif not isinstance(key, str):
                     raise RuntimeError(f'Passed element in keys {key} is not a valid str.')
+                
+                # If here, than the key is a single str, wrap in tuple w/ None
+                else:
+                    keys[i] = (key, None)
         
         else:
-            raise RuntimeError(f'keys must be str or list of str, not passed {keys}.')
+            raise RuntimeError(f'keys must be str or list of str / tuple.')
 
         return keys
 
@@ -220,7 +265,7 @@ class Ref():
 
         #  Return first
         if len(inds) > 0:
-            self._print(f'Mapping: {original_name} -> {inds[0][1]}.', level=1)
+            self._print(f'Mapping: {original_name} -> {inds[0][1]}.', level=2)
             return inds[0][0]
 
         # First pass if doesn't find is to try again, but with all i_keys removed
@@ -246,6 +291,8 @@ class Ref():
         
     
     def get_plot_vals(self, data, hemi=None, i_keys=None, d_keys=None):
+
+        self._print(f'Start get plot vals for hemi={hemi}', level=1)
 
         # Process keys input
         i_keys, d_keys = self._proc_keys_input(i_keys), self._proc_keys_input(d_keys)
@@ -274,7 +321,7 @@ class Ref():
             # if so, trigger an error.
             if ind in used_inds:
                 raise RuntimeError(f'Error: mapping {name} failed, as another ROI already mapped to the same referece (ind={ind}). '\
-                                   'Set verbose>=1 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
+                                   'Set verbose>=2 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
             else:
                 used_inds.add(ind)
 
@@ -287,12 +334,12 @@ class SurfRef(Ref):
     
     def __init__(self, space='fsaverage5', parc='destr',
                  data_dr='default', surf_mesh=None,
-                 bg_map=None, verbose=0):
+                 bg_map=None, verbose=0, _print=None):
 
         if space == 'default':
             space = 'fsaverage5'
 
-        super().__init__(space, parc, data_dr, verbose=verbose)
+        super().__init__(space, parc, data_dr, verbose=verbose, _print=_print)
 
         self.surf_mesh = surf_mesh
         self.bg_map = bg_map
@@ -345,7 +392,7 @@ class SurfRef(Ref):
             
             # Get auto determined
             lh_a_key, rh_a_key = auto_determine_lh_rh_keys(data)
-            self._print(f'Auto determined lh and rh keys as {lh_a_key, rh_a_key}', level=1)
+            self._print(f'Auto determined keys as lh_key={lh_a_key}, rh_key={rh_a_key}.', level=1)
 
             # Only override passed value for one if auto
             if lh_key == 'auto':
@@ -396,12 +443,13 @@ class SurfRef(Ref):
 
 class VolRef(Ref):
     
-    def __init__(self, space='mni_1mm', parc='aseg', data_dr='default', verbose=0):
+    def __init__(self, space='mni_1mm', parc='aseg', data_dr='default',
+                 verbose=0, _print=None):
 
         if space == 'default':
             space = 'mni_1mm'
 
-        super().__init__(space, parc, data_dr, verbose=verbose)
+        super().__init__(space, parc, data_dr, verbose=verbose, _print=_print)
     
     @property
     def shape(self):

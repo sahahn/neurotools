@@ -1,14 +1,15 @@
 import warnings
 
 def _get_print(verbose, _print=None):
-    
+
+    # Top behavior should be, if already print
+    # init'ed keep that
+    if not _print is None:
+        return _print
+
     # Helper for muted print
     if verbose is None:
         return _get_print(verbose=-10)
-    
-    # If already set
-    if not _print is None:
-        return _print
 
     def _print(*args, **kwargs):
 

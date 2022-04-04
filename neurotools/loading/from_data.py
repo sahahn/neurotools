@@ -3,6 +3,7 @@ import os
 from .. import data_dr
 from .funcs import load
 from ..misc.text import clean_key
+from ..misc.print import _get_print
 from .space import get_space_options
 
 # Order determined by chance of false positive and frequency
@@ -106,9 +107,12 @@ def _load_medial_wall(space, hemi):
     # Return loaded as bool
     return load(loc, dtype='bool')
 
-def auto_load_rois(data, space=None, hemi=None):
+def auto_load_rois(data, space=None, hemi=None, verbose=None, _print=None):
 
     from ..plotting.ref import SurfRef, VolRef
+
+    # Get _print object
+    _print = _get_print(verbose=verbose, _print=_print)
 
     # Standerdize hemi if not None
     if hemi is not None:
@@ -119,6 +123,7 @@ def auto_load_rois(data, space=None, hemi=None):
     
     # Get most likely parcel
     parc = _get_most_likely_parcel(data)
+    _print(f'Detected most likely parcel from passed ROIs: {parc}', level=1)
 
     # Grab space options, starting w/ default or user passed
     if space is None:
@@ -129,20 +134,40 @@ def auto_load_rois(data, space=None, hemi=None):
     for space in space_options:
         
         try:
-            sr = SurfRef(space=space, parc=parc, verbose=-1)
+
+            # Run to check to see if works, w/ errors / warnings muted
+            SurfRef(space=space, parc=parc, verbose=-1).get_hemis_plot_vals(data)
+
+            # Not the most eff. but now we re-run again, but passing the current verbose
+            # state, now that we know this space works e.g., we want to avoid
+            # printing verbose for all the ones that fail.
+            # Note: Passing print will override default verbose.
+
+            sr = SurfRef(space=space, parc=parc, _print=_print)
             vals = sr.get_hemis_plot_vals(data)
 
             # Apply hemi if not None
             if hemi is not None:
                 vals = hemi[vals]
 
+            _print(f'Extracted plot values for space: {space}', level=1)
+
             return vals, space
         except (RuntimeError, FileNotFoundError):
             pass
 
         try:
-            ref = VolRef(space=space, parc=parc, verbose=-1)
-            return ref.get_plot_vals(data), space
+
+            # See SurfRef logic / comments for this
+            VolRef(space=space, parc=parc, verbose=-1).get_plot_vals(data)
+
+            # Now actually get
+            ref = VolRef(space=space, parc=parc, _print=_print)
+            plot_vals = ref.get_plot_vals(data)
+            
+            _print(f'Extracted plot values for space: {space}', level=1)
+
+            return plot_vals, space
         except (RuntimeError, FileNotFoundError):
             pass
 

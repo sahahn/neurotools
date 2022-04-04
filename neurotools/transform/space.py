@@ -129,7 +129,7 @@ def _check_rois(data):
     return False
 
 def process_space(data, space=None, hemi=None,
-                  verbose=0, _print=None):
+                  verbose=1, _print=None):
     '''
     If hemi=None, auto-detect. Or can pass as
     lh or rh, as this is the only case
@@ -171,7 +171,7 @@ def process_space(data, space=None, hemi=None,
     # or atleast try ... 
     is_rois = _check_rois(data)
     if is_rois:
-        return auto_load_rois(data, space=space, hemi=hemi)
+        return auto_load_rois(data, space=space, hemi=hemi, _print=_print)
     
     # Space info- sep by hemi
     lh_space_mapping = _get_space_mapping(hemi='lh')
