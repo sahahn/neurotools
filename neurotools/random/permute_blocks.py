@@ -133,6 +133,10 @@ def block_permutation(x, blocks, random_state=None, within_grp=True):
 
     # Permute blocks one
     permuted_indx = permute_blocks(blocks, rng, within_grp=within_grp)
+
+    # TODO fix this case
+    if isinstance(x, (pd.Series, pd.DataFrame)):
+        pass
     
     # Return original sequence in new permuted order
     return x[permuted_indx]
