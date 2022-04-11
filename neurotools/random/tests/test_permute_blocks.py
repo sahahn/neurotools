@@ -1,5 +1,36 @@
 import numpy as np
+import pandas as pd
 from ..permute_blocks import block_permutation, get_auto_vg
+
+def test_series_cases_base():
+
+    x = pd.Series([1, 2, 3], index=['s1', 's2', 's3'])
+    blocks = pd.Series([1, 2, 2], index=['s1', 's2', 's3'])
+
+    # Only s2 and s3 can swap, just need to check s1 then
+    for i in range(10):
+        p_x = block_permutation(x, blocks)
+        assert p_x.loc['s1'] == 1
+
+def test_series_cases_mismatch_order():
+
+    x = pd.Series([1, 2, 3], index=['s1', 's2', 's3'])
+    blocks = pd.Series([1, 1, 2], index=['s2', 's3', 's1'])
+
+    # Only s2 and s3 can swap, just need to check s1 then
+    for _ in range(10):
+        p_x = block_permutation(x, blocks)
+        assert p_x.loc['s1'] == 1
+
+def test_df_case():
+
+    x = pd.DataFrame([1, 2, 3], index=['s1', 's2', 's3'])
+    x[1] = [1, 2, 3]
+    x[2] = [1, 2, 3]
+
+    for _ in range(5):
+        p_x = block_permutation(x, x[1])
+        assert (p_x == x).sum().sum() ==  9
 
 def test_basic_example():
 

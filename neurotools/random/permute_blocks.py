@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_random_state
 from sklearn.preprocessing import LabelEncoder
-
+import warnings
 
 def _within_grp_permute(blocks, rng):
     '''If here, means performing permutations within each
@@ -105,6 +105,11 @@ def permute_blocks(in_blocks, rng, within_grp=True):
     to any subtypes
     '''
 
+    # Check for index attribute
+    index = None
+    if hasattr(in_blocks, 'index'):
+        index = in_blocks.index
+
     # Prep blocks for permutations - adding ones and index cols
     # Then sorting, such that we can make assumptions
     # about the ordering of whole block swaps
@@ -118,7 +123,15 @@ def permute_blocks(in_blocks, rng, within_grp=True):
     permuted_blocks = permuted_blocks[rev_lex_sort_order]
     
     # Only need to return the new permuted index
-    return permuted_blocks[:, -1]
+    permuted_indx = permuted_blocks[:, -1]
+
+    # If passed an object originally w/ index, return
+    # the permuted order of the actual index names
+    if index is not None:
+        return index[permuted_indx], index
+
+    # Otherwise, return the permuted indx as arranged integer index
+    return permuted_indx, index
 
 def block_permutation(x, blocks, random_state=None, within_grp=True):
     '''
@@ -131,14 +144,47 @@ def block_permutation(x, blocks, random_state=None, within_grp=True):
     # Proc. random state
     rng = check_random_state(random_state)
 
-    # Permute blocks one
-    permuted_indx = permute_blocks(blocks, rng, within_grp=within_grp)
+    # Permute blocks once - in addition  to return permuted index
+    # we also need the block index, in case order was different between
+    # x and blocks and we need to use index
+    permuted_indx, block_index = permute_blocks(blocks, rng, within_grp=within_grp)
 
-    # TODO fix this case
-    if isinstance(x, (pd.Series, pd.DataFrame)):
-        pass
-    
-    # Return original sequence in new permuted order
+    # Series case
+    if isinstance(x, pd.Series):
+        
+        # Save original type
+        original_type = x.dtype
+
+        # Replace values w/ array of original
+        x.loc[block_index] = np.array(x.loc[permuted_indx])
+
+        # Cast back  to original type
+        x = x.astype(original_type)
+
+        return x
+
+    # Dataframe case
+    elif isinstance(x, pd.DataFrame):
+
+        # Save original types
+        original_types = x.dtypes
+
+        # Replace values w/ array of original
+        x.loc[block_index, :] = np.array(x.loc[permuted_indx])
+        
+        # Make sure each col's dtype stays the same
+        for dtype, col in zip(original_types, x.columns):
+            x[col] = x[col].astype(dtype)
+
+        return x
+
+    # Check for potential unexpected case and warn
+    if block_index is not None:
+        warnings.warn('Passed blocks had index, but object to permute does not.')
+
+
+    # Base case, return original sequence
+    # in new permuted order
     return x[permuted_indx]
 
 
