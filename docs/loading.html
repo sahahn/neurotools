@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="misc" href="misc.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2022.03.04"/>
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.04.07"/>
         <title>loading - neurotools 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
 
@@ -36,10 +36,12 @@
   }
 </style></head>
   <body>
+    
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
     </script>
     
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
@@ -288,20 +290,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.58416114, 0.1658408 ],</span>
-<span class="go">       [0.75314047, 0.01801893],</span>
-<span class="go">       [0.09366529, 0.42387093],</span>
-<span class="go">       [0.36766598, 0.42197767],</span>
-<span class="go">       [0.52516344, 0.80006475]])</span>
+<span class="go">array([[0.13044383, 0.04328193],</span>
+<span class="go">       [0.32066984, 0.80902876],</span>
+<span class="go">       [0.78119925, 0.16086687],</span>
+<span class="go">       [0.93501986, 0.73403596],</span>
+<span class="go">       [0.9444193 , 0.09860859]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.58416114, 0.1658408 ],</span>
-<span class="go">       [0.75314047, 0.01801893],</span>
-<span class="go">       [0.09366529, 0.42387093],</span>
-<span class="go">       [0.36766598, 0.42197767],</span>
-<span class="go">       [0.52516344, 0.80006475]])</span>
+<span class="go">array([[0.13044383, 0.04328193],</span>
+<span class="go">       [0.32066984, 0.80902876],</span>
+<span class="go">       [0.78119925, 0.16086687],</span>
+<span class="go">       [0.93501986, 0.73403596],</span>
+<span class="go">       [0.9444193 , 0.09860859]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -481,7 +483,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">subjs</span>
-<span class="gh">Out[4]: </span><span class="go">['subj2', 'subj3', 'subj1']</span>
+<span class="gh">Out[4]: </span><span class="go">['subj3', 'subj2', 'subj1']</span>
 
 <span class="go"># Within each subject's directory is single data file</span>
 <span class="go"># E.g., loading the first subjects data</span>
@@ -493,9 +495,9 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/37675ecc926da4589dc8b44d2ab5d59b</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/177c2d3dedc0c2e11b5e6f9576b665b9</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.003427267074584961 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.005980253219604492 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -514,9 +516,9 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8effc2a5532e9a8e4f3ff9be0f254d6a</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8841fae2e1b41b87100395387154b1ec</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.002984762191772461 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.0034525394439697266 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -575,10 +577,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.92573187, 0.        , 0.        , 0.76754065]),</span>
-<span class="go"> array([0.51342384, 0.        , 0.        , 0.30556678]),</span>
-<span class="go"> array([0.65333967, 0.        , 0.        , 0.7471196 ]),</span>
-<span class="go"> array([0.78923539, 0.        , 0.        , 0.51437802])]</span>
+<span class="go">[array([0.33715103, 0.        , 0.        , 0.54254284]),</span>
+<span class="go"> array([0.72147391, 0.        , 0.        , 0.45945074]),</span>
+<span class="go"> array([0.62021584, 0.        , 0.        , 0.79954769]),</span>
+<span class="go"> array([0.34352116, 0.        , 0.        , 0.95696731])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -594,14 +596,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f3bcd33c2b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3bcd33c8e0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3bcd33c160&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f3bcd33c700&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f8dddcce970&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8dddccec10&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8dddcced60&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8dddcce760&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.92573187, 0.        , 0.        , 0.76754065])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.33715103, 0.        , 0.        , 0.54254284])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
