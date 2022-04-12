@@ -974,6 +974,45 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
                                    '_print': _print,
                                    **kwargs}
 
+def _check_subplot_args(**kwargs):
+
+    # If already a subplot spec passed, then just check for figure, then return.
+    if 'subplot_spec' in kwargs and kwargs['subplot_spec'] is not None:
+        
+        # If figure is passed and not None, we don't need to set
+        if 'figure' in kwargs and kwargs['figure'] is not None:
+            pass
+        else:
+            kwargs['figure'] = plt.gcf()
+        
+        # Then return
+        return kwargs
+
+    # If ax is passed, but subplot_spec not, then change to subplot version
+    if 'ax' in kwargs:
+
+        # Remove from kwargs
+        ax = kwargs.pop('ax')
+
+        # If not None, continue w/ figure check / convert to subplot
+        if ax is not None:
+
+            # Set off, for plotting
+            ax.set_axis_off()
+
+            # If figure is passed and not None, we don't need to set
+            if 'figure' in kwargs and kwargs['figure'] is not None:
+                pass
+            else:
+                kwargs['figure'] = plt.gcf()
+
+            # Convert ax to subplot spec
+            ax_as_subplot_spec = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=ax)
+
+            # Add in as subplot spec, replacing passed ax
+            kwargs['subplot_spec'] = ax_as_subplot_spec[0, 0]
+
+    return kwargs
 
 def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     '''The most automated magic plotting function avaliable,
@@ -1348,6 +1387,9 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
     '''
 
+    # Some logic for handling if this is going to be a subplot
+    kwargs = _check_subplot_args(**kwargs)
+    
     # Setup
     data, func, args = _setup_auto_plot(data, space=space, hemi=hemi,
                                         verbose=verbose, **kwargs)
