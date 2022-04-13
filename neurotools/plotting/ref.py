@@ -236,9 +236,10 @@ class Ref():
 
         # Keep copy of original name for verbose print
         original_name = name
-
+        
         # Base transform roi name
         name = clean_key(name)
+        self._print(f'clean_key: {original_name} to {name}.', level=3)
 
         # Apply the mapping
         for key in self.mapping:
@@ -246,6 +247,7 @@ class Ref():
 
             if trans_key in name:
                 name = name.replace(trans_key, clean_key(self.mapping[key]))
+                self._print(f'rep {trans_key}:{clean_key(self.mapping[key])}, new={name}.', level=3)
 
         # Find the ind
         inds = []
@@ -290,20 +292,11 @@ class Ref():
         raise RuntimeError(f'Could not find matching roi for {name}!')
         
     
-    def get_plot_vals(self, data, hemi=None, i_keys=None, d_keys=None):
+    def _get_plot_vals(self, roi_dict,
+                       roi_alt_names,
+                       ref_vals, i_keys, use_just_alt=False):
 
-        self._print(f'Start get plot vals for hemi={hemi}', level=1)
-
-        # Process keys input
-        i_keys, d_keys = self._proc_keys_input(i_keys), self._proc_keys_input(d_keys)
-        
-        # Get base roi dict
-        roi_dict, roi_alt_names = _get_roi_dict(data, i_keys, d_keys)
-        
-        # Get ref vals
-        ref_vals = self._get_ref_vals(hemi)
-
-        # Init plot vals
+         # Init plot vals
         plot_vals = np.zeros(np.shape(ref_vals))
 
         # Keep track of already found inds
@@ -313,6 +306,10 @@ class Ref():
             # Get plot value
             value = roi_dict[name]
 
+            # Optionally, override name w/ alt_name
+            if use_just_alt:
+                name = alt_name
+
             # Try to find the name in the reference values
             ind = self._find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
 
@@ -320,7 +317,8 @@ class Ref():
             # one another has already mapped to,
             # if so, trigger an error.
             if ind in used_inds:
-                raise RuntimeError(f'Error: mapping {name} failed, as another ROI already mapped to the same referece (ind={ind}). '\
+                self._print('Overlapping ROI mapping error.', level=2)
+                raise RuntimeError(f'Error: mapping {name} failed, as another ROI already mapped to the same reference (ind={ind}). '\
                                    'Set verbose>=2 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
             else:
                 used_inds.add(ind)
@@ -328,6 +326,32 @@ class Ref():
             # Set the proper values based on the found index
             plot_vals = np.where(ref_vals == ind, value, plot_vals)
 
+        return plot_vals
+
+    def get_plot_vals(self, data, hemi=None, i_keys=None, d_keys=None):
+
+        self._print(f'Start get plot vals for hemi={hemi}', level=1)
+
+        # Process keys input
+        i_keys, d_keys = self._proc_keys_input(i_keys), self._proc_keys_input(d_keys)
+        
+        # Get base roi dict
+        roi_dict, roi_alt_names = _get_roi_dict(data, i_keys, d_keys)
+        self._print(f'roi_alt_names={roi_alt_names}', level=3)
+        
+        # Get ref vals
+        ref_vals = self._get_ref_vals(hemi)
+
+        # Everything about this is hacky, but if fails the first way
+        # with runtime error, try once more, but passing w/ use_just_alt
+        try:
+            plot_vals = self._get_plot_vals(roi_dict, roi_alt_names,
+                                            ref_vals, i_keys, use_just_alt=False)
+        except RuntimeError:
+            self._print(f'Trying plot vals w/ use_just_alt=True', level=2)
+            plot_vals = self._get_plot_vals(roi_dict, roi_alt_names,
+                                            ref_vals, i_keys, use_just_alt=True)
+       
         return plot_vals
 
 class SurfRef(Ref):
