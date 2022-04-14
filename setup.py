@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='neurotools',
-      version='0.2',
+      version='0.21',
       description='General helper functions for working with neuroimaging data.',
       url='http://github.com/sahahn/neurotools',
       author='Sage Hahn',
@@ -21,7 +21,7 @@ setup(name='neurotools',
           'nilearn>=0.8.1',
           'networkx',
           'neuromaps @ https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip',
-          'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.2.tar.gz'
+          'neurotools_data @ https://github.com/sahahn/neurotools_data/archive/refs/tags/1.2.3.tar.gz'
       ],
       test_suite='pytest',
       tests_require=['pytest', 'coverage'],
