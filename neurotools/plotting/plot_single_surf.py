@@ -6,7 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colorbar import make_axes
 from matplotlib.cm import ScalarMappable, get_cmap
 from matplotlib.colors import Normalize, LinearSegmentedColormap
-from matplotlib.colors import Normalize, LinearSegmentedColormap
 from distutils.version import LooseVersion
 import matplotlib
 
@@ -244,7 +243,7 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
                             np.logical_not(
                                 np.isnan(surf_map_faces)))[0]
         else:
-            kept_indices = np.where(np.abs(surf_map_faces) >= threshold)[0]
+            kept_indices = np.where(np.abs(surf_map_faces) >= np.abs(threshold))[0]
 
         surf_map_faces = surf_map_faces - vmin
         surf_map_faces = surf_map_faces / (vmax - vmin)

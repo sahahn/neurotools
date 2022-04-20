@@ -157,7 +157,12 @@ def _get_roi_dict(data, i_keys=None, d_keys=None):
             spec_data[name] = data[name]
 
     # Generate list of alt names
-    u_markers = get_unique_str_markers(list(spec_data))
+    try:
+        u_markers = get_unique_str_markers(list(spec_data))
+
+    # If fails, then pass same as base
+    except IndexError:
+        u_markers = list(spec_data)
 
     return spec_data, u_markers
 

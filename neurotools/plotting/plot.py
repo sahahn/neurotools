@@ -7,11 +7,21 @@ from ..transform.space import process_space
 from scipy.stats import scoreatpercentile
 import nibabel as nib
 from ..misc.print import _get_print
+import matplotlib.colors as colors
 
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     from nilearn.plotting import plot_glass_brain, plot_stat_map, plot_roi
+
+
+def _trunc_cmap(cmap, minval=0.0, maxval=1.0, n=1000):
+    
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    
+    return new_cmap
 
 def _proc_vs(data, vmin, vmax, symmetric_cbar):
     
@@ -69,8 +79,15 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
 def _proc_threshold(data, threshold, percentile=75, rois=False):
     
+    # If None, set to a bit below minimum
+    if threshold is None:
+        flat_abs_data = np.abs(_collapse_data(data))
+
+        # Want to handle 0's and NaN's
+        return np.nanmin(flat_abs_data[np.where(flat_abs_data != 0)]) / 5
+
     # Only proc if left at auto
-    if threshold != 'auto':
+    if not (threshold == 'auto' or threshold == 'default'):
         return threshold
 
     # If ROIs then default is .5
@@ -83,8 +100,8 @@ def _proc_threshold(data, threshold, percentile=75, rois=False):
     
     # Get percentile - not counting any zeros!
     threshold = scoreatpercentile(flat_data[flat_data != 0], per=percentile) - 1e-5
-    return threshold
 
+    return threshold
 
 def _collapse_data(data):
     '''Assumes data is in standard {} form.'''
@@ -121,7 +138,7 @@ def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
     '''Assumes data is in standard {} form.'''
      
     # If user passed, keep that value
-    if symmetric_cbar != 'auto':
+    if not (symmetric_cbar == 'auto' or symmetric_cbar == 'default'):
         return symmetric_cbar
     
     # If rois, default = False, so return
@@ -299,7 +316,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       figsize=(15, 10), symmetric_cbar='auto',
                       figure=None, subplot_spec=None,
                       wspace=-.35, hspace=-.1,
-                      colorbar=False, dist=6.5,
+                      colorbar=False, dist=6.5, b_sz=.5,
                       colorbar_params=None, **kwargs):
     '''
     data should be list with two elements [lh, rh] data.
@@ -309,9 +326,8 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
     'fb' / front back, means plot anterior posterior views in a row.
     '''
 
-    # Proc default
-    if colorbar_params is None:
-        colorbar_params = {}
+    # Proc defaults for colorbar params
+    colorbar_params = _sort_colorbar_kwargs(colorbar_params=colorbar_params, **kwargs)
 
     # Proc if sym cbar auto - assume rois False here
     symmetric_cbar = _get_if_sym_cbar(data, symmetric_cbar, rois=False)
@@ -326,11 +342,23 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
         views = ['lateral', 'lateral', 'medial', 'medial']
         widths, heights = [1, 1], [1, 1]
 
+    elif view in ['flat standard', 'fs', 'row standard']:
+        hemis = ['lh', 'rh', 'b', 'lh', 'rh']
+        views = ['lateral', 'lateral', 'b', 'medial', 'medial']
+        widths, heights = [1, 1, b_sz, 1, 1], [1]
+
+    # TODO still looks like ass
+    elif view in ['flat extra', 'fe', 'row extra']:
+        hemis = ['lh', 'rh', 'lh', 'rh', 'b', 'lh', 'rh', 'lh', 'rh']
+        views = ['anterior', 'anterior', 'lateral', 'lateral', 'b',
+                 'medial', 'medial', 'posterior', 'posterior']
+        widths, heights = [1, 1, 1, 1, b_sz, 1, 1, 1, 1], [1]
+
     elif view in ['fb', 'front back', 'ap', 'anterior posterior']:
         hemis = ['lh', 'rh', 'b', 'lh', 'rh']
         views = ['anterior', 'anterior', 'b',
                  'posterior', 'posterior']
-        widths, heights = [1, 1, .5, 1, 1], [1]
+        widths, heights = [1, 1, b_sz, 1, 1], [1]
 
     elif view in ['f', 'front', 'a', 'anterior']:
         hemis = ['lh', 'rh']
@@ -389,7 +417,7 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
 
 def plot_surf_vol_collage(surf, vol,
                           vol_plot_type='glass',
-                          cmap='cold_hot',
+                          cmap='default',
                           threshold='auto',
                           surf_to_vol_ratio=1,
                           vmin=None, vmax=None,
@@ -519,11 +547,11 @@ def plot_surf_vol_collage(surf, vol,
 def _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness):
 
     # Allow any user passed args to override space ref defaults here
-    if surf_mesh is None:
+    if surf_mesh is None or surf_mesh == 'auto' or surf_mesh == 'default':
         surf_mesh = ref.surf_mesh
-    if bg_map is None:
+    if bg_map is None or bg_map == 'auto' or bg_map == 'default':
         bg_map = ref.bg_map
-    if darkness is None:
+    if darkness is None or darkness == 'auto' or darkness == 'default':
         darkness = ref.darkness
 
     return surf_mesh, bg_map, darkness
@@ -564,6 +592,9 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
 
 def _proc_avg_method(data, rois, avg_method):
 
+    if avg_method is None:
+        return None
+
     # TODO need volumetric case here?
 
     # If rois force avg method to median
@@ -572,7 +603,7 @@ def _proc_avg_method(data, rois, avg_method):
     
     # Otherwise set based on if we think we are
     # plotting roi values on a surface
-    if avg_method == 'default':
+    if avg_method == 'default' or avg_method == 'auto':
         
         flat_data = _collapse_data(data)
 
@@ -590,7 +621,7 @@ def _proc_avg_method(data, rois, avg_method):
 
 def _proc_colorbar(colorbar, rois):
 
-    if colorbar == 'default':
+    if colorbar == 'default' or colorbar == 'auto':
         colorbar = True
         
         if rois:
@@ -703,7 +734,7 @@ def _sort_kwargs(kwargs):
     # Surface specific
     surf_args = ['alpha', 'bg_map',
                  'surf_mesh', 'darkness',
-                 'view', 'dist']
+                 'view', 'dist', 'b_sz']
     surf_params = {key: kwargs[key] for key in surf_args if key in kwargs}
     
     # Special cases
@@ -737,6 +768,7 @@ def _sort_kwargs(kwargs):
 
 def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
 
+
     # Handle if not passed
     if colorbar_params is None:
         if 'colorbar_params' in kwargs:
@@ -759,7 +791,7 @@ def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
 def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
     
     # Keep user passed if not user passed
-    if cmap != 'default':
+    if not (cmap == 'default' or cmap is None or cmap == 'auto'):
         return cmap
     
     # If plotting rois
@@ -777,7 +809,7 @@ def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
         return 'Reds'
 
     # Last case is symmetric cbar
-    return 'cold_hot'
+    return _trunc_cmap(plt.get_cmap('cold_white_hot'), minval=0.05, maxval=0.95)
 
 
 def _plot_surfs_vol(data, space=None, hemi=None,
@@ -865,13 +897,14 @@ def plot_volume(vol,
                 vol_plot_type='glass',
                 cmap=None,
                 colorbar='default',
+                symmetric_cbar='auto',
                 threshold='auto',
                 vmax=None,
                 figure=None,
                 axes=None,
                 **kwargs):
 
-    # Base stat cases
+    # Base stat map cases
     rois = False
     if vol_plot_type == 'glass':
         vol_plot_func = plot_glass_brain
@@ -880,18 +913,18 @@ def plot_volume(vol,
     
     # ROI case
     elif vol_plot_type == 'roi':
-        vol_plot_func = plot_roi
+        vol_plot_func = plot_rois
         rois = True
 
-    # Proc threshold if auto
-    threshold = _proc_threshold(vol, threshold, rois=rois)
-    
-    # Add or don't add colorbar
-    colorbar = _proc_colorbar(colorbar, rois=rois)
-    
+    # Process defaults
+    symmetric_cbar, threshold, cmap, colorbar, _ = _prep_base_auto_defaults(vol, rois,
+                                                                            symmetric_cbar, threshold,
+                                                                            cmap, colorbar, avg_method=None)
+
     # Call vol plot function
     vol_plot_func(vol, figure=figure,  axes=axes,
-                  cmap=cmap, threshold=threshold,
+                  cmap=cmap, threshold=threshold, 
+                  symmetric_cbar=symmetric_cbar,
                   vmax=vmax, colorbar=colorbar, **kwargs)
     
     # Set if used by upper level functions to return
@@ -1164,7 +1197,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           representing the name of a matplotlib colormap. This will be the color map
           in which the values are plotted according to. When plotting surface
           parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
-          if plotting not symmetric statistical maps, and 'cold_hot' if plotting
+          if plotting not symmetric statistical maps, and 'cold_white_hot' if plotting
           symmetric statistical maps (e.g., values above and below 0). In case of
           not sym plotting, and plotting  negative numbers, will switch from 'Reds'
           to 'Blues_r'.

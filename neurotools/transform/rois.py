@@ -3,7 +3,8 @@ import warnings
 from scipy.linalg import lstsq
 from sklearn.base import BaseEstimator, TransformerMixin
 from ..loading import load
-
+import nibabel as nib
+import pandas as pd
 
 class SurfLabels(BaseEstimator, TransformerMixin):
     '''Extract signals from non-overlapping labels for surface data.
@@ -790,3 +791,33 @@ class SurfMaps(BaseEstimator, TransformerMixin):
 
         elif self.strategy_ == 'average':
             raise RuntimeError('Cannot calculate reverse of average.')
+
+
+def project_map_fis(fis, atlas, label_names=None):
+
+    # Get values as array
+    atlas_vals = atlas.get_fdata()
+    
+    # Grab example slice to init
+    ex = atlas.slicer[:, :, :, 0]
+    fill = np.zeros(ex.shape)
+    
+    # Fill each
+    for i in range(len(fis)):
+        
+        fi = fis[i]
+    
+        # If passed series, use label names to index
+        if isinstance(fis, pd.Series):
+            map_i = np.where(label_names == fis.index[i])[0][0]
+        else:
+            map_i = i
+        
+        # Get reference ROI
+        roi = atlas_vals[:, :, :, map_i]
+
+        # Distribute weight based on roi map
+        fill += (roi * fi) / roi.sum()
+    
+    # Return in nifti image
+    return nib.Nifti1Image(fill, affine=ex.affine)
