@@ -23,6 +23,7 @@ def _get_print(verbose, _print=None):
             return
 
         # Use warnings for level = 0
+        # If warn, don't also print
         if level == 0:
 
             # Conv print to str - then warn
@@ -32,7 +33,7 @@ def _get_print(verbose, _print=None):
             as_str = sep.join(str(arg) for arg in args)
             warnings.warn(as_str)
 
-        if verbose >= level:
+        elif verbose >= level:
             print(*args, **kwargs, flush=True)
 
     return _print

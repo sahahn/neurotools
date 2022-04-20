@@ -9,11 +9,16 @@ from .. import data_dr as def_data_dr
 from ..loading.from_data import get_surf_loc
 from difflib import SequenceMatcher
 from ..misc.text import clean_key
+from itertools import permutations
 
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     from nilearn.surface import load_surf_data
+
+# Custom exception
+class RepeatROIError(Exception):
+    pass
 
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
@@ -118,7 +123,6 @@ def auto_determine_lh_rh_keys(data):
 
     raise RuntimeError('Could not auto determine lh and rh unique keys.')
 
-
 def _is_in(name, key):
 
     # Unpack tuple key
@@ -134,6 +138,26 @@ def _is_in(name, key):
     else:
         raise RuntimeError('Invalid key type.')
 
+def _replace(name, key, new):
+
+      # Unpack tuple key
+    k, k_type = key
+
+    if k_type is None:
+        return name.replace(k, new)
+    elif k_type == 'start':
+        if name.startswith(k):
+            return name[len(k):]
+        return name
+    elif k_type == 'end':
+        if name.endswith(k):
+            return name[:len(k)]
+        return name
+    else:
+        raise RuntimeError('Invalid key type.')
+
+def _get_pieces(key):
+    return set([k for k in key.split(' ') if len(k) > 0])
 
 def _get_roi_dict(data, i_keys=None, d_keys=None):
     '''If data is a df, with assume that the data is stored in two columns
@@ -165,6 +189,33 @@ def _get_roi_dict(data, i_keys=None, d_keys=None):
         u_markers = list(spec_data)
 
     return spec_data, u_markers
+
+def _check_combos(not_found, name_pieces):
+    
+    # If size 0 or size 1, then return
+    # as combo search is over
+    if len(not_found) <= 1:
+        return not_found
+    
+    # Generate all possible combinations, checking sequentially
+    for n in range(2, len(not_found)+1):
+        ps = permutations(not_found, n)
+        
+        # Check each combo
+        for p in ps:
+            combo = ''.join(p)
+            
+            # If present, call recursively
+            # but with each piece removed from
+            # not found
+            if combo in name_pieces:
+                for name in p:
+                    not_found.remove(name)
+                    
+                return _check_combos(not_found, name_pieces)
+
+    # If no matches, return as is
+    return not_found
 
 class Ref():
     
@@ -205,6 +256,13 @@ class Ref():
     def _get_ref_vals(self, hemi=None):
         pass
 
+    def _add_to_inds(self, inds, name, label, trans_label):
+
+        sim = similar(trans_label, name)
+        ind = int(self.label_2_int[label])
+        inds.append((ind, label, sim))
+        self._print(f'Found match {trans_label} w/ similarity={sim}', level=3)
+
     def _proc_keys_input(self, keys):
 
         if keys is None:
@@ -237,65 +295,156 @@ class Ref():
 
         return keys
 
-    def _find_ref_ind(self, name, alt_name=None, i_keys=None):
+    def _check_for_pieces_ind(self, name, check_combos=True):
 
-        # Keep copy of original name for verbose print
-        original_name = name
-        
-        # Base transform roi name
-        name = clean_key(name)
-        self._print(f'clean_key: {original_name} to {name}.', level=3)
-
-        # Apply the mapping
-        for key in self.mapping:
-            trans_key = clean_key(key)
-
-            if trans_key in name:
-                name = name.replace(trans_key, clean_key(self.mapping[key]))
-                self._print(f'rep {trans_key}:{clean_key(self.mapping[key])}, new={name}.', level=3)
-
-        # Find the ind
+        # Alternate case if sub-string not found
+        # designed to get at cases where the order might be wrong
         inds = []
+        
+        # Get names as pieces representation
+        name_pieces = _get_pieces(name)
+
         for label in self.label_2_int:
+
+            # Use the cleaned version of each
+            trans_label = clean_key(label)
+            trans_pieces = _get_pieces(trans_label)
+
+            # Compute intersection
+            piece_intersection = trans_pieces.intersection(name_pieces)
+
+            # If the same
+            if len(piece_intersection) == len(trans_pieces):
+                self._add_to_inds(inds, name, label, trans_label)
+
+            # Otherwise, check recursively for combinations
+            elif check_combos:
+
+                not_found = trans_pieces - piece_intersection
+                not_found = _check_combos(not_found, name_pieces)
+                
+                # If empty, found
+                if len(not_found) == 0:
+                    self._add_to_inds(inds, name, label, trans_label)
+
+        return inds
+
+    def _check_for_ind(self, name, original_name):
+
+        # Try to find the correct index
+        inds = []
+
+        # These labels are the ground truth we need
+        # to map to the saved index
+        for label in self.label_2_int:
+
+            # Use the cleaned version of each
             trans_label = clean_key(label)
 
-            # Try to find name, if found keep track
+            # If the ground truth is sub-string of the current name
+            # Keep track, w/ also a simmilarity score
             if trans_label in name:
                 ind = int(self.label_2_int[label])
 
                 # Append ind, label and simmilarity
-                inds.append((ind, label, similar(trans_label, name)))
+                self._add_to_inds(inds, name, label, trans_label)
+
+        # If none found from base index search, use pieces method
+        if len(inds) == 0:
+            inds  = self._check_for_pieces_ind(name)
 
         # If more than one, sort so first is highest simmilarity
         if len(inds) > 1:
             inds = sorted(inds, key=lambda i : i[2], reverse=True)
 
-        #  Return first
+        #  Return first, if only one then that is first
         if len(inds) > 0:
             self._print(f'Mapping: {original_name} -> {inds[0][1]}.', level=2)
             return inds[0][0]
 
-        # First pass if doesn't find is to try again, but with all i_keys removed
+        # If not found, return None
+        return None
+
+    def _apply_mappings_to_name(self, name):
+
+        self._print(f'Applying mapping to {name}', level=2)
+
+        # Apply the mapping for this parcellation
+        for key in self.mapping:
+
+            # Get a clean representation of a possible transform key
+            trans_key = clean_key(key)
+
+            # If found in the current ROI name, replace it
+            if trans_key in name:
+
+                # Get the cleaned new value to replace with
+                new = clean_key(self.mapping[key])
+                name = name.replace(trans_key, new)
+                self._print(f'replace: "{trans_key}":"{new}", new="{name}"', level=3)
+
+        return name
+        
+
+    def _find_ref_ind(self, name, alt_name=None, i_keys=None):
+
+        # Keep copy of original name for verbose print
+        original_name = name
+        
+        # Base clean name + store copy
+        name = clean_key(name)
+        clean_name = name
+        self._print(f'clean_key: "{original_name}" to "{name}"', level=3)
+
+        # Try applying mappings to name, then perform first check 
+        name = self._apply_mappings_to_name(name)
+        ind = self._check_for_ind(name, original_name)
+        if ind is not None:
+            return ind
+
+        # Next, let's try with the pre-mapped name
+        ind = self._check_for_ind(clean_name, original_name)
+        if ind is not None:
+            return ind
+
+        # Next, try again but with all i_keys removed from the name
         if i_keys is not None:
             next_name = original_name
             for key in i_keys:
-                next_name = next_name.replace(key, '')
+                next_name = _replace(next_name, key, '')
 
-            self._print(f'Did not find roi for {original_name}, trying with {next_name}', level=2)
-            return self._find_ref_ind(next_name, alt_name=alt_name, i_keys=None)
+            self._print(f'Did not find roi for "{original_name}", trying with "{next_name}"', level=2)
+            
+            # We make sure to pass i_keys as None here, to avoid infinite loops
+            ind = self._find_ref_ind(next_name, alt_name=alt_name, i_keys=None)
+            if ind is not None:
+                return ind
 
-        # If still didn't find, try again with the passed alt name
+        # If still haven't found anything, try everything again but with alternate name
         if alt_name is not None:
-            self._print(f'Did not find roi for {name}, trying with {alt_name}', level=2)
-            return self._find_ref_ind(alt_name, alt_name=None, i_keys=i_keys)
+            self._print(f'Did not find roi for "{name}", trying with "{alt_name}"', level=2)
 
-        # If error, print out the true region names
-        self._print('Note that the passed values must be able to map on in some way to one of these regions:',
-                    list(self.label_2_int), level=0)
+            # We make sure to pass alt_name as None here, to avoid infinite loops
+            ind = self._find_ref_ind(alt_name, alt_name=None, i_keys=i_keys)
+            if ind is not None:
+                return ind
+
+        # If finally not found, return None
+        return None
+
+    def find_ref_ind(self, name, alt_name=None, i_keys=None):
+
+        # Try to find ind
+        ind = self._find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
+        if ind is not None:
+            return ind
+
+         # If error, print out the true region names
+        self._print('The passed values must be able to map in some way to one of these reference region names:',
+                    list(self.label_2_int), 'You can turn on verbose to see what is already being checked.', level=0)
 
         # If didn't find with alt name also
-        raise RuntimeError(f'Could not find matching roi for {name}!')
-        
+        raise RuntimeError(f'Could not find matching ROI for: "{name}"')
     
     def _get_plot_vals(self, roi_dict,
                        roi_alt_names,
@@ -316,15 +465,15 @@ class Ref():
                 name = alt_name
 
             # Try to find the name in the reference values
-            ind = self._find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
+            ind = self.find_ref_ind(name=name, alt_name=alt_name, i_keys=i_keys)
 
             # Check to see if this ROI is mapping to 
             # one another has already mapped to,
             # if so, trigger an error.
             if ind in used_inds:
                 self._print('Overlapping ROI mapping error.', level=2)
-                raise RuntimeError(f'Error: mapping {name} failed, as another ROI already mapped to the same reference (ind={ind}). '\
-                                   'Set verbose>=2 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
+                raise RepeatROIError(f'Error: mapping {name} failed, as another ROI already mapped to the same reference (ind={ind}). '\
+                                      'Set verbose>=2 in Ref object and double check how each ROI is being mapped to make sure it is correct. ')
             else:
                 used_inds.add(ind)
 
@@ -344,15 +493,15 @@ class Ref():
         roi_dict, roi_alt_names = _get_roi_dict(data, i_keys, d_keys)
         self._print(f'roi_alt_names={roi_alt_names}', level=3)
         
-        # Get ref vals
+        # Load reference values
         ref_vals = self._get_ref_vals(hemi)
 
-        # Everything about this is hacky, but if fails the first way
-        # with runtime error, try once more, but passing w/ use_just_alt
+        # Try - but in case of repeat ROI error
+        # then try again, but with use_just_alt
         try:
             plot_vals = self._get_plot_vals(roi_dict, roi_alt_names,
                                             ref_vals, i_keys, use_just_alt=False)
-        except RuntimeError:
+        except RepeatROIError:
             self._print(f'Trying plot vals w/ use_just_alt=True', level=2)
             plot_vals = self._get_plot_vals(roi_dict, roi_alt_names,
                                             ref_vals, i_keys, use_just_alt=True)

@@ -183,6 +183,9 @@ def clean_key(key):
     key = key.replace('.', ' ')
     key = key.replace('-', ' ')
     key = key.replace('_', ' ')
+    key = key.replace('  ', ' ')
+    key = key.replace('   ', ' ')
+    key = key.replace('\t', ' ')
     key = key.replace('\n', ' ')
 
     key = key.replace('&', ' and ')
