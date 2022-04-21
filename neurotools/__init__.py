@@ -6,4 +6,4 @@ from pathlib import Path
 data_dr = Path(neurotools_data.__file__).parent.absolute()
 
 # Set version
-__version__ = '0.2'
+__version__ = '0.22'

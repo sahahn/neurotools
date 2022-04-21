@@ -1,7 +1,14 @@
 from setuptools import setup, find_packages
 
-setup(name='neurotools',
-      version='0.21',
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+setup(name='bp-neurotools',
+      version='0.22',
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       description='General helper functions for working with neuroimaging data.',
       url='http://github.com/sahahn/neurotools',
       author='Sage Hahn',
