@@ -8,7 +8,7 @@ import warnings
 __version__ = '0.23'
 __data_version__ = '1.2.5'
 
-CURRENT_DR = Path().resolve()
+CURRENT_DR = Path(__file__).parent.absolute()
 DATA_REF_LOC = os.path.join(CURRENT_DR, 'data_ref.txt')
 
 def get_data_dr_path(download_loc):
