@@ -21,3 +21,6 @@ slurm/run_permuted_v/test_*
 examples/dev.ipynb
 examples/explore.ipynb
 examples/curious.ipynb
+dist
+*egg-info
+data_ref.txt
