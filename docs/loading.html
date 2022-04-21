@@ -204,30 +204,736 @@
 <h1>loading<a class="headerlink" href="#loading" title="Permalink to this headline">#</a></h1>
 <section id="load">
 <h2>load<a class="headerlink" href="#load" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.load">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load" title="Permalink to this definition">#</a></dt>
+<dd><p>Smart loading function for neuro-imaging type data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (str, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> or other) – The location / file path of the data to load passed
+as a str, or can accept directly numpy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a>
+or objects from nibabel, ect…</p></li>
+<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
+The typical benefit of index_slicing over masking in a later
+step is where data to load will be read with nibabel
+(e.g., saved as .nii or .mgz) and can therefore use an index_slice
+to load in only the data of interest.</p>
+<p>For example let’s say the shape of data is 5 x 20 on
+the disk, but you only need the data in the first 20, e.g.,
+so with traditional slicing that is [0], in this case by using the
+mask you have to load the full data from the disk, then slice it.
+But if you pass <code class="code highlight python docutils literal notranslate"><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code> here, then this accomplishes the same thing,
+but only loads the requested slice from the disk.</p>
+<p>You must use python keyword <cite>slice</cite> for complex slicing. For example
+in the example above you may pass either <code class="code highlight python docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code> or <code class="code highlight python docutils literal notranslate"><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code>,
+but if you wanted something more complex, e.g. passing
+something like <code class="code highlight python docutils literal notranslate"><span class="name"><span class="pre">my_array</span></span><span class="punctuation"><span class="pre">[</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">,</span></span> <span class="punctuation"><span class="pre">::</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">]</span></span></code> you should pass
+<code class="code highlight python docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">),</span></span> <span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">))</span></span></code> here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
+If left as None, keep original data type, otherwise
+can pass as a string name of datatype to cast to.
+For example, ‘float32’ to cast to 32 bit floating point
+precision.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>data</strong> – Returned is the requested data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code></a>,
+or if passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, then <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> will be returned. The shape
+of the returned data will be the shape of the data array portion of
+whatever data is passed with extra singular dimensions removed
+(i.e., np.squeeze is applied). If passed an index slice, only
+the portion of the data specified by the index slice will be loaded
+and returned.</p>
+<p>Note: The data type of the returned data will depend on how the
+data to be loaded is saved.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Data can be loaded by simply passing a file location
+to load. For example, we can load just an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> of ones:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">neurotools.loading</span> <span class="kn">import</span> <span class="n">load</span>
+
+<span class="gp">In [2]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">'data/ones.nii.gz'</span><span class="p">)</span>
+
+<span class="gp">In [3]: </span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+<span class="gh">Out[3]: </span><span class="go">(10,)</span>
+</pre></div>
+</div>
+<p>This function is likewise robust to being passed non-file paths, for
+example passing an already defined <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> to load:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">In [5]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="gp">In [6]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="gh">Out[6]: </span><span class="go">(5, 3)</span>
+</pre></div>
+</div>
+<p>Note here that load will also apply a squeeze function to any loaded data,
+getting rid of any used dimensions.</p>
+<p>Next, let’s look at an example where we pass a specific index slice.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="go"># Let's say we want to select columns 0 and 1</span>
+<span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="gh">Out[8]: </span><span class="go"></span>
+<span class="go">array([[0.95563927, 0.0925879 ],</span>
+<span class="go">       [0.08026947, 0.39781275],</span>
+<span class="go">       [0.42959098, 0.23288488],</span>
+<span class="go">       [0.72788898, 0.54519276],</span>
+<span class="go">       [0.14273965, 0.48676974]])</span>
+
+<span class="go"># It's a bit more awkward but we pass:</span>
+<span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="gh">Out[9]: </span><span class="go"></span>
+<span class="go">array([[0.95563927, 0.0925879 ],</span>
+<span class="go">       [0.08026947, 0.39781275],</span>
+<span class="go">       [0.42959098, 0.23288488],</span>
+<span class="go">       [0.72788898, 0.54519276],</span>
+<span class="go">       [0.14273965, 0.48676974]])</span>
+</pre></div>
+</div>
+</dd></dl>
 </section>
 <section id="load-data">
 <h2>load_data<a class="headerlink" href="#load-data" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.load_data">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_as_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_as_zero</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.load_data" title="Permalink to this definition">#</a></dt>
+<dd><p>This method is designed to load data saved in a particular way,
+specifically where each subject / participants data is saved seperately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subjects</strong> (<em>array-like</em>) – A list or array-like with the names of the subjects to load, where
+the names correspond in some way to the way the way the subject’s data
+is saved. This correspondence is specified in template_path.</p></li>
+<li><p><strong>template_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>func</em>) – <p>A str indicating the template form for how a single
+subjects data should be loaded, where SUBJECT will be
+replaced with that subjects name, and optionally CONTRAST will
+be replaced with the contrast name.</p>
+<p>For example, to load subject X’s contrast Y saved under
+‘some_loc/X_Y.nii.gz’
+the template_path would be: ‘some_loc/SUBJECT_CONTRAST.nii.gz’.</p>
+<p>You may also alternatively pass template_path as a python function,
+with first argument accepting subject, and optional second argument
+accepting contrast. In this case, the function should return the correct
+path for that subject / contrast pair when given one or both of these arguments.</p>
+<p>Note: The use of CONTRAST within the template path is optional, but
+this parameter is not.</p>
+</p></li>
+<li><p><strong>contrast</strong> (str or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>The name of the contrast, used along with the template
+path to define where to load data.
+If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, then it is assumed that CONTRAST
+is not present in the template_path and will be ignored.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>mask</strong> (str, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>After data is loaded, it can optionally be
+masked according to a specific <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>.</p>
+<p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, and the data to be loaded is multi-dimensional,
+then the data will be flattened by default, e.g., if each data
+point originally has shape 10 x 2, the flattened shape will be 20.</p>
+<p>If passed a str, it will be assumed to be the location of a mask
+in which to load, where the shape of the mask should match the data.</p>
+<p>When passing a mask, either by location or by <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> directly,
+values set to either 1 or True indicate the value should be kept,
+whereas values of 0 or False indicate the values at that location should
+be discarded.</p>
+<p>If a mask is used, see function <code class="xref py py-func docutils literal notranslate"><span class="pre">funcs.reverse_mask_data()</span></code>
+for reversing masked data (e.g., an eventual statistical output)
+back into it’s pre-masked state.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>index_slice</strong> (slices, tuple of slices, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>You may optional pass index slicing here.
+The typical benefit of index_slicing over masking
+is where data to load will be read with nibabel
+(e.g., saved as .nii or .mgz) and can therefore use an index_slice
+to load in only the data of interest.</p>
+<p>For example let’s say the shape of data is 5 x 20 on
+the disk, but you only need the data in the first 20, e.g.,
+so with traditional slicing that is [0], in this case by using the
+mask you have to load the full data from the disk, then slice it.
+But if you pass <code class="code highlight python docutils literal notranslate"><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code> here, then this
+accomplishes the same thing,
+but only loads the requested slice from the disk.</p>
+<p>You must use python keyword <cite>slice</cite> for complex slicing. For example
+in the example above you may pass either <code class="code highlight python docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code> or <code class="code highlight python docutils literal notranslate"><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code>,
+but if you wanted something more complex, e.g. passing
+something like <code class="code highlight python docutils literal notranslate"><span class="name"><span class="pre">my_array</span></span><span class="punctuation"><span class="pre">[</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">:</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">,</span></span> <span class="punctuation"><span class="pre">::</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">]</span></span></code> you should pass
+<code class="code highlight python docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">1</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">5</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">2</span></span><span class="punctuation"><span class="pre">),</span></span> <span class="name builtin"><span class="pre">slice</span></span><span class="punctuation"><span class="pre">(</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="keyword constant"><span class="pre">None</span></span><span class="punctuation"><span class="pre">,</span></span><span class="literal number integer"><span class="pre">3</span></span><span class="punctuation"><span class="pre">))</span></span></code> here.</p>
+<p>If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> (the default), this option is
+ignored and the full data avaliable is loaded.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>zero_as_nan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>Often in neuroimaging data, NaN values
+are encoded as 0’s (I’m not sure why either).
+If this flag is set to True, then any 0’s
+found in the loaded data will be replaced with NaN.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>nan_as_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>As an alternative to zero_as_nan, can
+instead set any NaNs found to zeros.
+Note, if this is True then zero_as_nan can
+not also be True.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The data type in which to cast loaded data to.
+If left as None, keep original data type, otherwise
+can pass as a string name of datatype to cast to.
+For example, ‘float32’ to cast to 32 bit floating point
+precision.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>The number of threads to use when loading data.</p>
+<p>Note: Often n_jobs will refer to number of separate processors,
+but in this case it refers to threads,
+which are not limited by the number of cores avaliable.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>This parameter controls the verbosity of this function.</p>
+<ul>
+<li><p>If -1, then no message at all will be printed.</p></li>
+<li><p>If 0, only warnings will be printed.</p></li>
+<li><p>If 1, general status updates will be printed.</p></li>
+<li><p>If &gt;= 2, full verbosity will be enabled.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>cache_args</strong> (<em>keyword arguments</em>) – <p>There are a number of optional cache arguments that can be set via
+kwargs, as listed below.</p>
+<ul>
+<li><p><strong>cache_dr</strong> : str or None</p>
+<p>The location of where to cache the results of
+this function, for faster loading in the future.</p>
+<p>If None, do not cache. The default if not set is
+‘default’, which will use caching in a location defined
+by the function name in a folder called
+neurotools_cache in the users homes directory.</p>
+</li>
+<li><p><strong>cache_max_sz</strong> : str or int</p>
+<p>This parameter defines the maximize size of
+the cache directory. The idea is that if saving a new
+cached function call and it exceeds this cache max size,
+previous saved caches (by oldest in terms of used) will be
+deleted, ensuring the cache directory remains under this size.</p>
+<p>Can either pass in terms of bytes directly as a number,
+or in terms of a str w/ byte marker, e.g., ‘14G’ for
+14 gigabytes, or ‘10 KB’ for 10 kilobytes.</p>
+<p>The default if not set is ‘30G’.</p>
+</li>
+<li><p><strong>use_base_name</strong> : bool</p>
+<p>Optionally when any arguments used in the
+caching can be cached based on either their full file
+path, if use_base_name is False, or just the file name itself,
+so for example /some/path/location vs. just location.
+The default if not set is True, as it assumes that maybe
+another file in another location with the same name is the same.</p>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>data</strong> – Loaded data across all specified subjects is returned
+as a 2D numpy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> (shape= subj x data) where the first
+dimension is subject and the second is a single dimension representation
+of that subjects data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Consider the following simplified example where we are interested in loading and
+concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3’.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">neurotools.loading</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">load_data</span>
+
+<span class="go"># Data are saved in separate folders</span>
+<span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
+
+<span class="gp">In [4]: </span><span class="n">subjs</span>
+<span class="gh">Out[4]: </span><span class="go">['subj3', 'subj2', 'subj1']</span>
+
+<span class="go"># Within each subject's directory is single data file</span>
+<span class="go"># E.g., loading the first subjects data</span>
+<span class="gp">In [5]: </span><span class="n">load</span><span class="p">(</span><span class="s1">'data/ex1/subj1/data.nii.gz'</span><span class="p">)</span>
+<span class="gh">Out[5]: </span><span class="go">array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1.])</span>
+
+<span class="go"># Now we can load all subjects with the load_data method</span>
+<span class="gp">In [6]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
+<span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
+<span class="gp">   ...: </span>
+<span class="go">No existing cache found, loading directly</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/177c2d3dedc0c2e11b5e6f9576b665b9</span>
+<span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.003588438034057617 seconds.</span>
+
+<span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
+<span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
+</pre></div>
+</div>
+<p>Additional arguments can of course be added allowing for more flexibility.
+Consider an additional case below:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># We can add a mask, keeping only</span>
+<span class="go"># the first and last data point</span>
+<span class="gp">In [8]: </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="gp">In [9]: </span><span class="n">mask</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mask</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+
+<span class="gp">In [10]: </span><span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">subjects</span><span class="o">=</span><span class="n">subjs</span><span class="p">,</span>
+<span class="gp">   ....: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">,</span>
+<span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+<span class="gp">   ....: </span>
+<span class="go">No existing cache found, loading directly</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8841fae2e1b41b87100395387154b1ec</span>
+<span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.003075838088989258 seconds.</span>
+</pre></div>
+</div>
+</dd></dl>
 </section>
 <section id="reverse-mask-data">
 <h2>reverse_mask_data<a class="headerlink" href="#reverse-mask-data" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.reverse_mask_data">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">reverse_mask_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.reverse_mask_data" title="Permalink to this definition">#</a></dt>
+<dd><p>This function is used to reverse the application of a mask
+to a data array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> or list of) – Some data in which to transform from either
+a single dimensional <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> of data,
+or a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>
+of data with shape = subjs x data, back to the original shape
+of the data pre-masking. Instead of a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a>, a list
+of single <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> can be passed as well.</p></li>
+<li><p><strong>mask</strong> (loc or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>) – The location of, or a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> mask, where
+(1/True=keep, 0/False=discard) in which to reverse the
+application of. If the passed mask is either
+a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> with an affine, or saved as a nifti,
+then as a part of the reverse mask process, the data
+will be converted into a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>reversed_data</strong> – In the case that the mask is passed in a format that
+provides an affine, data will be returned in <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>
+format. If instead the mask is passed as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> or
+location of a saved data array without affine information,
+then the data will be returned as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">array</span></code></a>.</p>
+<p>If either a list of data <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">arrays</span></code></a> is passed, or data is passed
+as a 2D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">array</span></code></a> with shape = subjs x data, then the returned
+reversed data will be a list with each element corresponding
+to each passed subject’s reversed data.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> or list of</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Consider the following brief example:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">neurotools.loading</span> <span class="kn">import</span> <span class="n">reverse_mask_data</span>
+
+<span class="gp">In [3]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="gp">In [4]: </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="gp">In [5]: </span><span class="n">reversed_data</span> <span class="o">=</span> <span class="n">reverse_mask_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+<span class="gp">In [6]: </span><span class="n">reversed_data</span>
+<span class="gh">Out[6]: </span><span class="go"></span>
+<span class="go">[array([0.10938893, 0.        , 0.        , 0.55009869]),</span>
+<span class="go"> array([0.03575791, 0.        , 0.        , 0.83618908]),</span>
+<span class="go"> array([0.48451175, 0.        , 0.        , 0.22660638]),</span>
+<span class="go"> array([0.57623395, 0.        , 0.        , 0.93722472])]</span>
+
+<span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="gh">Out[7]: </span><span class="go">(4,)</span>
+</pre></div>
+</div>
+<p>Or in the case where the mask is a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a>:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+
+<span class="go"># Convert mask to nifti</span>
+<span class="gp">In [9]: </span><span class="n">mask</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="gp">In [10]: </span><span class="n">reversed_data</span> <span class="o">=</span> <span class="n">reverse_mask_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+<span class="gp">In [11]: </span><span class="n">reversed_data</span>
+<span class="gh">Out[11]: </span><span class="go"></span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fe1862813a0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe1862817c0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe1862813d0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fe1862812b0&gt;]</span>
+
+<span class="go"># Closer look</span>
+<span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.10938893, 0.        , 0.        , 0.55009869])</span>
+
+<span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
+<span class="gh">Out[13]: </span><span class="go"></span>
+<span class="go">array([[1., 0., 0., 0.],</span>
+<span class="go">       [0., 1., 0., 0.],</span>
+<span class="go">       [0., 0., 1., 0.],</span>
+<span class="go">       [0., 0., 0., 1.]])</span>
+</pre></div>
+</div>
+</dd></dl>
 </section>
 <section id="get-overlap-subjects">
 <h2>get_overlap_subjects<a class="headerlink" href="#get-overlap-subjects" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.get_overlap_subjects">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">get_overlap_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.get_overlap_subjects" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper function to be used when working with template_path style saved
+data in order to compute an overlapping set of subjects between a dataframe
+and a template path, or alternatively between two dataframes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
+subjects in which to overlap.
+Where the names correspond in some way to the
+way the way the subject’s data is saved.</p></li>
+<li><p><strong>template_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>A str indicating the template form for how a single
+subjects data should be loaded (or in this case located),
+where SUBJECT will be replaced with that subjects name,
+and optionally CONTRAST will be replaced with the contrast name.</p>
+<p>For example, to load subject X’s contrast Y saved under
+‘some_loc/X_Y.nii.gz’
+the template_path would be: ‘some_loc/SUBJECT_CONTRAST.nii.gz’.</p>
+<p>Note that the use of a CONTRAST argument is optional.</p>
+<p>Note that if this parameter is passed, then data_df will
+be ignored!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>contrast</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the contrast, used along with the template
+path to define where to load data.</p>
+<p>If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> then it is assumed that CONTRAST
+is not present in the template_path and will be ignored.</p>
+<p>Note that if this parameter is passed, then data_df will
+be ignored! This parameter is used only with the template_path option.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
+to overlap with <cite>df</cite>, INSTEAD of a template_path and / or contrast set of arguments.
+Explicitly, if specifying a data_df, a template_path should not be passed!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>By default this value is 1. This parameter
+controls the verbosity of this function.</p>
+<p>If -1, then no message at all will be printed.
+If 0, only warnings will be printed.
+If 1, general status updates will be printed.
+If &gt;= 2, full verbosity will be enabled.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </section>
 <section id="from-data-get-surf-loc">
 <h2>from_data.get_surf_loc<a class="headerlink" href="#from-data-get-surf-loc" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.from_data.get_surf_loc">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.from_data.</span></span><span class="sig-name descname"><span class="pre">get_surf_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hemi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.from_data.get_surf_loc" title="Permalink to this definition">#</a></dt>
+<dd><p>Find the saved surface file based
+on space, hemi and key, with tolerance
+to different naming schemes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The space of the data, where space refers to a valid surface
+space, e.g., ‘fsaverage’.</p></li>
+<li><p><strong>hemi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The hemisphere to find, can pass as ‘lh’ / ‘rh’ or
+some alternate formats, e.g., ‘left’ / ‘right’.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>list of str</em>) – The identifying key of the surface to load. If passing
+a list of keys, will try to find the correct surface in the
+order of the passed list, e.g., you should pass the most
+specific option first, then potentially more general options.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>path</strong> – The path of the saved requested surface file, or
+None if not found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 <section id="abcd-load-from-csv">
 <h2>abcd.load_from_csv<a class="headerlink" href="#abcd-load-from-csv" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.abcd.load_from_csv">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_cat_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ordinal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cache_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_from_csv" title="Permalink to this definition">#</a></dt>
+<dd><p>Special ABCD Study specific helper utility to load specific
+columns from a csv saved version of the DEAP release RDS
+file or similar ABCD specific csv dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>list-like</em>) – <p>Either a single str with the column name to load,
+or a list / list-like with the names of multiple columns to
+load.</p>
+<p>If any variable passed is wrapped in ‘C(variable_name)’
+that variable will be ordinalized (or whatever option is specified
+with the encode_cat_as option) and saved under the base variable name
+(i.e., with C() wrapper removed).</p>
+</p></li>
+<li><p><strong>csv_loc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The str location of the csv saved version of the DEAP release
+RDS file for the ABCD Study - or any other comma seperated dataset
+with an eventname column.</p></li>
+<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>list-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>The single eventname as a str, or multiple eventnames
+in which to include results by. If passed as None then
+all avaliable data will be kept.</p>
+<p>If a single eventname is specified then the eventname
+column will be dropped, otherwise it will be kept.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'baseline_year_1_arm_1'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>drop_nan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, then drop any rows / subjects data with
+missing values in any of the requested columns.</p>
+<p>Note: Any values encoded as [‘777’, 999, ‘999’, 777]
+will be treated as NaN. This is a special ABCD specific consideration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>encode_cat_as</strong> (<em>{'ordinal'</em><em>, </em><em>'one hot'</em><em>, </em><em>'dummy'}</em><em>, </em><em>optional</em>) – <p>The way in which categorical vars, any wrapped in C(),
+should be categorically encoded.</p>
+<ul>
+<li><p>’ordinal’ :</p>
+<p>The variables in encoded sequentially in one
+column with the original name, with values 0 to k-1
+where k is the number of unique categorical values.
+This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p>
+</li>
+<li><p>’one hot’ :</p>
+<p>The variables is one hot encoded, adding columns
+for each unique value. This method uses function <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html#pandas.get_dummies" title="(in pandas v1.4.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.get_dummies()</span></code></a>.</p>
+</li>
+<li><p>’dummy’ :</p>
+<p>Same as ‘one hot’, except one of the columns is then dropped.</p>
+</li>
+</ul>
+</p></li>
+<li><p><strong>cache_args</strong> (<em>keyword arguments</em>) – <p>There are a number of optional cache arguments that can be set via
+kwargs, as listed below.</p>
+<ul>
+<li><p><strong>cache_dr</strong> : str or None</p>
+<p>The location of where to cache the results of
+this function, for faster loading in the future.</p>
+<p>If None, do not cache. The default if not set is
+‘default’, which will use caching in a location defined
+by the function name in a folder called
+neurotools_cache in the users homes directory.</p>
+</li>
+<li><p><strong>cache_max_sz</strong> : str or int</p>
+<p>This parameter defines the maximize size of
+the cache directory. The idea is that if saving a new
+cached function call and it exceeds this cache max size,
+previous saved caches (by oldest in terms of used) will be
+deleted, ensuring the cache directory remains under this size.</p>
+<p>Can either pass in terms of bytes directly as a number,
+or in terms of a str w/ byte marker, e.g., ‘14G’ for
+14 gigabytes, or ‘10 KB’ for 10 kilobytes.</p>
+<p>The default if not set is ‘30G’.</p>
+</li>
+<li><p><strong>use_base_name</strong> : bool</p>
+<p>Optionally when any arguments used in the
+caching can be cached based on either their full file
+path, if use_base_name is False, or just the file name itself,
+so for example /some/path/location vs. just location.
+The default if not set is True, as it assumes that maybe
+another file in another location with the same name is the same.</p>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>df</strong> – Will return a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> as indexed by
+column <cite>src_subject_id</cite> within the original csv.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 <section id="abcd-load-family-block-structure">
 <h2>abcd.load_family_block_structure<a class="headerlink" href="#abcd-load-family-block-structure" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.abcd.load_family_block_structure">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.abcd.</span></span><span class="sig-name descname"><span class="pre">load_family_block_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baseline_year_1_arm_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_neg_ones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_max_sz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30G'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.abcd.load_family_block_structure" title="Permalink to this definition">#</a></dt>
+<dd><p>This helper utility loads PALM-style exchanability blocks for ABCD study specific data
+according to right now a fixed set of rules:</p>
+<ul class="simple">
+<li><p>Families of the same type can be shuffled (i.e., same number of members + of same status)</p></li>
+<li><p>Siblings of the same type can be shuffled</p></li>
+<li><p>Treat DZ as ordinary sibs (i.e., just treat MZ seperately)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_loc</strong> (<em>str / file path</em>) – The location of the csv saved version of the DEAP release
+RDS file for the ABCD Study. This can also just be any
+other csv as long as it has columns:
+‘rel_family_id’, ‘rel_relationship’, ‘genetic_zygosity_status_1’</p></li>
+<li><p><strong>subjects</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><em>array-like</em><em>, </em><em>optional</em>) – <p>Can optionally specify that the block structure be created on a subset of subjects,
+though if any missing values are present in rel_relationship or rel_family_id
+within this subset, then those will be further dropped.</p>
+<p>If passed as non-null, this should be a valid array-like
+or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html#pandas.Index" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Index</span></code></a> style set of subjects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>eventname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>array-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>A single eventname as a str in which to specify data by.</p>
+<p>For now, this method only supports loading data at a single
+time point across subjects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'baseline_year_1_arm_1'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>add_neg_ones</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If True, add a left-most column
+with all negative ones representing
+that swaps should occur within group at
+the outermost level. Note that if using
+a permutation function through neurotools
+that accepts this style of blocks,
+this outer layer is assumed by default,
+so this parameter can be left as False.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>block_structure</strong> – The loaded block structure as indexed by src_subject_id with
+columns: ‘neg_ones’, ‘family_type’, ‘rel_family_id’ and ‘rel_relationship’.</p>
+<p>Any subjects with missing values in a key column have been dropped from
+this returned structure.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 <section id="outliers-drop-top-x-outliers">
 <h2>outliers.drop_top_x_outliers<a class="headerlink" href="#outliers-drop-top-x-outliers" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.outliers.drop_top_x_outliers">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.outliers.</span></span><span class="sig-name descname"><span class="pre">drop_top_x_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.outliers.drop_top_x_outliers" title="Permalink to this definition">#</a></dt>
+<dd><p>Drop a fixed number of outliers from a set of loaded subjects data,
+based on the absolute mean of each subject’s data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array</em>) – Loaded 2D numpy array with shape # of subjects x data points,
+representing the loaded data in which to drop outliers from.</p></li>
+<li><p><strong>subjects</strong> (<em>numpy array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em>, </em><em>optional</em>) – <p>A corresponding list or array like of subjects with the same
+length as the first dimension of the passed data. If passed,
+then will return as a modified subject array representing
+the new subject list with dropped outliers excluded.
+If not passed, i.e., left as default None,
+will only return the modified data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>top</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>The number of subjects to drop.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array</em>) – The loaded 2D data, but with <cite>top</cite> subjects data removed.</p></li>
+<li><p><strong>subjects</strong> (<em>numpy array</em>) – If passed originally as None, only data will be returned,
+otherwise this will represent the new list of kept subjects,
+with <cite>top</cite> removed.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 <section id="parcels-load-32k-fs-lr-concat">
 <h2>parcels.load_32k_fs_LR_concat<a class="headerlink" href="#parcels-load-32k-fs-lr-concat" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.parcels.load_32k_fs_LR_concat">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.parcels.</span></span><span class="sig-name descname"><span class="pre">load_32k_fs_LR_concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parcel_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.parcels.load_32k_fs_LR_concat" title="Permalink to this definition">#</a></dt>
+<dd><p>Dedicated loader function for saved parcels as generated in
+parc_scaling project. These parcellations are all in space 32k_fs_LR,
+and are left, right hemisphere concatenated. The parcel will be
+downloaded to parcels directory in the default data dr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parcel_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the parcel to load,
+see <a class="reference external" href="https://github.com/sahahn/parc_scaling/tree/main/parcels">https://github.com/sahahn/parc_scaling/tree/main/parcels</a>
+for valid options.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>parcel</strong> – The loaded concat LR parcellation as a numpy array is returned.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </section>
 
