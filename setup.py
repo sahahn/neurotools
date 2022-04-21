@@ -6,7 +6,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='bp-neurotools',
-      version='0.22',
+      version='0.23',
       long_description=long_description,
       long_description_content_type='text/markdown',
       description='General helper functions for working with neuroimaging data.',
