@@ -1,9 +1,7 @@
-from neuromaps import transforms
 from ..loading.from_data import get_surf_loc, _load_medial_wall
 from ..loading.funcs import load
 from ..transform.space import _resolve_space_name
 import warnings
-
 
 def vol_to_surf(vol, target_space='32k_fs_LR',
                 method='auto', ref_key='pial',
@@ -21,7 +19,6 @@ def vol_to_surf(vol, target_space='32k_fs_LR',
     
     
     '''
-
     # Make sure valid target space
     target_space = _resolve_space_name(target_space)
 
@@ -63,6 +60,11 @@ def _get_fs_density(target_space):
 
     sz = len(_load_medial_wall(target_space))
 
+    try:
+         from neuromaps import transforms
+    except ImportError:
+        raise ImportError('Download neuromaps to use this method with pip install https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip')
+
     # Try to get density from base library
     try:
         return transforms.DENSITY_MAP[sz]
@@ -70,6 +72,11 @@ def _get_fs_density(target_space):
         raise RuntimeError(f'target_space: {target_space} not supported with hcp style resampling.')
 
 def _hcp_vol_to_surf(vol, target_space):
+
+    try:
+         from neuromaps import transforms
+    except ImportError:
+        raise ImportError('Download neuromaps to use this method with pip install https://github.com/netneurolab/neuromaps/archive/refs/tags/0.0.1.zip')
 
     if 'fs_LR' in target_space:
         ret = transforms.mni152_to_fslr(vol, fslr_density=target_space.split('_')[0])
