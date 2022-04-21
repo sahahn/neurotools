@@ -1,5 +1,7 @@
 # neurotools
 
+[![pip](https://badge.fury.io/py/bp-neurotools.svg)](https://pypi.org/project/bp-neurotools/)
+
 Creative and original name? Maybe not. Lots of cool and helpful tools for working with neuroimaging data? Yes.
 
 ## What's Included?
@@ -41,8 +43,15 @@ neurotools is split into a number of different directories / sub-packages, each 
 
 
 Besides these main functionalities, another main folder is included, called "slurm". This folder
-will store examples for using the neurotools package on a SLURM cluster is a massively paralell way. Included are, and in the future will be, examples with extra scripts and pieces responsible for submitting and collecting jobs.
+will store examples for using the neurotools package on a SLURM cluster is a massively paralell way.
+Included are, and in the future will be, examples with extra scripts and pieces responsible for submitting and collecting jobs.
 
 ## Install
 
-For now, this repository only lives on github, so the only way to download it is by cloning (`git clone https://github.com/sahahn/neurotools`) and pip installing (navigate into the directory then run `pip install .`) the repository.
+The easiest way to install is through pypip via
+
+`pip install bp-neurotools`
+
+You can also  install the latest version via github directly, by cloning (`git clone https://github.com/sahahn/neurotools`) and then pip installing (navigate into the directory then run `pip install .`) the repository.
+
+This will install for you the latest version. Note that on running it for the first time, it will install for you automatically the required external data that the library leverages.
