@@ -192,7 +192,7 @@ def _get_most_likely_parcel(data):
         # Get set of clean refs
         clean_refs = set([clean_key(k) for k in mappings[parcel].keys()] +\
                          [clean_key(v) for v in mappings[parcel].values()])
-        clean_refs = list(clean_refs)
+        clean_refs = [c for c in clean_refs if len(c) > 2]
         
         # Do a simple check for each parcel to try and
         # figure which one has the most
