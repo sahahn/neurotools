@@ -1,6 +1,25 @@
 import tensorflow as tf
-import tensorflow.experimental.numpy as tnp
 import numpy as np
+from distutils.version import LooseVersion
+
+def alt_tf_pinv(a, rcond=1e-15):
+    '''https://stackoverflow.com/questions/42501715/alternative-of-numpy-linalg-pinv-in-tensorflow'''
+    
+    s, u, v = tf.linalg.svd(a)
+    limit = rcond * tf.reduce_max(s)
+    non_zero = tf.greater(s, limit)
+    reciprocal = tf.where(non_zero, tf.math.reciprocal(s), tf.zeros(s.shape, dtype=a.dtype))
+    lhs = tf.matmul(v, tf.linalg.diag(reciprocal))
+    
+    return tf.matmul(lhs, u, transpose_b=True)
+
+def pinv(a):
+
+    # If early version of tensorflow, no built in p_inv
+    if LooseVersion(tf.__version__) < LooseVersion("2.1"):
+        return alt_tf_pinv(a)
+    else:
+        return tf.linalg.pinv(a)
 
 def cast_input_to_tensor(target_vars, rz, hz, input_matrix,
                          drm, contrast, dtype=None):
@@ -15,28 +34,27 @@ def cast_input_to_tensor(target_vars, rz, hz, input_matrix,
 def calc_den_fast(c, cte, r):
 
     # Reshape and calc pinverse of cte
-    cte_inv = tf.linalg.pinv(tf.transpose(tf.reshape(cte,
-                                                    (r, r, cte.shape[-1])),
-                                          perm=[2, 0, 1]))
+    cte_inv = pinv(tf.transpose(tf.reshape(cte, (r, r, cte.shape[-1])),
+                                perm=[2, 0, 1]))
 
     # Apply the contrast to extract correct pieces, and return squeezed
-    return tnp.squeeze(tf.transpose((tf.transpose(c) @ cte_inv @ c), perm=[1, 2, 0]))
+    return tf.squeeze(tf.transpose((tf.transpose(c) @ cte_inv @ c), perm=[1, 2, 0]))
 
 @tf.function
 def proc_vg(vg_idx, drm, res, input_matrix):
 
     # Sum the diag resid matrix for this variance group
-    diag_resid_sum_vg = tnp.sum(drm[vg_idx], axis=0)
+    diag_resid_sum_vg = tf.reduce_sum(drm[vg_idx], axis=0)
 
     # Divide by sum-squared residuals
-    weights_vg = diag_resid_sum_vg / tnp.sum(tnp.square(res[vg_idx]), axis=0)
+    weights_vg = diag_resid_sum_vg / tf.reduce_sum(tf.square(res[vg_idx]), axis=0)
 
     # Get correct piece of input matrix
     input_matrix_vg = tf.transpose(input_matrix[vg_idx]) @ input_matrix[vg_idx]
 
     # Perform matrix dot product between weights_vg and input_matrix_vg
-    return tnp.dot(tnp.expand_dims(tf.reshape(input_matrix_vg, [-1]), axis=1),
-                   tnp.expand_dims(weights_vg, axis=0))
+    return tf.matmul(tf.expand_dims(tf.reshape(input_matrix_vg, [-1]), axis=1),
+                     tf.expand_dims(weights_vg, axis=0))
 
 def fastv(input_matrix, psi, res,
           variance_groups, drm, contrast):
@@ -45,7 +63,7 @@ def fastv(input_matrix, psi, res,
     # Init vars
     dtype = input_matrix.dtype.name
     r = input_matrix.shape[-1]
-    cte  = tnp.zeros((r ** 2, res.shape[-1]), dtype=dtype)
+    cte  = tf.zeros((r ** 2, res.shape[-1]), dtype=dtype)
 
     # Process each variance group
     for vg in np.unique(variance_groups):
@@ -53,9 +71,9 @@ def fastv(input_matrix, psi, res,
         # Get index of the current vg
         vg_idx = variance_groups == vg
         cte += proc_vg(vg_idx, drm, res, input_matrix)
-      
+
     # Calc rest of v and return
-    return tf.transpose(contrast) @ psi / tnp.sqrt(
+    return tf.transpose(contrast) @ psi / tf.sqrt(
         calc_den_fast(contrast, cte, r))
 
 def freedmanlane(p_set, target_vars, rz, hz):
@@ -86,4 +104,4 @@ def run_permutation(p_set, target_vars, rz, hz,
               contrast=contrast)
     
     # Return as numpy array for max compat
-    return np.array(tnp.squeeze(v))
+    return np.array(tf.squeeze(v))
