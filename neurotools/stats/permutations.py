@@ -141,7 +141,7 @@ def _proc_input(tested_vars, confounding_vars):
     tmpZ = np.linalg.svd(input_vars @ contrast0)[0]
 
     # Get Z and X
-    Z = tmpZ[:,0:confounding_vars.shape[-1]]
+    Z = tmpZ[:, 0:confounding_vars.shape[-1]]
     X = tmpX - Z @ np.linalg.pinv(Z) @ tmpX
 
     return X, Z, contrast
@@ -280,7 +280,11 @@ def _process_permuted_v_base(tested_vars,
         len(permutation_structure) or (len(confounding_vars) != len(tested_vars)):
         raise RuntimeError('The passed lengths for tested_vars, target_vars, ' \
                            'confounding_vars and permutation structure must all be the same!')
-    
+
+    # Raise error if there are >= confounding variables than samples
+    if confounding_vars.shape[1] >= len(tested_vars):
+        raise ValueError('You may not pass more confounding variables than samples.')
+
     # Check for nans
     _nan_check(confounding_vars)
     _nan_check(tested_vars)
