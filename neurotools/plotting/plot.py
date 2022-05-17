@@ -901,7 +901,7 @@ def plot_volume(vol,
     
     # ROI case
     elif vol_plot_type == 'roi':
-        vol_plot_func = plot_rois
+        vol_plot_func = plot_roi
         rois = True
 
     # Process defaults
