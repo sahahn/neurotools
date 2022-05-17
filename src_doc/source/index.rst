@@ -28,6 +28,7 @@ Some more complete examples can be found below:
    plot_cifti_from_rois/plot_cifti_from_rois.ipynb
    plot_named_rois/plot.ipynb
    permutations.ipynb
+   indv_network_compare.ipynb
    
 
 Indices and tables
