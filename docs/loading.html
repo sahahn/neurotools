@@ -290,20 +290,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.58885758, 0.86306598],</span>
-<span class="go">       [0.03396192, 0.40771312],</span>
-<span class="go">       [0.34663376, 0.50187781],</span>
-<span class="go">       [0.69739639, 0.28498616],</span>
-<span class="go">       [0.29657605, 0.19948983]])</span>
+<span class="go">array([[0.2441208 , 0.56788244],</span>
+<span class="go">       [0.62206939, 0.48785615],</span>
+<span class="go">       [0.70492096, 0.7907969 ],</span>
+<span class="go">       [0.86206476, 0.13258471],</span>
+<span class="go">       [0.32372933, 0.56582257]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.58885758, 0.86306598],</span>
-<span class="go">       [0.03396192, 0.40771312],</span>
-<span class="go">       [0.34663376, 0.50187781],</span>
-<span class="go">       [0.69739639, 0.28498616],</span>
-<span class="go">       [0.29657605, 0.19948983]])</span>
+<span class="go">array([[0.2441208 , 0.56788244],</span>
+<span class="go">       [0.62206939, 0.48785615],</span>
+<span class="go">       [0.70492096, 0.7907969 ],</span>
+<span class="go">       [0.86206476, 0.13258471],</span>
+<span class="go">       [0.32372933, 0.56582257]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -483,7 +483,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">subjs</span>
-<span class="gh">Out[4]: </span><span class="go">['subj3', 'subj2', 'subj1']</span>
+<span class="gh">Out[4]: </span><span class="go">['subj1', 'subj3', 'subj2']</span>
 
 <span class="go"># Within each subject's directory is single data file</span>
 <span class="go"># E.g., loading the first subjects data</span>
@@ -495,9 +495,9 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/177c2d3dedc0c2e11b5e6f9576b665b9</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/a3254d788e91f1304bb22269e2bf6f6f</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.004130363464355469 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.003502368927001953 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -516,9 +516,9 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/8841fae2e1b41b87100395387154b1ec</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/1b19a119018700876da5b5d953010dd4</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.0035927295684814453 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.002942323684692383 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -577,10 +577,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.93821667, 0.        , 0.        , 0.63623021]),</span>
-<span class="go"> array([0.06224624, 0.        , 0.        , 0.01950057]),</span>
-<span class="go"> array([0.40701885, 0.        , 0.        , 0.6777959 ]),</span>
-<span class="go"> array([0.99289015, 0.        , 0.        , 0.90898038])]</span>
+<span class="go">[array([0.92078734, 0.        , 0.        , 0.77255845]),</span>
+<span class="go"> array([0.01912763, 0.        , 0.        , 0.37989242]),</span>
+<span class="go"> array([0.37903582, 0.        , 0.        , 0.36255407]),</span>
+<span class="go"> array([0.37266388, 0.        , 0.        , 0.71178578])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -596,14 +596,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f5db11324f0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5db1132910&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5db1132520&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f5db1132400&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f2cae4497f0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae4498b0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae449610&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae449580&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.93821667, 0.        , 0.        , 0.63623021])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.92078734, 0.        , 0.        , 0.77255845])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -753,7 +753,7 @@ should be categorically encoded.</p>
 <p>The variables in encoded sequentially in one
 column with the original name, with values 0 to k-1
 where k is the number of unique categorical values.
-This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p>
+This method uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrdinalEncoder</span></code></a>.</p>
 </li>
 <li><p>’one hot’ :</p>
 <p>The variables is one hot encoded, adding columns
