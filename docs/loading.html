@@ -290,20 +290,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.2441208 , 0.56788244],</span>
-<span class="go">       [0.62206939, 0.48785615],</span>
-<span class="go">       [0.70492096, 0.7907969 ],</span>
-<span class="go">       [0.86206476, 0.13258471],</span>
-<span class="go">       [0.32372933, 0.56582257]])</span>
+<span class="go">array([[0.56791527, 0.45237086],</span>
+<span class="go">       [0.02663918, 0.7303988 ],</span>
+<span class="go">       [0.39989259, 0.47022973],</span>
+<span class="go">       [0.90339318, 0.11033049],</span>
+<span class="go">       [0.25843855, 0.87868884]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.2441208 , 0.56788244],</span>
-<span class="go">       [0.62206939, 0.48785615],</span>
-<span class="go">       [0.70492096, 0.7907969 ],</span>
-<span class="go">       [0.86206476, 0.13258471],</span>
-<span class="go">       [0.32372933, 0.56582257]])</span>
+<span class="go">array([[0.56791527, 0.45237086],</span>
+<span class="go">       [0.02663918, 0.7303988 ],</span>
+<span class="go">       [0.39989259, 0.47022973],</span>
+<span class="go">       [0.90339318, 0.11033049],</span>
+<span class="go">       [0.25843855, 0.87868884]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -497,7 +497,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/a3254d788e91f1304bb22269e2bf6f6f</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.003502368927001953 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0035445690155029297 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -518,7 +518,7 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/1b19a119018700876da5b5d953010dd4</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.002942323684692383 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.003055095672607422 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -577,10 +577,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.92078734, 0.        , 0.        , 0.77255845]),</span>
-<span class="go"> array([0.01912763, 0.        , 0.        , 0.37989242]),</span>
-<span class="go"> array([0.37903582, 0.        , 0.        , 0.36255407]),</span>
-<span class="go"> array([0.37266388, 0.        , 0.        , 0.71178578])]</span>
+<span class="go">[array([0.82670946, 0.        , 0.        , 0.44189912]),</span>
+<span class="go"> array([0.15353019, 0.        , 0.        , 0.46187378]),</span>
+<span class="go"> array([0.75647691, 0.        , 0.        , 0.75995125]),</span>
+<span class="go"> array([0.67637893, 0.        , 0.        , 0.61228901])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -596,14 +596,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f2cae4497f0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae4498b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae449610&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f2cae449580&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d92ddf0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d940550&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d940730&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d8f49a0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.92078734, 0.        , 0.        , 0.77255845])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.82670946, 0.        , 0.        , 0.44189912])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -935,6 +935,23 @@ for valid options.</p>
 </dl>
 </dd></dl>
 </section>
+<section id="space-get-space-options">
+<h2>space.get_space_options<a class="headerlink" href="#space-get-space-options" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="neurotools.loading.space.get_space_options">
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.space.</span></span><span class="sig-name descname"><span class="pre">get_space_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.space.get_space_options" title="Permalink to this definition">#</a></dt>
+<dd><p>Simple utility design to return
+the avaliable spaces based off the downloaded data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>spaces</strong> – list of currently downloaded / avaliable spaces.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
 </section>
 
         </article>
@@ -1004,6 +1021,7 @@ for valid options.</p>
 <li><a class="reference internal" href="#abcd-load-family-block-structure">abcd.load_family_block_structure</a></li>
 <li><a class="reference internal" href="#outliers-drop-top-x-outliers">outliers.drop_top_x_outliers</a></li>
 <li><a class="reference internal" href="#parcels-load-32k-fs-lr-concat">parcels.load_32k_fs_LR_concat</a></li>
+<li><a class="reference internal" href="#space-get-space-options">space.get_space_options</a></li>
 </ul>
 </li>
 </ul>

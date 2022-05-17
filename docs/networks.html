@@ -2,10 +2,12 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2022.04.07"/><title>Index - neurotools 0.2 documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <meta name="generator" content="sphinx-4.2.0, furo 2022.04.07"/>
+        <title>networks - neurotools 0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -132,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -192,127 +194,129 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          
-<section class="genindex-section">
-  <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#D"><strong>D</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a></div>
+          <section id="networks">
+<h1>networks<a class="headerlink" href="#networks" title="Permalink to this headline">#</a></h1>
+<section id="thresholdnetworkmeasures">
+<h2>ThresholdNetworkMeasures<a class="headerlink" href="#thresholdnetworkmeasures" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="neurotools.networks.measures.ThresholdNetworkMeasures">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">neurotools.networks.measures.</span></span><span class="sig-name descname"><span class="pre">ThresholdNetworkMeasures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'abs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'avg_degree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_incr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.networks.measures.ThresholdNetworkMeasures" title="Permalink to this definition">#</a></dt>
+<dd><p>This class is designed for thresholding and then extracting network
+measures from an input correlation matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – <p>A floating point threshold between 0 and 1.
+This represents the threshold at which a connection
+in the passed data needs to be in order for it to
+be set as an edge. The type of threshold_method
+also changes how this threshold behaves.</p>
+<p>If ‘density’, then this value represents the
+percent of edges to keep, out of all possible edges.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mf">.2</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>threshold_type</strong> (<em>{'abs'</em><em>, </em><em>'pos'</em><em>, </em><em>'neg'}</em>) – <p>The type of thresholding, e.g., should the threshold
+be applied to:</p>
+<ul>
+<li><dl class="simple">
+<dt>’abs’</dt><dd><p>The absolute value of the connections</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’pos’</dt><dd><p>Only consider edges as passed the threshold if &gt;= self.threshold</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’neg’</dt><dd><p>Only consider edges as passed the if &lt;= self.threshold</p>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'abs'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>threshold_method</strong> (<em>{'value'</em><em>, </em><em>'density'}</em><em>, </em><em>optional</em>) – <p>The method for thresholding. The two
+defined options are either to define an edge
+strictly by value, e.g., if threshold_type is ‘abs’,
+and threshold is .2, then any connection greater than or
+equal to .2 will be set as an edge.</p>
+<p>Alternatively, you may specify that the threshold be
+treated as a density. What this means is that if the threshold
+is set to for example .2, then the top 20% of edges by weight
+will be set as an edge, regardless of the actual value of the edge.</p>
+<p>The passed percentage will be considered
+out of all the possible edges. This will be used to
+select a threshold value, rounding up if needed, then
+all edges above or equal to the threshold will be kept
+(positive or abs case) or in neg case, all edges less than or equal.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'value'</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>to_compute</strong> – <div class="line-block">
+<div class="line">Either a single str representing a network
+measure to compute, or a list of valid
+measures. You may also pass any custom function
+which accepts one argument G, and returns
+a value.</div>
+</div>
+<div class="line-block">
+<div class="line">The following global measures are currently implemented
+as options:</div>
+<div class="line"><br/></div>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>ensure<span class="classifier">{None, ‘edge’, ‘is_conn’, float}, optional</span></dt><dd><p>When constructing the thresholded network,
+you may optionally specify what trait of the network to
+ensure according to the passed threshold and threshold type.
+By default, this value will be set to ‘edge’, which means,
+if the passed settings do not ensure atleast 1 edge, the
+threshold will be incremented by the ensure_incr, default = .01,
+until there is atleast one edge.</p>
+<p>Alternatively, you may pass ‘is_conn’ to specify that
+the network should be connected, that is, every node can be reached by
+every other. Or None, to do
+no checks (which may result in some kind of error).</p>
+<p>Lastly, you may pass a float value between 0 and 1, which
+specifies that the criteria check the size of the largest connected
+component relative to the total number of nodes. For example, passing
+1 is the same as passing ‘is_conn’, where the largest connected component is
+the same size as the network, and a value of .5 would be that atleast
+half the nodes are connected to each other.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="s1">'edge'</span>
+</pre></div>
+</div>
+</dd>
+<dt>ensure_incr<span class="classifier">float, optional</span></dt><dd><p>The amount in which to increment each time when checking
+for an ensure criteria. Note if ensure is None, this
+parameter is not used. Also note that this value in the case of threshold_method by value,
+is repeatedly decremented from the original passed
+threshold, unless the threshold type is ‘neg’, in that case it will be incremented.</p>
+<p>In the case of threshold_type is density, this value will always be incremented,
+as only positive thresholds make sense for density.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mf">.01</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 </section>
-<section id="D" class="genindex-section">
-  <h2>D</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="loading.html#neurotools.loading.outliers.drop_top_x_outliers">drop_top_x_outliers() (in module neurotools.loading.outliers)</a>
-</li>
-    </ul></td>
-  </tr></table>
 </section>
-
-<section id="G" class="genindex-section">
-  <h2>G</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="transform.html#neurotools.transform.network.gen_fs_subj_vertex_network">gen_fs_subj_vertex_network() (in module neurotools.transform.network)</a>
-</li>
-        <li><a href="transform.html#neurotools.transform.network.gen_indv_roi_network">gen_indv_roi_network() (in module neurotools.transform.network)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.get_overlap_subjects">get_overlap_subjects() (in module neurotools.loading)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="stats.html#neurotools.stats.get_resid">get_resid() (in module neurotools.stats)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.space.get_space_options">get_space_options() (in module neurotools.loading.space)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.from_data.get_surf_loc">get_surf_loc() (in module neurotools.loading.from_data)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="L" class="genindex-section">
-  <h2>L</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="loading.html#neurotools.loading.load">load() (in module neurotools.loading)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.parcels.load_32k_fs_LR_concat">load_32k_fs_LR_concat() (in module neurotools.loading.parcels)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="loading.html#neurotools.loading.load_data">load_data() (in module neurotools.loading)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.abcd.load_family_block_structure">load_family_block_structure() (in module neurotools.loading.abcd)</a>
-</li>
-        <li><a href="loading.html#neurotools.loading.abcd.load_from_csv">load_from_csv() (in module neurotools.loading.abcd)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="N" class="genindex-section">
-  <h2>N</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="misc.html#neurotools.misc.text.name_replace">name_replace() (in module neurotools.misc.text)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="P" class="genindex-section">
-  <h2>P</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="stats.html#neurotools.stats.permutations.permuted_v">permuted_v() (in module neurotools.stats.permutations)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="plotting.html#neurotools.plotting.plot">plot() (in module neurotools.plotting)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="R" class="genindex-section">
-  <h2>R</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="loading.html#neurotools.loading.reverse_mask_data">reverse_mask_data() (in module neurotools.loading)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="S" class="genindex-section">
-  <h2>S</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="transform.html#neurotools.transform.rois.SurfLabels">SurfLabels (class in neurotools.transform.rois)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="transform.html#neurotools.transform.rois.SurfMaps">SurfMaps (class in neurotools.transform.rois)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="T" class="genindex-section">
-  <h2>T</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="networks.html#neurotools.networks.measures.ThresholdNetworkMeasures">ThresholdNetworkMeasures (class in neurotools.networks.measures)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
 
         </article>
       </div>
@@ -341,8 +345,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">networks</a><ul>
+<li><a class="reference internal" href="#thresholdnetworkmeasures">ThresholdNetworkMeasures</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

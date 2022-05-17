@@ -214,7 +214,7 @@ used to plot a wide range of neuroimaging data (volumes / surfs).</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>array</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>ect</em><em>...</em>) – <p>The data in which to plot, either statistical map or parcellaction,
 as broadly either a single surface, collage of surfaces, a single
-volume, or collage with surfaces and volume.</p>
+volume, or collage with surfaces and volume, or as pandas series of ROIs and values.</p>
 <p>Data can be passed in many ways:</p>
 <ul>
 <li><p>As array-like input representing a single surface hemisphere,
@@ -239,6 +239,7 @@ that the first two passed index are left and right hemisphere
 surface data, and the last is subcortical / volumetric data, all to
 be plotted together in a collage.</p></li>
 <li><p>As a <a class="reference external" href="https://nipy.org/nibabel/reference/nibabel.nifti1.html#nibabel.nifti1.Nifti1Image" title="(in NiBabel v3.2.2+146.ga20f13ad)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nifti1Image</span></code></a> to be plotted volumetrically.</p></li>
+<li><p>experimental support for pandas Series of ROI names.</p></li>
 </ul>
 </p></li>
 <li><p><strong>space</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>This argument defines the “space” in which
