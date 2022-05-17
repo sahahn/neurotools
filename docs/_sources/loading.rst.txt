@@ -54,3 +54,11 @@ outliers.drop_top_x_outliers
 parcels.load_32k_fs_LR_concat
 ==============================
 .. autofunction:: load_32k_fs_LR_concat
+
+
+
+.. currentmodule:: neurotools.loading.space
+
+space.get_space_options
+==============================
+.. autofunction:: get_space_options
