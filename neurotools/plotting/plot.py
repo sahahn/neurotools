@@ -76,7 +76,6 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
     return vmin, vmax
 
-
 def _proc_threshold(data, threshold, percentile=75, rois=False):
     
     # If None, set to a bit below minimum
@@ -133,7 +132,6 @@ def _collapse_data(data):
     # Return as concat version
     return np.concatenate(collapsed)
 
-
 def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
     '''Assumes data is in standard {} form.'''
      
@@ -176,7 +174,6 @@ def _add_plots_to_axes(figure, grid, proj_3d, n_cols, n_rows, widths):
                 axes.append(figure.add_subplot(grid[i, j], projection=proj_3d[i][j]))
 
     return figure, axes
-
 
 def _setup_fig_axes(widths, heights, 
                     figure=None, subplot_spec=None,
@@ -275,7 +272,6 @@ def _setup_fig_axes(widths, heights,
     # Return each, axes instead of grid
     return figure, axes, colorbar_ax
 
-
 def plot_surf_hemi(data, ref, hemi,
                    surf_mesh='inflated',
                    bg_map='sulc',
@@ -306,7 +302,6 @@ def plot_surf_hemi(data, ref, hemi,
                             vmin=vmin,
                             vmax=vmax,
                             **kwargs)
-
 
 def plot_surf_collage(data, ref=None, surf_mesh='inflated',
                       bg_map='sulc', view='standard',
@@ -413,7 +408,6 @@ def plot_surf_collage(data, ref=None, surf_mesh='inflated',
              colorbar_params=colorbar_params, **kwargs)
 
     return figure, axes, smfs
-
 
 def plot_surf_vol_collage(surf, vol,
                           vol_plot_type='glass',
@@ -556,7 +550,6 @@ def _proc_ref_arg_defaults(ref, surf_mesh, bg_map, darkness):
 
     return surf_mesh, bg_map, darkness
 
-
 def _load_data_and_ref(data, space=None, hemi=None, _print=None):
     
     # Process the data + space - returns data as dict
@@ -588,7 +581,6 @@ def _load_data_and_ref(data, space=None, hemi=None, _print=None):
         ref.darkness = 1
 
     return data, ref
-
 
 def _proc_avg_method(data, rois, avg_method):
 
@@ -629,7 +621,6 @@ def _proc_colorbar(colorbar, rois):
     
     return colorbar
 
-
 def _prep_base_auto_defaults(data_as_list, rois,
                              symmetric_cbar, threshold,
                              cmap, colorbar, avg_method):
@@ -657,7 +648,6 @@ def _prep_base_auto_defaults(data_as_list, rois,
     # Return
     return symmetric_cbar, threshold, cmap, colorbar, avg_method
 
-
 def _prep_auto_defaults(data, space, hemi, rois,
                         symmetric_cbar, threshold,
                         cmap, colorbar, avg_method, _print):
@@ -672,7 +662,6 @@ def _prep_auto_defaults(data, space, hemi, rois,
                                  cmap, colorbar, avg_method)
 
     return data, ref, symmetric_cbar, threshold, cmap, colorbar, avg_method
-
 
 def _plot_surfs(data, space=None, hemi=None, surf_mesh=None,
                 bg_map=None, rois=False, cmap='default',
@@ -811,7 +800,6 @@ def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
     # Last case is symmetric cbar
     return _trunc_cmap(plt.get_cmap('cold_white_hot'), minval=0.05, maxval=0.95)
 
-
 def _plot_surfs_vol(data, space=None, hemi=None,
                     rois=False, cmap='default',
                     vol_plot_type='glass',
@@ -931,7 +919,6 @@ def plot_volume(vol,
     vol_smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
 
     return figure, axes, vol_smfs
-
 
 def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
@@ -1056,7 +1043,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     data : str, array, dict, ect...
         The data in which to plot, either statistical map or parcellaction,
         as broadly either a single surface, collage of surfaces, a single
-        volume, or collage with surfaces and volume.
+        volume, or collage with surfaces and volume, or as pandas series of ROIs and values.
     
         Data can be passed in many ways:
 
@@ -1087,6 +1074,8 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           be plotted together in a collage.
 
         - As a :class:`Nifti1Image<nibabel.nifti1.Nifti1Image>` to be plotted volumetrically.
+
+        - experimental support for pandas Series of ROI names.
 
     space : None or str, optional
         This argument defines the "space" in which
@@ -1436,7 +1425,6 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
     return None
 
-
 def _get_is_roi(args):
     
     # Vol case
@@ -1465,7 +1453,6 @@ def _get_data_func_types(data):
         is_rois.append(_get_is_roi(args))
 
     return data_func_types, data_as_list, is_rois
-
 
 def _add_grid_wh(sz, layout_params, max_cols=2):
     

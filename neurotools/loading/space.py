@@ -3,6 +3,14 @@ import os
 from .. import data_dr
 
 def get_space_options():
+    '''Simple utility design to return
+    the avaliable spaces based off the downloaded data.
+
+    Returns
+    --------
+    spaces : list
+        list of currently downloaded / avaliable spaces.
+    '''
     
     spaces = []
     
