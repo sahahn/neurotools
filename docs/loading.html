@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="misc" href="misc.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="plotting" href="plotting.html" /><link rel="prev" title="Welcome to neurotools’s documentation!" href="index.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2022.04.07"/>
         <title>loading - neurotools 0.2 documentation</title>
@@ -157,8 +157,9 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">loading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="misc.html">misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="random.html">random</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rely.html">rely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="resample.html">resample</a></li>
@@ -290,20 +291,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.56791527, 0.45237086],</span>
-<span class="go">       [0.02663918, 0.7303988 ],</span>
-<span class="go">       [0.39989259, 0.47022973],</span>
-<span class="go">       [0.90339318, 0.11033049],</span>
-<span class="go">       [0.25843855, 0.87868884]])</span>
+<span class="go">array([[0.62622465, 0.58912299],</span>
+<span class="go">       [0.1671295 , 0.92205143],</span>
+<span class="go">       [0.21148325, 0.94789813],</span>
+<span class="go">       [0.17910452, 0.56682864],</span>
+<span class="go">       [0.55262315, 0.78034317]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.56791527, 0.45237086],</span>
-<span class="go">       [0.02663918, 0.7303988 ],</span>
-<span class="go">       [0.39989259, 0.47022973],</span>
-<span class="go">       [0.90339318, 0.11033049],</span>
-<span class="go">       [0.25843855, 0.87868884]])</span>
+<span class="go">array([[0.62622465, 0.58912299],</span>
+<span class="go">       [0.1671295 , 0.92205143],</span>
+<span class="go">       [0.21148325, 0.94789813],</span>
+<span class="go">       [0.17910452, 0.56682864],</span>
+<span class="go">       [0.55262315, 0.78034317]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -497,7 +498,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/a3254d788e91f1304bb22269e2bf6f6f</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0035445690155029297 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.003592967987060547 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -518,7 +519,7 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/1b19a119018700876da5b5d953010dd4</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.003055095672607422 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.003273487091064453 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -577,10 +578,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.82670946, 0.        , 0.        , 0.44189912]),</span>
-<span class="go"> array([0.15353019, 0.        , 0.        , 0.46187378]),</span>
-<span class="go"> array([0.75647691, 0.        , 0.        , 0.75995125]),</span>
-<span class="go"> array([0.67637893, 0.        , 0.        , 0.61228901])]</span>
+<span class="go">[array([0.52758507, 0.        , 0.        , 0.05677621]),</span>
+<span class="go"> array([0.8420176, 0.       , 0.       , 0.3636364]),</span>
+<span class="go"> array([0.63429523, 0.        , 0.        , 0.18415976]),</span>
+<span class="go"> array([0.91809603, 0.        , 0.        , 0.75003445])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -596,14 +597,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d92ddf0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d940550&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d940730&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f8f6d8f49a0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fd6694931c0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd6694a65e0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd6694a60a0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fd66945adf0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.82670946, 0.        , 0.        , 0.44189912])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.52758507, 0.        , 0.        , 0.05677621])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -959,12 +960,12 @@ the avaliable spaces based off the downloaded data.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="misc.html">
+          <a class="next-page" href="plotting.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">misc</div>
+                <div class="title">plotting</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

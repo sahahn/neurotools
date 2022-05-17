@@ -10,8 +10,9 @@ The library is split up into a few different core modules:
    :caption: Contents:
 
    loading
-   misc
    plotting
+   networks
+   misc
    random
    rely
    resample
@@ -25,6 +26,7 @@ More full examples are also provided for some cases:
    :caption: Examples:
 
    test.ipynb
+   plot_cifti_from_rois/plot_cifti_from_rois.ipynb
 
 Indices and tables
 ==================
