@@ -183,8 +183,7 @@ def _test_split(all_subjects, stratify, groups, split_random_state):
                                                     stratify=stratify_vals)
 
     return g1_subjects, g2_subjects
-
-                                
+                            
 def run_rely(covars_df, data_df=None,
              contrast=None, template_path=None, mask=None,
              index_slice=None, stratify=None, groups=None,

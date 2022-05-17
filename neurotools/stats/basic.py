@@ -25,7 +25,7 @@ def get_resid(covars, data):
 
     data : numpy array
         The data in which to residualize. This
-        input muct have shape number of subjects x number of
+        input must have shape number of subjects x number of
         data features
 
     Returns
@@ -92,7 +92,23 @@ def _get_resid_without_nans(covars, data):
 
 def get_cohens(data):
     '''Get cohen's d value with or without any
-    missing values present in data'''
+    missing values present in data
+
+    Parameters
+    -----------
+    data : numpy array
+        The data in which to compute the cohen's d metric more.
+        Input must have shape number of subjects x number of
+        data features.
+
+    Returns
+    ---------
+    cohens : numpy array
+        A 1D array with the same shape as the
+        number of features / axis=1 in data, representing
+        the calculated cohen's d.
+    
+    '''
 
     if np.isnan(data).any():
         return _get_cohens_with_nan(data)

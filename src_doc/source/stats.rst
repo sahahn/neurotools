@@ -9,6 +9,12 @@ get_resid
 .. autofunction:: get_resid
 
 
+get_cohens
+============
+.. autofunction:: get_cohens
+
+
+
 .. currentmodule:: neurotools.stats.permutations
 
 permutations.permuted_v
