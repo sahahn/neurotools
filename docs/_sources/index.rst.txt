@@ -19,14 +19,17 @@ The library is split up into a few different core modules:
    stats
    transform
 
-More full examples are also provided for some cases:
+Some more complete examples can be found below:
 
 .. toctree::
    :maxdepth: 1
    :caption: Examples:
 
-   test.ipynb
    plot_cifti_from_rois/plot_cifti_from_rois.ipynb
+   plot_named_rois/plot.ipynb
+   permutations.ipynb
+   indv_network_compare.ipynb
+   
 
 Indices and tables
 ==================

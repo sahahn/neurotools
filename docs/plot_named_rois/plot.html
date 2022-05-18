@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Plotting from ROI names" href="../plot_named_rois/plot.html" /><link rel="prev" title="transform" href="../transform.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Permuted v-test with nested family" href="../permutations.html" /><link rel="prev" title="Plot cifti from ROIs" href="../plot_cifti_from_rois/plot_cifti_from_rois.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2022.04.07"/>
-        <title>Plot cifti from ROIs - neurotools 0.2 documentation</title>
+        <title>Plotting from ROI names - neurotools 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -168,8 +168,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Plot cifti from ROIs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plot_named_rois/plot.html">Plotting from ROI names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot_cifti_from_rois/plot_cifti_from_rois.html">Plot cifti from ROIs</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Plotting from ROI names</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../permutations.html">Permuted v-test with nested family</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../indv_network_compare.html">Compare Individualized Network Stats</a></li>
 </ul>
@@ -452,30 +452,25 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<section id="Plot-cifti-from-ROIs">
-<h1>Plot cifti from ROIs<a class="headerlink" href="#Plot-cifti-from-ROIs" title="Permalink to this headline">#</a></h1>
+<section id="Plotting-from-ROI-names">
+<h1>Plotting from ROI names<a class="headerlink" href="#Plotting-from-ROI-names" title="Permalink to this headline">#</a></h1>
+<p>In this simple example, we have a pandas series with a mix of cortical and subcortical features, that we want to plot.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">neurotools.plotting.ref</span> <span class="kn">import</span> <span class="n">SurfRef</span><span class="p">,</span> <span class="n">VolRef</span>
 <span class="kn">from</span> <span class="nn">neurotools.plotting</span> <span class="kn">import</span> <span class="n">plot</span>
-<span class="kn">from</span> <span class="nn">neurotools.loading</span> <span class="kn">import</span> <span class="n">load</span>
-<span class="kn">from</span> <span class="nn">neurotools.transform</span> <span class="kn">import</span> <span class="n">SurfLabels</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
 </div>
-<p>The first step is loading some set of rois for an example subject just as a 1D numpy array, in this case w/ length 379.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rois</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'ex_rois.csv'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">rois</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rois</span><span class="p">))</span>
-<span class="n">rois</span><span class="o">.</span><span class="n">shape</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rois</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'rois.csv'</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">rois</span>
 </pre></div>
 </div>
 </div>
@@ -483,87 +478,137 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(379,)
-</pre></div></div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<div class="table-wrapper"><table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Feature</th>
+<th>masked</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>lh_cort.destrieux_g.and.s.cingul.ant</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>rh_cort.destrieux_g.and.s.cingul.ant</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>lh_cort.destrieux_g.and.s.cingul.mid.ant</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>rh_cort.destrieux_g.and.s.cingul.mid.ant</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>lh_cort.destrieux_g.and.s.cingul.mid.post</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>...</th>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<th>164</th>
+<td>rh_subcort.aseg_putamen</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>165</th>
+<td>lh_subcort.aseg_thalamus.proper</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>166</th>
+<td>rh_subcort.aseg_thalamus.proper</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>167</th>
+<td>lh_subcort.aseg_ventraldc</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>168</th>
+<td>rh_subcort.aseg_ventraldc</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table></div>
+<p>169 rows × 2 columns</p>
+</div></div>
 </div>
-<p>Next, we need to load the parcellation label file in a simmilar way, i.e., as just a flat 1D array.</p>
+<p>First, let’s handle the cortical features:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parcel</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">'HCP2016FreeSurferSubcortical_dparc.dlabel.nii'</span><span class="p">)</span>
-<span class="n">parcel_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">parcel</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-<span class="n">parcel_labels</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(96854,)
-</pre></div></div>
-</div>
-<p>Then, we initialize a SurfLabels object based off the parcel labels file - which we can use to inverse transform the ROIs back into the space of the dlabel file</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sl_transformer</span> <span class="o">=</span> <span class="n">SurfLabels</span><span class="p">(</span><span class="n">parcel_labels</span><span class="p">,</span> <span class="n">background_label</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">sl_transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">rois</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/plot_cifti_from_rois_plot_cifti_from_rois_8_0.png" src="../_images/plot_cifti_from_rois_plot_cifti_from_rois_8_0.png"/>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">vol_plot_type</span><span class="o">=</span><span class="s1">'stat'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'My Data'</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize a surface reference that we will use</span>
+<span class="c1"># to extract hemisphere plotting values, we must supply the name</span>
+<span class="c1"># of the parcellation here.</span>
+<span class="n">surf_ref</span> <span class="o">=</span> <span class="n">SurfRef</span><span class="p">(</span><span class="n">space</span><span class="o">=</span><span class="s1">'fsaverage5'</span><span class="p">,</span> <span class="n">parc</span><span class="o">=</span><span class="s1">'destr'</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Get the values to plot for left and right hemispheres</span>
+<span class="c1"># Specifying only keys with .destrieux_g.</span>
+<span class="n">to_plot</span> <span class="o">=</span> <span class="n">surf_ref</span><span class="o">.</span><span class="n">get_hemis_plot_vals</span><span class="p">(</span><span class="n">rois</span><span class="p">,</span> <span class="n">i_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">'.destrieux_g.'</span><span class="p">])</span>
+
+<span class="c1"># Plot  just cortical</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">to_plot</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
-/home/sage/anaconda3/envs/bpt/lib/python3.9/site-packages/nilearn/plotting/img_plotting.py:348: FutureWarning: Default resolution of the MNI template will change from 2mm to 1mm in version 0.10.0
-  anat_img = load_mni152_template()
+Auto determined keys as lh_key=('lh_', 'start'), rh_key=('rh_', 'start').
+Start get plot vals for hemi=lh
+Start get plot vals for hemi=rh
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/plot_cifti_from_rois_plot_cifti_from_rois_9_1.png" src="../_images/plot_cifti_from_rois_plot_cifti_from_rois_9_1.png"/>
+<img alt="../_images/plot_named_rois_plot_4_1.png" src="../_images/plot_named_rois_plot_4_1.png"/>
 </div>
 </div>
+<p>Next, let’s extract just the subcortical features</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># You can also plot the parcellation</span>
-<span class="c1"># with the same command! Wowza</span>
-<span class="n">plot</span><span class="p">(</span><span class="n">parcel</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Similar to surface ref, we specify a volume reference, and extract the values needed</span>
+<span class="n">vol_ref</span> <span class="o">=</span> <span class="n">VolRef</span><span class="p">(</span><span class="n">space</span><span class="o">=</span><span class="s1">'mni_1mm'</span><span class="p">,</span> <span class="n">parc</span><span class="o">=</span><span class="s1">'aseg'</span><span class="p">)</span>
+<span class="n">vol</span> <span class="o">=</span> <span class="n">vol_ref</span><span class="o">.</span><span class="n">get_plot_vals</span><span class="p">(</span><span class="n">rois</span><span class="p">,</span> <span class="n">i_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">'.aseg_'</span><span class="p">])</span>
+
+<span class="c1"># Plot just the volume</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">vol</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">.01</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -571,7 +616,43 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/plot_cifti_from_rois_plot_cifti_from_rois_10_0.png" src="../_images/plot_cifti_from_rois_plot_cifti_from_rois_10_0.png"/>
+<img alt="../_images/plot_named_rois_plot_6_0.png" src="../_images/plot_named_rois_plot_6_0.png"/>
+</div>
+</div>
+<p>What if we want to plot them together?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add vol info to to_plot dict</span>
+<span class="n">to_plot</span><span class="p">[</span><span class="s1">'vol'</span><span class="p">]</span> <span class="o">=</span> <span class="n">vol</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">to_plot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+['lh', 'rh', 'vol']
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># And use magic plot function</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">to_plot</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">.01</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/plot_named_rois_plot_9_0.png" src="../_images/plot_named_rois_plot_9_0.png"/>
 </div>
 </div>
 </section>
@@ -581,23 +662,23 @@ div.rendered_html tbody tr:hover {
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../plot_named_rois/plot.html">
+          <a class="next-page" href="../permutations.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Plotting from ROI names</div>
+                <div class="title">Permuted v-test with nested family</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../transform.html">
+          <a class="prev-page" href="../plot_cifti_from_rois/plot_cifti_from_rois.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">transform</div>
+                <div class="title">Plot cifti from ROIs</div>
                 
               </div>
             </a>
