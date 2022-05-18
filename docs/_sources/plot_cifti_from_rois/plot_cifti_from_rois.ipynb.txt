@@ -1,6 +1,14 @@
 {
  "cells": [
   {
+   "cell_type": "markdown",
+   "id": "sacred-steel",
+   "metadata": {},
+   "source": [
+    "# Plot cifti from ROIs"
+   ]
+  },
+  {
    "cell_type": "code",
    "execution_count": 1,
    "id": "detected-percentage",
