@@ -74,7 +74,7 @@ random_effects_vars = name_replace(random_effects_vars, '.', '')
 df.index = [i.replace('NDAR_', '') for i in df.index]
 
 # Get overlap of subjects
-subjects = get_overlap_subjects(df=df, template_path=template_path,
+subjects = get_overlap_subjects(subjs=df, template_path=template_path,
                                 contrast=contrast, verbose=1)
 
 # Re-index base df

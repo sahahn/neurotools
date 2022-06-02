@@ -219,7 +219,7 @@ def load_and_setup_data(tested_vars, confounding_vars, csv_loc,
     confounding_vars.remove(tested_vars[0])
 
     # Get overlap of subjects with df and imaging data
-    subjects = get_overlap_subjects(df=df,
+    subjects = get_overlap_subjects(subjs=df,
                                     template_path=template_path,
                                     verbose=1)
 

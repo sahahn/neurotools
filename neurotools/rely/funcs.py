@@ -382,7 +382,7 @@ def run_rely(covars_df, data_df=None,
     _print = _get_print(verbose=verbose)
     
     # Get overlapping subjects
-    all_subjects = get_overlap_subjects(df=covars_df, template_path=template_path,
+    all_subjects = get_overlap_subjects(subjs=covars_df, template_path=template_path,
                                         contrast=contrast,
                                         data_df=data_df, _print=_print)
 
@@ -561,7 +561,7 @@ def load_resid_data(covars_df, contrast, template_path, mask=None,
             raise RuntimeError('template_path must be a str.')
     
     # Get overlapping subjects
-    all_subjects = get_overlap_subjects(df=covars_df,
+    all_subjects = get_overlap_subjects(subjs=covars_df,
                                         template_path=template_path,
                                         contrast=contrast,
                                         _print=_print)
