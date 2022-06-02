@@ -294,20 +294,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.54142835, 0.56404641],</span>
-<span class="go">       [0.5099113 , 0.51134164],</span>
-<span class="go">       [0.94690225, 0.20429228],</span>
-<span class="go">       [0.42909642, 0.35913417],</span>
-<span class="go">       [0.51820801, 0.74728923]])</span>
+<span class="go">array([[0.6069117 , 0.22558003],</span>
+<span class="go">       [0.14961007, 0.08143679],</span>
+<span class="go">       [0.29071452, 0.15100361],</span>
+<span class="go">       [0.16680269, 0.873708  ],</span>
+<span class="go">       [0.83456597, 0.05808181]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.54142835, 0.56404641],</span>
-<span class="go">       [0.5099113 , 0.51134164],</span>
-<span class="go">       [0.94690225, 0.20429228],</span>
-<span class="go">       [0.42909642, 0.35913417],</span>
-<span class="go">       [0.51820801, 0.74728923]])</span>
+<span class="go">array([[0.6069117 , 0.22558003],</span>
+<span class="go">       [0.14961007, 0.08143679],</span>
+<span class="go">       [0.29071452, 0.15100361],</span>
+<span class="go">       [0.16680269, 0.873708  ],</span>
+<span class="go">       [0.83456597, 0.05808181]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -487,7 +487,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">In [3]: </span><span class="n">subjs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">'data/ex1'</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">subjs</span>
-<span class="gh">Out[4]: </span><span class="go">['subj1', 'subj3', 'subj2']</span>
+<span class="gh">Out[4]: </span><span class="go">['subj3', 'subj1', 'subj2']</span>
 
 <span class="go"># Within each subject's directory is single data file</span>
 <span class="go"># E.g., loading the first subjects data</span>
@@ -499,9 +499,9 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="gp">   ...: </span>                     <span class="n">template_path</span><span class="o">=</span><span class="s1">'data/ex1/SUBJECT/data.nii.gz'</span><span class="p">)</span>
 <span class="gp">   ...: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/a3254d788e91f1304bb22269e2bf6f6f</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/819d62c6a327bffd76a4294b40916b17</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0032656192779541016 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0032253265380859375 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -520,9 +520,9 @@ Consider an additional case below:</p>
 <span class="gp">   ....: </span>                     <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 <span class="gp">   ....: </span>
 <span class="go">No existing cache found, loading directly</span>
-<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/1b19a119018700876da5b5d953010dd4</span>
+<span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/7cec15fac7eec08a38d4a389b22ca11c</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.002835512161254883 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.00286865234375 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -581,10 +581,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.85553505, 0.        , 0.        , 0.35678118]),</span>
-<span class="go"> array([0.48841622, 0.        , 0.        , 0.8321871 ]),</span>
-<span class="go"> array([0.59233834, 0.        , 0.        , 0.27522169]),</span>
-<span class="go"> array([0.61722974, 0.        , 0.        , 0.1816566 ])]</span>
+<span class="go">[array([0.29593869, 0.        , 0.        , 0.97224539]),</span>
+<span class="go"> array([0.34656873, 0.        , 0.        , 0.0114889 ]),</span>
+<span class="go"> array([0.94100469, 0.        , 0.        , 0.7409963 ]),</span>
+<span class="go"> array([0.51166257, 0.        , 0.        , 0.54927979])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -600,14 +600,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f58f5540f10&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f58f55408e0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f58f55082b0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f58f55086d0&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7f6263f9e4c0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6263f9e340&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6263f9e310&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7f6263f9e3d0&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.85553505, 0.        , 0.        , 0.35678118])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.29593869, 0.        , 0.        , 0.97224539])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
@@ -623,18 +623,21 @@ to each passed subject’s reversed data.</p>
 <h2>get_overlap_subjects<a class="headerlink" href="#get-overlap-subjects" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="neurotools.loading.get_overlap_subjects">
-<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">get_overlap_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.get_overlap_subjects" title="Permalink to this definition">#</a></dt>
-<dd><p>Helper function to be used when working with template_path style saved
-data in order to compute an overlapping set of subjects between a dataframe
+<span class="sig-prename descclassname"><span class="pre">neurotools.loading.</span></span><span class="sig-name descname"><span class="pre">get_overlap_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neurotools.loading.get_overlap_subjects" title="Permalink to this definition">#</a></dt>
+<dd><dl>
+<dt>Helper function to be used when working with template_path style saved</dt><dd><p>data in order to compute an overlapping set of subjects between a dataframe
 and a template path, or alternatively between two dataframes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>) – A <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> that is indexed by the names of the
+<dl>
+<dt>subjs<span class="classifier">list-like or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Either list-like or a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>
+that is indexed by the names of the
 subjects in which to overlap.
 Where the names correspond in some way to the
-way the way the subject’s data is saved.</p></li>
-<li><p><strong>template_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>A str indicating the template form for how a single
+way the way the subject’s data is saved.</p>
+</dd>
+</dl>
+</dd>
+<dt>s</dt><dd><dl>
+<dt>template_path<span class="classifier">str, list of str, optional</span></dt><dd><p>A str indicating the template form for how a single
 subjects data should be loaded (or in this case located),
 where SUBJECT will be replaced with that subjects name,
 and optionally CONTRAST will be replaced with the contrast name.</p>
@@ -642,13 +645,14 @@ and optionally CONTRAST will be replaced with the contrast name.</p>
 ‘some_loc/X_Y.nii.gz’
 the template_path would be: ‘some_loc/SUBJECT_CONTRAST.nii.gz’.</p>
 <p>Note that the use of a CONTRAST argument is optional.</p>
+<p>You can also pass a list of template_path’s in which to overlap.</p>
 <p>Note that if this parameter is passed, then data_df will
 be ignored!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
-</p></li>
-<li><p><strong>contrast</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The name of the contrast, used along with the template
+</dd>
+<dt>contrast<span class="classifier">str, optional</span></dt><dd><p>The name of the contrast, used along with the template
 path to define where to load data.</p>
 <p>If passed <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> then it is assumed that CONTRAST
 is not present in the template_path and will be ignored.</p>
@@ -657,15 +661,15 @@ be ignored! This parameter is used only with the template_path option.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
-</p></li>
-<li><p><strong>data_df</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional) – <p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
+</dd>
+<dt>data_df<span class="classifier"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>, optional</span></dt><dd><p>Optionally specify a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>, indexed by subject, in which
 to overlap with <cite>df</cite>, INSTEAD of a template_path and / or contrast set of arguments.
 Explicitly, if specifying a data_df, a template_path should not be passed!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
-</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – <p>By default this value is 1. This parameter
+</dd>
+<dt>verbose<span class="classifier">int, optional</span></dt><dd><p>By default this value is 1. This parameter
 controls the verbosity of this function.</p>
 <p>If -1, then no message at all will be printed.
 If 0, only warnings will be printed.
@@ -674,8 +678,8 @@ If &gt;= 2, full verbosity will be enabled.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
-</p></li>
-</ul>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
