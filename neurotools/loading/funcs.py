@@ -801,19 +801,19 @@ s
         
         # Single tp case
         else:
-            all_subjects = [s for s in subjs if 
+            all_subjects = [subj for subj in subjs if 
                             os.path.exists(_apply_template(subject=subj,
                                                            template_path=template_path,
                                                            contrast=contrast))]
 
     # Unless computing just overlap with data df
     else:
-        all_subjects = [s for s in subjs if s in data_df.index]
+        all_subjects = [subj for subj in subjs if subj in data_df.index]
 
     _print('Found', len(all_subjects), 'subjects with data.', level=1)
     
     # Print missing subjects if high enough verbose
-    missing_subjects = [s for s in subjs if s not in all_subjects]
+    missing_subjects = [subj for ssubj in subjs if subj not in all_subjects]
     _print('Missing:', missing_subjects, level=2)
 
     return all_subjects
