@@ -294,20 +294,20 @@ getting rid of any used dimensions.</p>
 <span class="go"># Let's say we want to select columns 0 and 1</span>
 <span class="gp">In [8]: </span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="gh">Out[8]: </span><span class="go"></span>
-<span class="go">array([[0.65792481, 0.27304543],</span>
-<span class="go">       [0.33713486, 0.00904382],</span>
-<span class="go">       [0.40827595, 0.66429283],</span>
-<span class="go">       [0.246651  , 0.62702105],</span>
-<span class="go">       [0.3667798 , 0.5263324 ]])</span>
+<span class="go">array([[0.72985059, 0.00102751],</span>
+<span class="go">       [0.98263662, 0.34106399],</span>
+<span class="go">       [0.57454001, 0.23615256],</span>
+<span class="go">       [0.84292275, 0.74310495],</span>
+<span class="go">       [0.06495864, 0.60732639]])</span>
 
 <span class="go"># It's a bit more awkward but we pass:</span>
 <span class="gp">In [9]: </span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_slice</span><span class="o">=</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
-<span class="go">array([[0.65792481, 0.27304543],</span>
-<span class="go">       [0.33713486, 0.00904382],</span>
-<span class="go">       [0.40827595, 0.66429283],</span>
-<span class="go">       [0.246651  , 0.62702105],</span>
-<span class="go">       [0.3667798 , 0.5263324 ]])</span>
+<span class="go">array([[0.72985059, 0.00102751],</span>
+<span class="go">       [0.98263662, 0.34106399],</span>
+<span class="go">       [0.57454001, 0.23615256],</span>
+<span class="go">       [0.84292275, 0.74310495],</span>
+<span class="go">       [0.06495864, 0.60732639]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -501,7 +501,7 @@ concatenating the data from three subjects: ‘subj1’, ‘subj2’ and subj3�
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/819d62c6a327bffd76a4294b40916b17</span>
 <span class="go">Current saved size is: 368 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 10) in 0.0047419071197509766 seconds.</span>
+<span class="go">Loaded data with shape: (3, 10) in 0.0044171810150146484 seconds.</span>
 
 <span class="gp">In [7]: </span><span class="n">all_data</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(3, 10)</span>
@@ -522,7 +522,7 @@ Consider an additional case below:</p>
 <span class="go">No existing cache found, loading directly</span>
 <span class="go">Saving loaded data to cache_loc: /home/runner/neurotools_cache/_base_load_data/7cec15fac7eec08a38d4a389b22ca11c</span>
 <span class="go">Current saved size is: 544 / 32212254720 (cache_max_sz)</span>
-<span class="go">Loaded data with shape: (3, 2) in 0.004310131072998047 seconds.</span>
+<span class="go">Loaded data with shape: (3, 2) in 0.00432586669921875 seconds.</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -581,10 +581,10 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [6]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
-<span class="go">[array([0.53680549, 0.        , 0.        , 0.28329039]),</span>
-<span class="go"> array([0.3312956 , 0.        , 0.        , 0.99347716]),</span>
-<span class="go"> array([0.22654325, 0.        , 0.        , 0.08000247]),</span>
-<span class="go"> array([0.98306101, 0.        , 0.        , 0.66172256])]</span>
+<span class="go">[array([0.36550292, 0.        , 0.        , 0.48926144]),</span>
+<span class="go"> array([0.06822381, 0.        , 0.        , 0.56173037]),</span>
+<span class="go"> array([0.86999783, 0.        , 0.        , 0.01415011]),</span>
+<span class="go"> array([0.78179444, 0.        , 0.        , 0.90679894])]</span>
 
 <span class="gp">In [7]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 <span class="gh">Out[7]: </span><span class="go">(4,)</span>
@@ -600,14 +600,14 @@ to each passed subject’s reversed data.</p>
 
 <span class="gp">In [11]: </span><span class="n">reversed_data</span>
 <span class="gh">Out[11]: </span><span class="go"></span>
-<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7ff3562667c0&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff356266070&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff356266130&gt;,</span>
-<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7ff356266640&gt;]</span>
+<span class="go">[&lt;nibabel.nifti1.Nifti1Image at 0x7fde79325220&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fde79325580&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fde79325fa0&gt;,</span>
+<span class="go"> &lt;nibabel.nifti1.Nifti1Image at 0x7fde79337070&gt;]</span>
 
 <span class="go"># Closer look</span>
 <span class="gp">In [12]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.53680549, 0.        , 0.        , 0.28329039])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.36550292, 0.        , 0.        , 0.48926144])</span>
 
 <span class="gp">In [13]: </span><span class="n">reversed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">affine</span>
 <span class="gh">Out[13]: </span><span class="go"></span>
