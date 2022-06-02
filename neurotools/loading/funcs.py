@@ -813,7 +813,7 @@ s
     _print('Found', len(all_subjects), 'subjects with data.', level=1)
     
     # Print missing subjects if high enough verbose
-    missing_subjects = [subj for ssubj in subjs if subj not in all_subjects]
+    missing_subjects = [subj for subj in subjs if subj not in all_subjects]
     _print('Missing:', missing_subjects, level=2)
 
     return all_subjects
