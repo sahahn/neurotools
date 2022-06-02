@@ -5,6 +5,7 @@ import time
 from joblib import Parallel, delayed
 from nibabel import freesurfer as fs
 from nibabel import GiftiImage
+import pandas as pd
 from .cache import _base_cache_load
 from ..misc.print import _get_print
 
@@ -697,7 +698,7 @@ def _project_single_subj(subj, mask, mask_affine):
 
     return proj_subj
 
-def get_overlap_subjects(df, template_path=None, contrast=None,
+def get_overlap_subjects(subjs, template_path=None, contrast=None,
                          data_df=None, verbose=1, _print=None):
     '''Helper function to be used when working with template_path style saved
     data in order to compute an overlapping set of subjects between a dataframe
@@ -705,13 +706,14 @@ def get_overlap_subjects(df, template_path=None, contrast=None,
 
     Parameters
     ----------
-    df : :class:`pandas.DataFrame`
-        A :class:`pandas.DataFrame` that is indexed by the names of the
+    subjs : list-like or :class:`pandas.DataFrame`
+        Either list-like or a :class:`pandas.DataFrame`
+        that is indexed by the names of the
         subjects in which to overlap.
         Where the names correspond in some way to the
         way the way the subject's data is saved.
-
-    template_path : str, optional
+s
+    template_path : str, list of str, optional
         A str indicating the template form for how a single
         subjects data should be loaded (or in this case located),
         where SUBJECT will be replaced with that subjects name,
@@ -722,6 +724,8 @@ def get_overlap_subjects(df, template_path=None, contrast=None,
         the template_path would be: 'some_loc/SUBJECT_CONTRAST.nii.gz'.
 
         Note that the use of a CONTRAST argument is optional.
+
+        You can also pass a list of template_path's in which to overlap.
 
         Note that if this parameter is passed, then data_df will
         be ignored!
@@ -768,27 +772,48 @@ def get_overlap_subjects(df, template_path=None, contrast=None,
 
     '''
 
+    # Convert from pandas index if needed
+    if isinstance(subjs, (pd.DataFrame, pd.Series)):
+        subjs = subjs.index
+
     # Either init _print or use passed value
     _print = _get_print(verbose, _print=_print)
 
-    _print('Passed df with shape', df.shape, level=1)
+    _print(f'Passed {len(subjs)} subjects', level=1)
     _print('Determining valid overlap subjects', level=1)
     
     # Only include subject if found as file
     if template_path is not None:
-        all_subjects = [s for s in df.index if 
-                        os.path.exists(_apply_template(subject=s,
-                                                       template_path=template_path,
-                                                       contrast=contrast))]
 
-    # Unless computing overlap with data df
+        if data_df is not None:
+            raise RuntimeError('You cannot pass both data_df and template path.')
+
+        # Only add if in all template paths
+        if isinstance(template_path, list):
+            all_subjects = []
+            
+            for subj in subjs:
+                if all([os.path.exists(_apply_template(subject=subj,
+                                                       template_path=tp,
+                                                       contrast=contrast))
+                        for tp in template_path]):
+                    all_subjects.append(subj)
+        
+        # Single tp case
+        else:
+            all_subjects = [s for s in subjs if 
+                            os.path.exists(_apply_template(subject=subj,
+                                                           template_path=template_path,
+                                                           contrast=contrast))]
+
+    # Unless computing just overlap with data df
     else:
-        all_subjects = [s for s in df.index if s in data_df.index]
+        all_subjects = [s for s in subjs if s in data_df.index]
 
     _print('Found', len(all_subjects), 'subjects with data.', level=1)
     
     # Print missing subjects if high enough verbose
-    missing_subjects = [s for s in df.index if s not in all_subjects]
+    missing_subjects = [s for s in subjs if s not in all_subjects]
     _print('Missing:', missing_subjects, level=2)
 
     return all_subjects
