@@ -26,7 +26,8 @@ setup(name='bp-neurotools',
           'statsmodels>=0.13.2',
           'matplotlib>=3.3.4',
           'nilearn>=0.8.1',
-          'networkx'
+          'networkx',
+          'seaborn'
       ],
       test_suite='pytest',
       tests_require=['pytest', 'coverage'],
