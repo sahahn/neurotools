@@ -712,7 +712,7 @@ def get_overlap_subjects(subjs, template_path=None, contrast=None,
         subjects in which to overlap.
         Where the names correspond in some way to the
         way the way the subject's data is saved.
-s
+
     template_path : str, list of str, optional
         A str indicating the template form for how a single
         subjects data should be loaded (or in this case located),
