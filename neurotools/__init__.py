@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from urllib import request
 import tarfile
-import warnings
 
 # Set version
 __version__ = '0.24'

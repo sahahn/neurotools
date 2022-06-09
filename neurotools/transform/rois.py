@@ -555,6 +555,14 @@ class SurfMaps(BaseEstimator, TransformerMixin):
         self.mask = mask
         self.vectorize = vectorize
 
+    @property
+    def roi_labels(self):
+        return {i: label for i, label in enumerate(self.non_bkg_unique_)}
+
+    @property
+    def labels_to_roi(self):
+        return {label: i for i, label in enumerate(self.non_bkg_unique_)}
+
     def fit(self, X, y=None):
         '''Fit this object according
         the passed subjects data, X.
