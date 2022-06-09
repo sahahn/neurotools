@@ -559,9 +559,12 @@ class SurfMaps(BaseEstimator, TransformerMixin):
     def roi_labels(self):
         return {i: label for i, label in enumerate(self.non_bkg_unique_)}
 
-    @property
-    def labels_to_roi(self):
-        return {label: i for i, label in enumerate(self.non_bkg_unique_)}
+    def labels_to_roi_index(self, labels):
+
+        label_map = {label: i for i, label in enumerate(self.non_bkg_unique_)}
+        roi_index = np.array([label_map[l] for l in labels])
+        
+        return roi_index
 
     def fit(self, X, y=None):
         '''Fit this object according
