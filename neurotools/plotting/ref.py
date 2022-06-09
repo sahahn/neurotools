@@ -10,6 +10,7 @@ from ..loading.from_data import get_surf_loc
 from difflib import SequenceMatcher
 from ..misc.text import clean_key
 from itertools import permutations
+from .funcs import _data_to_dict
 
 import warnings
 with warnings.catch_warnings():
@@ -43,46 +44,7 @@ def _load_mapping(loc):
 
     return mapping
 
-def _get_col_names(df):
-    
-    all_cols = list(df)
 
-    for a in all_cols:
-        try:
-            df[a].astype('float')
-            value_col = a
-        except ValueError:
-            name_col = a
-
-    return name_col, value_col
-
-def _data_to_dict(data):
-
-    # If series convert to dict directly
-    if isinstance(data, pd.Series):
-        return data.to_dict()
-        
-    # If df
-    elif isinstance(data, pd.DataFrame):
-
-        # If only 1 col, use index as name col
-        if len(list(data)) == 1:
-            return data[list(data)[0]].to_dict()
-
-        # If 2 col DF proc
-        as_dict = {}
-        name_col, value_col = _get_col_names(data)
-
-        for i in data.index:
-            name = data[name_col].loc[i]
-            as_dict[name] = data[value_col].loc[i]
-
-        return as_dict
-
-    elif isinstance(data, dict):
-        return data
-
-    raise RuntimeError('Invalid format passed for data, must be dict, pd.Series or pd.DataFrame')
 
 def auto_determine_lh_rh_keys(data):
 

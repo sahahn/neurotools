@@ -377,6 +377,54 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             # Data dim is 0 since the shapes match
             self.data_dim_ = 0
 
+    @property
+    def roi_labels(self):
+        '''Stores a mapping between the index of the outputted transformed output,
+        and the original label.
+        '''
+        return {i: label for i, label in enumerate(self.non_bkg_unique_)}
+
+    def labels_to_roi_index(self, labels):
+        '''Convert from label values to the corresponding
+        index of the outputted ROIs.
+
+        Parameters
+        -----------
+        labels : array-like
+            Array-like of values found in self.labels_
+
+        Returns
+        --------
+        roi_index : array
+            The index of the outputted ROI per label passed.
+        '''
+
+        label_map = {label: i for i, label in enumerate(self.non_bkg_unique_)}
+        roi_index = np.array([label_map[l] for l in labels])
+        
+        return roi_index
+
+    def locs_to_roi_index(self, locs):
+        '''Convert from index locations in the original
+        data, e.g., surface vertex, to the corresponding
+        index of the outputted ROIs.
+        
+        Parameters
+        -----------
+        locs : array-like of int
+            An array-like of ints corresponding
+            to index within the spatial dimension of the
+            passed input data to transform.
+
+        Returns
+        --------
+        roi_index : array
+            The index of the outputted ROI per index loc passed.
+        '''
+
+        labels = self.labels_[locs]
+        return self.labels_to_roi_index(labels)
+
 
 class SurfMaps(BaseEstimator, TransformerMixin):
     '''Extract signals from overlapping labels for surface data.

@@ -175,8 +175,9 @@ def auto_load_rois(data, space=None, hemi=None, verbose=None, _print=None):
         
 def _get_most_likely_parcel(data):
 
-    # Get some helpful tools from ref
-    from ..plotting.ref import _load_mapping, _data_to_dict
+    # Get some helpful tools from ref / funcs
+    from ..plotting.ref import _load_mapping
+    from ..plotting.funcs import _data_to_dict
 
     # Load all mappings
     mappings_dr = os.path.join(data_dr, 'mappings')

@@ -5,76 +5,18 @@ from .plot_single_surf import plot_single_surf, add_collage_colorbar
 from .ref import SurfRef
 from ..transform.space import process_space
 from scipy.stats import scoreatpercentile
-import nibabel as nib
 from ..misc.print import _get_print
-import matplotlib.colors as colors
+from .funcs import (_proc_vs, _collapse_data, _data_to_dict,
+                    _get_if_sym_cbar, _proc_cmap, _get_colors)
+import pandas as pd
+import seaborn as sns
+
 
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter(action='ignore', category=FutureWarning)
     from nilearn.plotting import plot_glass_brain, plot_stat_map, plot_roi
 
-
-def _trunc_cmap(cmap, minval=0.0, maxval=1.0, n=1000):
-    
-    new_cmap = colors.LinearSegmentedColormap.from_list(
-        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    
-    return new_cmap
-
-def _proc_vs(data, vmin, vmax, symmetric_cbar):
-    
-    # If already set, skip
-    if vmin is not None and vmax is not None:
-        return vmin, vmax
-    
-    # Get data as flat array
-    flat_data = _collapse_data(data)
-
-    # Small percent of min / max to add to either end
-    s = np.nanmax(np.abs(flat_data)) / 25
-    
-    # Both not set case
-    if vmin is None and vmax is None:
-
-        # If not symmetric_cbar, then these value
-        # stay fixed as this
-        vmin, vmax = np.nanmin(flat_data) - s, np.nanmax(flat_data) + s
-        
-        # If symmetric need to override either
-        # vmin or vmax to be the opposite of the larger
-        if symmetric_cbar:
-            
-            # vmin is larger, override vmax
-            if np.abs(vmin) > vmax:
-                vmax = -vmin
-            
-            # vmax is larger, override vmin
-            else:
-                vmin = -vmax
-    
-    # If just vmin not set
-    if vmin is None:
-        
-        # If vmax set, vmin not, and symmetric cbar
-        # then vmin is -vmax
-        if symmetric_cbar:
-            vmin = -vmax
-        
-        # Otherwise, vmin is just the min value in the data
-        else:
-            vmin = np.nanmin(flat_data) - s
-
-    # If vmax not set, same cases as above but flipped
-    if vmax is None:
-
-        if symmetric_cbar:
-            vmax = -vmin
-        else:
-            vmax = np.nanmax(flat_data) + s
-
-    return vmin, vmax
 
 def _proc_threshold(data, threshold, percentile=75, rois=False):
     
@@ -101,57 +43,6 @@ def _proc_threshold(data, threshold, percentile=75, rois=False):
     threshold = scoreatpercentile(flat_data[flat_data != 0], per=percentile) - 1e-5
 
     return threshold
-
-def _collapse_data(data):
-    '''Assumes data is in standard {} form.'''
-    
-    # If directly nifti image
-    if isinstance(data, nib.Nifti1Image):
-        return np.array(data.get_fdata()).flatten()
-    
-    # Directly ndarray case
-    elif isinstance(data, np.ndarray):
-        return np.array(data).flatten()
-    
-    # Init empty list
-    collapsed = []
-    
-    # Handle passed as dict or list
-    # of arrays
-    for key in data:
-
-        # Get as item / array
-        if isinstance(data, dict):
-            item = data[key]
-        else:
-            item = key
-
-        # Recursive case add
-        collapsed.append(_collapse_data(item))
-
-    # Return as concat version
-    return np.concatenate(collapsed)
-
-def _get_if_sym_cbar(data, symmetric_cbar, rois=False):
-    '''Assumes data is in standard {} form.'''
-     
-    # If user passed, keep that value
-    if not (symmetric_cbar == 'auto' or symmetric_cbar == 'default'):
-        return symmetric_cbar
-    
-    # If rois, default = False, so return
-    if rois:
-        return False
-    
-    # Get data as 1D array
-    flat_data = _collapse_data(data)
-
-    # If all positive or negative, assume false
-    if np.all(flat_data >= 0) or np.all(flat_data <= 0):
-        return False
-
-    # Otherwise, assume is symmetric
-    return True
 
 def _add_plots_to_axes(figure, grid, proj_3d, n_cols, n_rows, widths):
 
@@ -776,29 +667,6 @@ def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
     colorbar_params = {**colorbar_params, **kwargs_colorbar_params}
 
     return colorbar_params
-
-def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
-    
-    # Keep user passed if not user passed
-    if not (cmap == 'default' or cmap is None or cmap == 'auto'):
-        return cmap
-    
-    # If plotting rois
-    if rois:
-        return 'prism'
-    
-    # If not symmetric, then just do Reds or Blues
-    if symmetric_cbar is False:
-
-        # If max value is 0 or less, use Blues
-        if np.nanmax(flat_data)  <= 0:
-            return 'Blues_r'
-
-        # Otherwise, reds
-        return 'Reds'
-
-    # Last case is symmetric cbar
-    return _trunc_cmap(plt.get_cmap('cold_white_hot'), minval=0.05, maxval=0.95)
 
 def _plot_surfs_vol(data, space=None, hemi=None,
                     rois=False, cmap='default',
@@ -1554,6 +1422,9 @@ def meta_collage(data, title=None, sub_titles=True,
                  vmax=None, colorbar_params=None, threshold='auto',
                  symmetric_cbar='auto', cmap='default', 
                  avg_method='default', sub_kwargs=None, **kwargs):
+    '''TODO Still work in progress, a number of formatting issues still.
+    Likely want to replace with something way more simple. E.g., use subplots
+    and don't try to share colorbar.'''
     
     # Check explicit sub kwargs
     if sub_kwargs is None:
@@ -1674,3 +1545,69 @@ def meta_collage(data, title=None, sub_titles=True,
                              threshold=threshold,
                              cmap=cmap,
                              **kwargs)
+
+def plot_bars(fis, top_n=5,
+              threshold=None,
+              ci='sd', ax=None,
+              var_name='Feature Name',
+              value_name='Feature Importance',
+              cmap='default', is_symmetric='auto',
+              vmin=None, vmax=None,
+              **plot_kwargs):
+    
+    # Get mean representation, if not already mean format
+    mean_fis = _data_to_dict(fis)
+    mean_fis_vals = np.array(list(mean_fis.values()))
+
+    # Get top n, just as the feature names
+    sorted_fis = np.array(sorted(mean_fis, key=lambda item: mean_fis[item]))
+    
+    # Determine is sym
+    is_sym = _get_if_sym_cbar(mean_fis_vals, symmetric_cbar=is_symmetric)
+
+    # Either use top n feats, or threshold
+    if threshold is None:
+    
+        top_feats = list(sorted_fis[-top_n:])
+        if is_sym:
+            top_feats = list(sorted_fis[:top_n]) + top_feats
+
+    # If threshold case, use that to define top feats to plot
+    else:
+
+        sorted_fis_vals = np.array([mean_fis[f] for f in sorted_fis])
+        top_feats = list(sorted_fis[np.abs(sorted_fis_vals) >= threshold])
+
+    # Extract vals
+    top_feat_vals = [mean_fis[f] for f in top_feats]
+
+    # If in repeated measure format, use directly
+    # as the plotting df, well after melt
+    if isinstance(fis, pd.DataFrame) and fis.shape[1] > 2:
+        plot_df = fis[top_feats].melt(var_name=var_name, value_name=value_name)
+
+    # Otherwise, use the mean fis directly
+    else:
+        plot_df = pd.DataFrame.from_dict({var_name: top_feats,
+                                          value_name: top_feat_vals})
+
+    # Get the colors of what to plot based on reference from top
+    # to all others and convert to dict pallette form
+    colors = _get_colors(top_feat_vals, mean_fis_vals, cmap=cmap,
+                         symmetric_cbar=is_sym, vmin=vmin, vmax=vmax)
+    palette = {w: c for w, c in zip(top_feats, colors)}
+    
+    # Make bar plot w/ seaborn
+    sns.barplot(x=value_name, y=var_name, orient='h',
+                data=plot_df, ci=ci, palette=palette,
+                ax=ax, **plot_kwargs)
+
+    # Add an extra line down the center + despine
+    if ax is None:
+        current_ax = plt.gca()
+        current_ax.axvline(0, color='k', lw=.2)
+        sns.despine(ax=current_ax, top=True, left=True, bottom=True,
+                    right=True)
+    else:
+        ax.axvline(0, color='k', lw=.2)
+        sns.despine(ax=ax, top=True, left=True, bottom=True, right=True)

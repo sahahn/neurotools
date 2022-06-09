@@ -6,7 +6,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='bp-neurotools',
-      version='0.23',
+      version='0.24',
       long_description=long_description,
       long_description_content_type='text/markdown',
       description='General helper functions for working with neuroimaging data.',
@@ -26,7 +26,8 @@ setup(name='bp-neurotools',
           'statsmodels>=0.13.2',
           'matplotlib>=3.3.4',
           'nilearn>=0.8.1',
-          'networkx'
+          'networkx',
+          'seaborn'
       ],
       test_suite='pytest',
       tests_require=['pytest', 'coverage'],

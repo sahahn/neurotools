@@ -10,35 +10,11 @@ import nibabel as nib
 from ..transform.rois import project_map_fis
 from .plot import plot
 
-from matplotlib.cm import get_cmap
 from matplotlib.colors import Normalize
 import seaborn as sns
-from .plot import _proc_vs, _get_if_sym_cbar, _proc_cmap
+from .funcs import _get_colors
 
 from textwrap import wrap
-
-def get_colors(weights, ref_weights, symmetric_cbar='auto',
-               cmap='default', vmin=None, vmax=None):
-
-    # Idea is use ref weights to determine sym cbar, cmap, vmin, vmax
-    # then normalize just the base weights - since get colors is used on a subset of
-    # either the degrees or edges ... 
-
-    # Process automatic symmetric_cbar
-    symmetric_cbar = _get_if_sym_cbar(ref_weights,
-                                      symmetric_cbar=symmetric_cbar,
-                                      rois=False) 
-
-    # Get cmap based on passed + if rois or not + if sym
-    cmap = _proc_cmap(cmap, rois=False, symmetric_cbar=symmetric_cbar, flat_data=ref_weights)
-    our_cmap = get_cmap(cmap)
-    
-    # Get normalize object - should end up 0 to 1
-    vmin, vmax = _proc_vs(ref_weights, vmin=vmin, vmax=vmax,
-                          symmetric_cbar=symmetric_cbar)
-    norm = Normalize(vmin=vmin, vmax=vmax)
-    
-    return [our_cmap(norm(w)) for w in weights]
 
 def _scale_weights(weights, ref_weights):
     
@@ -76,7 +52,7 @@ def add_subgraph_plot(sub_G, G, ax, edge_scale=5,
 
     # Optionally color edges
     if color_edges:
-        colors = get_colors(scaled_weights, ref_scaled_weights)
+        colors = _get_colors(scaled_weights, ref_scaled_weights)
         node_color = 'grey'
     else:
         colors = None
@@ -307,7 +283,7 @@ def _add_bars(degrees, fig, gs, feat_lim=20):
     # Use full degrees as reference for getting colors
     weights = np.array(df['Weighted Degree'])
     ref_weights = np.array(degrees)
-    colors = get_colors(weights, ref_weights)
+    colors = _get_colors(weights, ref_weights)
     palette = {w: c for w, c in zip(df['Node'], colors)}
 
     # Plot

@@ -2,10 +2,9 @@ from pathlib import Path
 import os
 from urllib import request
 import tarfile
-import warnings
 
 # Set version
-__version__ = '0.23'
+__version__ = '0.24'
 __data_version__ = '1.2.5'
 
 CURRENT_DR = Path(__file__).parent.absolute()
