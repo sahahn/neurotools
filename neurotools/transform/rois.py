@@ -379,6 +379,8 @@ class SurfLabels(BaseEstimator, TransformerMixin):
 
     @property
     def roi_labels(self):
+        '''Stores a mapping between the index of the outputted transformed output,
+        and the original label.'''
         return {i: label for i, label in enumerate(self.non_bkg_unique_)}
 
     def labels_to_roi_index(self, labels):
