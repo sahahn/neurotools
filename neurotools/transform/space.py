@@ -282,6 +282,16 @@ def process_space(data, space=None, hemi=None,
                 elif len(data) == sub_sz:
                     vol_data = data
                     break
+        
+        # Native space default
+        if space == 'native' and lh_data is None and rh_data is None:
+
+            if hemi is None or hemi == 'lh':
+                _print('Assuming native surface space left hemisphere', level=1)
+                lh_data = data
+            else:
+                _print('Assuming native surface space right hemisphere', level=1)
+                rh_data = data
 
     # Make sure something found, if not error
     if lh_data is None and rh_data is None and vol_data is None:

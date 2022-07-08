@@ -718,7 +718,6 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     
     # Set default figsize based on if colorbar
     if figsize == 'default':
-
         if colorbar:
             figsize = (12, 12)
         else:
@@ -927,9 +926,9 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           allows the user most control over how data is specified.
           Dictionary keys must be one or more of 'lh', 'rh' and 'vol',
           where values can be either array-like, file locations or nibabel
-          objects. Note that if you are trying to plot data in native
-          subject space, it must be passed in this dictionary style, along
-          with, if a surface, a proper value for surf_mesh.
+          objects. Note that if you are trying to plot data in "native"
+          subject space, it should be passed in this dictionary style, along
+          with, if a surface, a proper value for surf_mesh
 
         - As a list or array-like of length 3, indicating internally
           that the passed values represent in the first index the file location
