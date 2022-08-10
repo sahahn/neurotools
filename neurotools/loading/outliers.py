@@ -42,7 +42,7 @@ def drop_top_x_outliers(data, subjects=None, top=50):
     '''
 
     abs_data = np.abs(data)
-    m = np.mean(abs_data, axis=1)
+    m = np.nanmean(abs_data, axis=1)
     to_drop = np.argsort(m)[-top:]
     to_keep = np.ones(m.shape, dtype='bool')
     to_keep[to_drop] = 0
