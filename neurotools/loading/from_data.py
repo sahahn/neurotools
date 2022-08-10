@@ -132,7 +132,7 @@ def auto_load_rois(data, space=None, hemi=None, verbose=None, _print=None):
 
     # Try each
     for space in space_options:
-        
+
         try:
 
             # Run to check to see if works, w/ errors / warnings muted
