@@ -197,14 +197,19 @@ class SurfLabels(BaseEstimator, TransformerMixin):
                 default = None
         '''
 
+        # If passed as list of subjects, try to cast
+        # to array
+        if isinstance(X, list):
+            X = np.array(X)
+
         # X can either be a 1D surface, or a 2D surface
         # (e.g. - for timeseries or stacked contrasts)
         if len(X.shape) > 2:
             raise RuntimeError('X can be at most 2D.')
-        
+
         # Perform pieces of fit not based on passed data
         self._base_fit()
-        
+
         # Make sure labels matches X shape
         if len(self.labels_) not in X.shape:
             raise RuntimeError('Size of labels not found in X. '
@@ -363,11 +368,11 @@ class SurfLabels(BaseEstimator, TransformerMixin):
     def _check_inverse_transform_fitted(self, X_trans):
         '''There is a case where we just want to use the Transformer Object
         to inverse transform, which means it has not been fitted yet.'''
-        
+
         # If not fitted, fit based on reasonable values
         if not hasattr(self, "labels_"):
             self._base_fit()
-            
+
             # Set just to whatever current shape is
             self.original_transformed_shape_ = X_trans.shape
 
@@ -379,10 +384,10 @@ class SurfLabels(BaseEstimator, TransformerMixin):
 
     @property
     def roi_labels(self):
-        '''Stores a mapping between the index of the outputted transformed output,
-        and the original label.
+        '''Stores a mapping between the index of the outputted
+        transformed output, and the original label.
         '''
-        return {i: label for i, label in enumerate(self.non_bkg_unique_)}
+        return dict(enumerate(self.non_bkg_unique_))
 
     def labels_to_roi_index(self, labels):
         '''Convert from label values to the corresponding
