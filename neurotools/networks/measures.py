@@ -1,12 +1,14 @@
 import numpy as np
 import networkx as nx
+import networkx.algorithms.community as nx_comm
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def lovain_modularity(G):
-    import networkx.algorithms.community as nx_comm
+    '''Wrapper around networkx function'''
 
     return nx_comm.modularity(G, nx_comm.louvain_communities(G))
+
 
 class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
     '''This class is designed for thresholding and then extracting network
@@ -149,11 +151,14 @@ class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
     ensure_incr : float, optional
         The amount in which to increment each time when checking
         for an ensure criteria. Note if ensure is None, this
-        parameter is not used. Also note that this value in the case of threshold_method by value,
+        parameter is not used. Also note that this value in the case of
+        threshold_method by value,
         is repeatedly decremented from the original passed
-        threshold, unless the threshold type is 'neg', in that case it will be incremented.
+        threshold, unless the threshold type is 'neg', in that case it
+        will be incremented.
 
-        In the case of threshold_type is density, this value will always be incremented,
+        In the case of threshold_type is density, this value will
+        always be incremented,
         as only positive thresholds make sense for density.
 
         ::
@@ -215,7 +220,7 @@ class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
         # used nested in pipeline w/ param searches or
         # outside of ML
         self._param_checks()
-        
+
         # Store passed as initiaL
         self._threshold = self.threshold
 
@@ -231,7 +236,7 @@ class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
             'sigma': (nx.sigma, False),
             'omega': (nx.omega, False),
             'transitivity': (nx.transitivity, False),
-            'lovain_modularity' : (lovain_modularity, False),
+            'lovain_modularity': (lovain_modularity, False),
             'avg_eigenvector_centrality': (nx.eigenvector_centrality_numpy, True),
             'avg_closeness_centrality': (nx.closeness_centrality, True),
             'avg_degree': (self._avg_degree, False),
@@ -368,7 +373,6 @@ class ThresholdNetworkMeasures(BaseEstimator, TransformerMixin):
         else:
             raise RuntimeError('Invalid option passed for ensure.')
 
-        
         # Return the maybe changed threshold
         return self._threshold
 

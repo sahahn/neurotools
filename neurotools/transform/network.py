@@ -255,7 +255,7 @@ def gen_fs_subj_vertex_network(subj_dr, modality='thickness',
 class GroupDifNetwork(BaseEstimator, TransformerMixin):
 
     _needs_fit_index = True
-    
+
     def __init__(self, vectorize=True, scale_weights=False,
                  fit_only_group_index=None, pval_thresh=None,
                  passthrough=False, verbose=0):

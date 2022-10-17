@@ -5,7 +5,7 @@ import tarfile
 
 # Set version
 __version__ = '0.24'
-__data_version__ = '1.2.6'
+__data_version__ = '1.2.7'
 
 CURRENT_DR = Path(__file__).parent.absolute()
 DATA_REF_LOC = os.path.join(CURRENT_DR, 'data_ref.txt')

@@ -1,16 +1,18 @@
-import numpy as np
 import warnings
+import numpy as np
+import nibabel as nib
+import pandas as pd
 from scipy.linalg import lstsq
 from sklearn.base import BaseEstimator, TransformerMixin
 from ..loading import load
-import nibabel as nib
-import pandas as pd
+
 
 class SurfLabels(BaseEstimator, TransformerMixin):
     '''Extract signals from non-overlapping labels for surface data.
 
-    This class functions similar to :class:`NiftiLabelsMasker<nilearn.input_data.NiftiLabelsMasker>`,
-    except is designed to work with surface data. 
+    This class functions similar to
+    :class:`NiftiLabelsMasker<nilearn.input_data.NiftiLabelsMasker>`,
+    except is designed to work with surface data.
 
     Parameters
     -----------
@@ -18,7 +20,8 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         This should represent an array, of the same size as the data
         dimension, as a mask with unique integer values for each ROI.
         You can also pass a str location in which to load in this array.
-        Anything accepted by :func:`load<neurotools.loading.load>` is acceptable here.
+        Anything accepted by :func:`load<neurotools.loading.load>`
+        is acceptable here.
 
     background_label : int, array-like of int, optional
         This parameter determines which label, if any,
@@ -244,6 +247,11 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             array is passed 1D data, or 2D if passed
             vectorize=False and originally 2D data.
         '''
+
+        # Cast from list if needed
+        if isinstance(X, list):
+            X = np.array(X)
+
         return self.fit(X, y).transform(X)
 
     def _check_fitted(self):
@@ -279,6 +287,10 @@ class SurfLabels(BaseEstimator, TransformerMixin):
             array is passed 1D data, or 2D if passed
             vectorize=False and originally 2D data.
         '''
+
+        # Cast from list if needed
+        if isinstance(X, list):
+            X = np.array(X)
 
         if not hasattr(self, "labels_"):
             self._base_fit()
@@ -320,7 +332,7 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         # Save original shape if vectorize called,
         # used for reverse transform
         self.original_transformed_shape_ = X_trans.shape
-        
+
         return X_trans.flatten()
 
     def inverse_transform(self, X_trans):
@@ -405,15 +417,15 @@ class SurfLabels(BaseEstimator, TransformerMixin):
         '''
 
         label_map = {label: i for i, label in enumerate(self.non_bkg_unique_)}
-        roi_index = np.array([label_map[l] for l in labels])
-        
+        roi_index = np.array([label_map[label] for label in labels])
+
         return roi_index
 
     def locs_to_roi_index(self, locs):
         '''Convert from index locations in the original
         data, e.g., surface vertex, to the corresponding
         index of the outputted ROIs.
-        
+
         Parameters
         -----------
         locs : array-like of int
