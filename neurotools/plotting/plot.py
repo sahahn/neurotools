@@ -394,17 +394,7 @@ def plot_surf_vol_collage(surf, vol,
         vol_plot_func = plot_roi
     else:
         raise RuntimeError('vol_plot_type must be one of "glass", "stat" or "roi".')
-    
-    # Handle funny case where plotting glass
-    # but the plotted data is symmetric_cbar and plot abs not specified
-    if vol_plot_type == 'glass' and 'plot_abs' not in vol_params:
 
-        # If symmetric cbar, then we want
-        # glass to not plot abs
-        if symmetric_cbar:
-            vol_params['plot_abs'] = False
-            _print('Plotting glass brain with plot_abs=False.', level=1)
- 
     # Call base plot function
     vol_plot_func(vol,
                   figure=figure, axes=vol_ax, 
@@ -516,10 +506,10 @@ def _proc_colorbar(colorbar, rois):
 def _prep_base_auto_defaults(data_as_list, rois,
                              symmetric_cbar, threshold,
                              cmap, colorbar, avg_method):
-            
+
     # Collapse data
     flat_data = _collapse_data(data_as_list)
-    
+
     # Process automatic symmetric_cbar
     symmetric_cbar = _get_if_sym_cbar(flat_data,
                                       symmetric_cbar,
@@ -527,10 +517,10 @@ def _prep_base_auto_defaults(data_as_list, rois,
 
     # Proc threshold if auto
     threshold = _proc_threshold(flat_data, threshold, rois=rois)
-    
+
     # Get cmap based on passed + if rois or not + if sym
     cmap = _proc_cmap(cmap, rois, symmetric_cbar, flat_data=flat_data)
-    
+
     # Proc colorbar option - yes if not rois
     colorbar = _proc_colorbar(colorbar, rois)
 
@@ -539,6 +529,7 @@ def _prep_base_auto_defaults(data_as_list, rois,
 
     # Return
     return symmetric_cbar, threshold, cmap, colorbar, avg_method
+
 
 def _prep_auto_defaults(data, space, hemi, rois,
                         symmetric_cbar, threshold,
@@ -756,8 +747,10 @@ def plot_volume(vol,
                 symmetric_cbar='auto',
                 threshold='auto',
                 vmax=None,
+                vmin=None,
                 figure=None,
                 axes=None,
+                plot_abs='auto',
                 **kwargs):
 
     # Extract from kwargs if passed
@@ -780,9 +773,31 @@ def plot_volume(vol,
                                  symmetric_cbar, threshold,
                                  cmap, colorbar, avg_method=None)
 
-    # Handle case w/ sym cbar
-    if vol_plot_type in ('stat', 'roi') and 'vmin' in kwargs:
-        kwargs.pop('vmin')
+    # Proc vmin / vmax
+    vmin, vmax = _proc_vs(vol, vmin, vmax, symmetric_cbar)
+
+    # Handle funny cases around glass brain and if to plot_abs
+    if vol_plot_type == 'glass':
+
+        if plot_abs in ('auto', 'default'):
+
+            # Sym cbar case, don't plot absolute
+            if symmetric_cbar:
+                plot_abs = False
+
+            # Otherwise, other case is plotting just negative data
+            # Then we also don't want plot abs
+            elif vmax <= 0:
+                plot_abs = False
+
+        # Add to kwargs
+        kwargs['plot_abs'] = plot_abs
+
+    # In the case of plotting negative data
+    if vmax <= 0 and not symmetric_cbar:
+
+        # Set vmax to be sign flipped vmin
+        vmax = -vmin
 
     # Call vol plot function
     vol_plot_func(vol, figure=figure,  axes=axes,

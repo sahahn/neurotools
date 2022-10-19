@@ -115,7 +115,12 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
         # If not symmetric_cbar, then these value
         # stay fixed as this
-        vmin, vmax = np.nanmin(flat_data) - s, np.nanmax(flat_data) + s
+        vmin, vmax = np.nanmin(flat_data), np.nanmax(flat_data)
+
+        if vmin != 0:
+            vmin -= s
+        if vmax != 0:
+            vmin += s
 
         # If symmetric need to override either
         # vmin or vmax to be the opposite of the larger
@@ -139,7 +144,9 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
 
         # Otherwise, vmin is just the min value in the data
         else:
-            vmin = np.nanmin(flat_data) - s
+            vmin = np.nanmin(flat_data)
+            if vmin != 0:
+                vmin -= s
 
     # If vmax not set, same cases as above but flipped
     if vmax is None:
@@ -147,7 +154,9 @@ def _proc_vs(data, vmin, vmax, symmetric_cbar):
         if symmetric_cbar:
             vmax = -vmin
         else:
-            vmax = np.nanmax(flat_data) + s
+            vmax = np.nanmax(flat_data)
+            if vmax != 0:
+                vmax += s
 
     return vmin, vmax
 
@@ -212,7 +221,7 @@ def _get_colors(weights, ref_weights, symmetric_cbar='auto',
     # Process automatic symmetric_cbar
     symmetric_cbar = _get_if_sym_cbar(ref_weights,
                                       symmetric_cbar=symmetric_cbar,
-                                      rois=False) 
+                                      rois=False)
 
     # Get cmap based on passed + if rois or not + if sym
     cmap = _proc_cmap(cmap, rois=False, symmetric_cbar=symmetric_cbar,
@@ -223,6 +232,5 @@ def _get_colors(weights, ref_weights, symmetric_cbar='auto',
     vmin, vmax = _proc_vs(ref_weights, vmin=vmin, vmax=vmax,
                           symmetric_cbar=symmetric_cbar)
     norm = Normalize(vmin=vmin, vmax=vmax)
-    
-    return [our_cmap(norm(w)) for w in weights]
 
+    return [our_cmap(norm(w)) for w in weights]
