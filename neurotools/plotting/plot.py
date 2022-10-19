@@ -19,7 +19,7 @@ with warnings.catch_warnings():
 
 
 def _proc_threshold(data, threshold, percentile=75, rois=False):
-    
+
     # If None, set to a bit below minimum
     if threshold is None:
         flat_abs_data = np.abs(_collapse_data(data))
@@ -27,20 +27,21 @@ def _proc_threshold(data, threshold, percentile=75, rois=False):
         # Want to handle 0's and NaN's
         return np.nanmin(flat_abs_data[np.where(flat_abs_data != 0)]) / 5
 
-    # Only proc if left at auto
-    if not (threshold == 'auto' or threshold == 'default'):
+    # If not auto, then return, otherwise process
+    if threshold not in ('auto', 'default'):
         return threshold
 
     # If ROIs then default is .5
     # to not plot rois marked 0
     if rois:
         return .5
-    
+
     # Get flat data
     flat_data = _collapse_data(data)
-    
+
     # Get percentile - not counting any zeros!
-    threshold = scoreatpercentile(flat_data[flat_data != 0], per=percentile) - 1e-5
+    threshold = scoreatpercentile(flat_data[flat_data != 0],
+                                  per=percentile) - 1e-5
 
     return threshold
 
@@ -715,7 +716,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
             hspace = -.25
         if surf_wspace == 'default':
             surf_wspace = -.2
-    
+
     # Set default figsize based on if colorbar
     if figsize == 'default':
         if colorbar:
@@ -735,7 +736,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
     surf_params['darkness'], surf_params['alpha'] = darkness, alpha
     surf_params['ref'], surf_params['avg_method'] = ref, avg_method
     surf_params['wspace'], surf_params['bg_on_data'] = surf_wspace, bg_on_data
-    
+
     # Pass arguments to plot surf vol, and return
     return plot_surf_vol_collage(surf=[data['lh'], data['rh']],
                                  vol=data['vol'], vol_plot_type=vol_plot_type,
@@ -759,29 +760,36 @@ def plot_volume(vol,
                 axes=None,
                 **kwargs):
 
-    # Base stat map cases
+    # Extract from kwargs if passed
     rois = False
+    if 'rois' in kwargs:
+        rois = kwargs.pop('rois')
+
+    # Proc if ROIs or not
     if vol_plot_type == 'glass':
         vol_plot_func = plot_glass_brain
     elif vol_plot_type == 'stat':
         vol_plot_func = plot_stat_map
-    
-    # ROI case
-    elif vol_plot_type == 'roi':
+    elif rois or vol_plot_type == 'roi':
         vol_plot_func = plot_roi
         rois = True
 
     # Process defaults
-    symmetric_cbar, threshold, cmap, colorbar, _ = _prep_base_auto_defaults(vol, rois,
-                                                                            symmetric_cbar, threshold,
-                                                                            cmap, colorbar, avg_method=None)
+    symmetric_cbar, threshold, cmap, colorbar, _ =\
+        _prep_base_auto_defaults(vol, rois,
+                                 symmetric_cbar, threshold,
+                                 cmap, colorbar, avg_method=None)
+
+    # Handle case w/ sym cbar
+    if vol_plot_type in ('stat', 'roi') and 'vmin' in kwargs:
+        kwargs.pop('vmin')
 
     # Call vol plot function
     vol_plot_func(vol, figure=figure,  axes=axes,
-                  cmap=cmap, threshold=threshold, 
+                  cmap=cmap, threshold=threshold,
                   symmetric_cbar=symmetric_cbar,
                   vmax=vmax, colorbar=colorbar, **kwargs)
-    
+
     # Set if used by upper level functions to return
     vol_smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
 

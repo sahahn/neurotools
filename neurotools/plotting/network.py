@@ -60,7 +60,7 @@ def add_subgraph_plot(sub_G, G, ax, edge_scale=5,
 
     # Multiply further by edge, after weights potentially used by color
     scaled_weights = scaled_weights * edge_scale
-    
+
     # Set pos by layout choice
     if layout == 'spring':
         pos = nx.spring_layout(sub_G)
