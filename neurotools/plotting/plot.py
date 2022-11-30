@@ -640,7 +640,6 @@ def _sort_kwargs(kwargs):
 
 def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
 
-
     # Handle if not passed
     if colorbar_params is None:
         if 'colorbar_params' in kwargs:
@@ -1211,12 +1210,15 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           This parameter specified the darkness of the background image,
           when plotting a single or multiple surfaces. Where a value of 1
           indicates that the original values are used, and .5 would mean the
-          values are halved. If plotting in an fsaverage space the default value is 1,
-          if plotting in an fs_LR space, the default value is .5. 
+          values are halved. If plotting in an fsaverage space
+          the default value is 1,
+          if plotting in an fs_LR space,
+          the default value is .5.
 
         - **symmetric_cbar** : bool or 'aut'
 
-            Specifies whether the colorbar should range from -vmax to vmax or from vmin to vmax.
+            Specifies whether the colorbar should range from
+            -vmax to vmax or from vmin to vmax.
             Setting to 'auto' will select the latter if the range of
             the whole image is either positive or negative. There are some
             other automatic cases, but in general this parameter
@@ -1310,10 +1312,12 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     Notes
     -----------
     The creation of carefully constructed multi-figures can be a little tricky,
-    which is why it is helpful that so many of the default values have been set. That
-    said, it is likely the interested user could do better than the defaults with
-    say for example plotting a multi-figure surface + volume collage. In this instance,
-    if they wanted to tweak the positioning of the different sub figures relative to
+    which is why it is helpful that so many of the default values have
+    been set. That said, it is likely the interested user could
+    do better than the defaults with
+    say for example plotting a multi-figure surface + volume collage.
+    In this instance, if they wanted to tweak the positioning of
+    the different sub figures relative to
     each other, they could make use of the following parameters:
 
     - hspace
@@ -1361,7 +1365,7 @@ def _get_data_func_types(data):
     data_func_types = {}
     data_as_list = []
     is_rois = []
-    
+
     for key in list(data):
         loaded, func, args = _setup_auto_plot(data[key], space=None,
                                               hemi=None, verbose=0)
@@ -1372,26 +1376,27 @@ def _get_data_func_types(data):
     return data_func_types, data_as_list, is_rois
 
 def _add_grid_wh(sz, layout_params, max_cols=2):
-    
+
     # Return single row, w/ length sz
     if sz < max_cols:
         ws = [1 for _ in range(sz)]
         hs = [1]
-    
+
     # Otherwise calc as grid, w/ leave empty any missing
     else:
         n_rows = (sz+1) // max_cols
         ws = [1 for _ in range(max_cols)]
         hs = [1 for _ in range(n_rows)]
-        
+
     # Add to layout params
     layout_params['widths'] = ws
     layout_params['heights'] = hs
-    
+
     # Return n_rows, n_cols for conv.
     return len(ws), len(hs)
 
-def _get_def_layout_params(unique_func_types, data_keys, colorbar, colorbar_params):
+def _get_def_layout_params(unique_func_types, data_keys,
+                           colorbar, colorbar_params):
 
     # Init dict of layout params
     layout_params = {}
@@ -1469,42 +1474,42 @@ def _get_def_layout_params(unique_func_types, data_keys, colorbar, colorbar_para
 def meta_collage(data, title=None, sub_titles=True,
                  colorbar='default', verbose=0, vmin=None,
                  vmax=None, colorbar_params=None, threshold='auto',
-                 symmetric_cbar='auto', cmap='default', 
+                 symmetric_cbar='auto', cmap='default',
                  avg_method='default', sub_kwargs=None, **kwargs):
     '''TODO Still work in progress, a number of formatting issues still.
     Likely want to replace with something way more simple. E.g., use subplots
     and don't try to share colorbar.'''
-    
+
     # Check explicit sub kwargs
     if sub_kwargs is None:
         sub_kwargs = {}
-    
+
     # Check initial data
     data_func_types, data_as_list, is_rois = _get_data_func_types(data)
     unique_func_types = list(set(data_func_types.values()))
     data_keys = list(data)
-    
+
     # Catch error
     if len(set(is_rois)) > 1 and colorbar:
         raise RuntimeError('Cant plot mix of rois and stat maps with colorbar.')
-    
+
     # Passes True if all True
     rois = all(is_rois)
-    
+
     # Collapse data
     flat_data = _collapse_data(data_as_list)
-    
+
     # Process some base auto args
     symmetric_cbar, threshold, cmap, colorbar, avg_method =\
         _prep_base_auto_defaults(flat_data, rois,
                                  symmetric_cbar, threshold,
                                  cmap, colorbar, avg_method)
 
-    
+
     # Process vmin / vmax from data and passed args
     vmin, vmax = _proc_vs(data_as_list, vmin=vmin, vmax=vmax,
                           symmetric_cbar=symmetric_cbar)
-    
+
     # Proc default / add params
     colorbar_params = _sort_colorbar_kwargs(colorbar_params, **kwargs)
 
@@ -1576,13 +1581,11 @@ def meta_collage(data, title=None, sub_titles=True,
                               avg_method=avg_method, verbose=verbose,
                               returns=True,
                               **sub_kwargs)
-            
-            
             smfs.append(smfz)
-            
+
     # Set to concat
     smfs = np.concatenate(smfs)
-    
+
     # Add collage color bar
     if colorbar:
         add_collage_colorbar(figure=figure,
@@ -1594,6 +1597,39 @@ def meta_collage(data, title=None, sub_titles=True,
                              threshold=threshold,
                              cmap=cmap,
                              **kwargs)
+
+
+def plot_mosaic(data, mosiac,
+                figsize=(12, 8),
+                sm_kwargs=None, plot_names=True):
+    '''Rough start of an approach to plot based on a custom mosiac'''
+
+    if sm_kwargs is None:
+        sm_kwargs = {}
+
+    # Init subplot mosiac
+    fig, axes = plt.subplot_mosaic(mosaic=mosiac, figsize=figsize, **sm_kwargs)
+    ax_labels = list(axes)
+
+    # If data is list, cast to dict
+    if isinstance(data, list):
+        data = dict(enumerate(data))
+        plot_names = False
+
+    # Catch bad input
+    if not isinstance(data, dict):
+        raise RuntimeError('data must be passed as dict or list.')
+
+    if len(data) != len(ax_labels):
+        raise RuntimeError('length of data must match the mosiac')
+
+    # Check if data labels match ax_labels
+    if all([label in data for label in ax_labels]):
+        ax_mapping = {label: label for label in ax_labels}
+
+    # Otherwise generate mapping based on order
+    else:
+        ax_mapping = dict(zip(ax_labels, list(data)))
 
 def plot_bars(fis, top_n=5,
               threshold=None,
