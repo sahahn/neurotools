@@ -52,20 +52,20 @@ def _trunc_cmap(cmap, minval=0.0, maxval=1.0, num=1000):
 
 
 def _proc_cmap(cmap, rois, symmetric_cbar, flat_data):
-    
+
     # Keep user passed if not user passed
     if not (cmap == 'default' or cmap is None or cmap == 'auto'):
         return cmap
-    
+
     # If plotting rois
     if rois:
         return 'prism'
-    
+
     # If not symmetric, then just do Reds or Blues
     if symmetric_cbar is False:
 
         # If max value is 0 or less, use Blues
-        if np.nanmax(flat_data)  <= 0:
+        if np.nanmax(flat_data) <= 0:
             return 'Blues_r'
 
         # Otherwise, reds

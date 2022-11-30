@@ -660,6 +660,7 @@ def _sort_colorbar_kwargs(colorbar_params=None, **kwargs):
 
     return colorbar_params
 
+
 def _plot_surfs_vol(data, space=None, hemi=None,
                     rois=False, cmap='default',
                     vol_plot_type='glass',
@@ -740,6 +741,7 @@ def _plot_surfs_vol(data, space=None, hemi=None,
                                  surf_params=surf_params, vol_params=vol_params,
                                  surf_to_vol_ratio=surf_to_vol_ratio, _print=_print)
 
+
 def plot_volume(vol,
                 vol_plot_type='glass',
                 cmap=None,
@@ -806,15 +808,17 @@ def plot_volume(vol,
                   vmax=vmax, colorbar=colorbar, **kwargs)
 
     # Set if used by upper level functions to return
-    vol_smfs = [np.array([np.nanmin(vol.get_fdata()), np.nanmax(vol.get_fdata())])]
+    vol_smfs = [np.array([np.nanmin(vol.get_fdata()), 
+                np.nanmax(vol.get_fdata())])]
 
     return figure, axes, vol_smfs
+
 
 def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
 
     # Get verbose object
     _print = _get_print(verbose=verbose)
-    
+
     # Load / perform initial auto-detection of data
     data, _ = _load_data_and_ref(data, space=space, hemi=hemi, _print=_print)
 
@@ -884,6 +888,7 @@ def _setup_auto_plot(data, space=None, hemi=None, verbose=0, **kwargs):
                                    '_print': _print,
                                    **kwargs}
 
+
 def _check_subplot_args(**kwargs):
 
     # If already a subplot spec passed, then just check for figure, then return.
@@ -924,6 +929,7 @@ def _check_subplot_args(**kwargs):
 
     return kwargs
 
+
 def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     '''The most automated magic plotting function avaliable,
     used to plot a wide range of neuroimaging data (volumes / surfs).
@@ -933,12 +939,14 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
     data : str, array, dict, ect...
         The data in which to plot, either statistical map or parcellaction,
         as broadly either a single surface, collage of surfaces, a single
-        volume, or collage with surfaces and volume, or as pandas series of ROIs and values.
-    
+        volume, or collage with surfaces and volume,
+        or as pandas series of ROIs and values.
+
         Data can be passed in many ways:
 
         - As array-like input representing a single surface hemisphere,
-          concatenated hemispheres, concatenated hemispheres + flattened sub-cortical
+          concatenated hemispheres, concatenated
+          hemispheres + flattened sub-cortical
           values, or just flattened volumetric values.
 
         - As a str, representing the file location with saved values
@@ -1009,7 +1017,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
         any surface data. Further, this parameter
         is only relevant the surface data being plotted represents
         a single hemispheres data.
-        
+
         If left as default, None,
         then this option will be automatically set to plot
         left hemisphere data.
@@ -1032,7 +1040,8 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
         - >1 : Automatic choices are shown as well as additional helper text.
 
     returns : bool, optional
-        If the figure, axis / grid and smfs should be returned from the base function
+        If the figure, axis / grid and smfs should be
+        returned from the base function
         calls or not.
 
         ::
@@ -1047,7 +1056,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
         a volumetric image. The remaining parameters below are these kwargs.
 
         - **surf_mesh** : str or array
-        
+
           A str indicator specifying a valid surface mesh,
           with respect to the current space, or a two dimensional array
           with information about the coordinates and vertex-faces
@@ -1061,30 +1070,36 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           This parameter is only relevant when plotting surfaces.
 
         - **bg_map** : str or 2D array
-        
-          This argument specifies a background map to be used when plotting. This
-          should be passed as either a str indicator specifying a valid file
+
+          This argument specifies a background map to be
+          used when plotting. This should be passed as either a
+          str indicator specifying a valid file
           within the current surface space, or as a valid array of values,
-          again, with respect to the current space. This map is plotted in greyscale
-          underneath the data points, often used for realistic shading.
+          again, with respect to the current space.
+          This map is plotted in greyscale underneath the data points,
+          often used for realistic shading.
           The default for when plotting is 'sulc'.
 
         - **cmap** : str or :class:`matplotlib.colors.Colormap`
-          
+
           This should be pass as an instance
           of :class:`matplotlib.colors.Colormap` or str
-          representing the name of a matplotlib colormap. This will be the color map
-          in which the values are plotted according to. When plotting surface
-          parcellations, the default cmaps are 'prism' if plotting rois, 'Reds'
-          if plotting not symmetric statistical maps, and 'cold_white_hot' if plotting
-          symmetric statistical maps (e.g., values above and below 0). In case of
-          not sym plotting, and plotting  negative numbers, will switch from 'Reds'
-          to 'Blues_r'.
+          representing the name of a matplotlib colormap.
+          This will be the color map in which the values are
+          plotted according to. When plotting surface
+          parcellations, the default cmaps are 'prism'
+          if plotting rois, 'Reds'
+          if plotting not symmetric statistical maps, and 'cold_white_hot'
+          if plotting symmetric statistical maps
+          (e.g., values above and below 0).
+          In case of not sym plotting, and plotting negative numbers,
+          will switch from 'Reds' to 'Blues_r'.
 
         - **vol_plot_type** : {'glass', 'stat', 'roi'}
-        
-          This parameter control the type of volumetric plot in which to generate,
-          with valid values as one of 'glass', 'stat' and 'roi'. By default,
+
+          This parameter control the type of volumetric
+          plot in which to generate, with valid values as one
+          of 'glass', 'stat' and 'roi'. By default,
           if detected to be plotting a parcellation, the value 'roi' is used.
           Otherwise, the default volumetric plotting type is 'glass'.
           The corresponding back-end nilearn functions used are:
@@ -1097,36 +1112,36 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
         - **bg_on_data** : bool or float
           If True, and a bg_map is specified,
-          the data to plot is multiplied by the background image, 
+          the data to plot is multiplied by the background image,
           so that e.g. sulcal depth is visible beneath the surf_data.
 
           If passed as a float value, then that will trigger multiplying
           the data to plot by the background image times the passed bg_on_data
-          value. So for example passing True is equivalent to passing 1 and passing
-          False is the same as passing 0.
-          
+          value. So for example passing True is equivalent
+          to passing 1 and passing False is the same as passing 0.
+
           This allows for fine tuning how much the background image
           is melded with the data shown. The default value is .25.
 
           *This parameter is only used when plotting surfaces.*
 
         - **view** : str
-        
+
           If plotting a single surface hemisphere, this
           parameter must be one of:
 
             {'lateral', 'medial', 'dorsal', 'ventral', 'anterior', 'posterior'}
-          
+
           Where 'lateral' is the default view if none is set.
 
           If instead plotting a collage of surface views, then
           valid view parameters are one of:
 
             {'standard', 'front back', 'front', 'back'}
-          
+
           which correspond to different preset collections of surface views.
           The default if not specified in this case is 'standard'.
-        
+
           Note: If plotting a collage of surface and volumetric views,
           it is reccomended to keep the default collage 'standard' view,
           as the other views have not yet been properly formatted yet.
@@ -1144,10 +1159,11 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           customize the look and size of the colorbar. See below.
 
         - **rois** : bool
-          
+
           If passed, can force plot either is rois case or stat map case.
-          Ussually the auto settings will be fine, but this exists if need to override
-          without overriding all of the other little settings. Default is just automatically
+          Ussually the auto settings will be fine, but this
+          exists if need to override without overriding all of the other
+          little settings. Default is just automatically
           detected based on percent of unique values being plotted.
 
         - **avg_method** : 'mean', 'median', 'min', 'max' or  custom function
@@ -1163,10 +1179,12 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
 
           - custom function: You can also pass a custom function
 
-          If plotting roi's the default will be 'median'. Otherwise, the default
-          will be set based on the ratio between the number of unique values
-          to data points. So if more than 5% of data points are unique, 'mean'
-          will be used, otherwise 'median' will be used. This is to try and accurately detect
+          If plotting roi's the default will be 'median'.
+          Otherwise, the default will be set based on the ratio between
+          the number of unique values to data points.
+          So if more than 5% of data points are unique, 'mean'
+          will be used, otherwise 'median' will be used.
+          This is to try and accurately detect
           when parcellations are being plotted.
 
         - **alpha** : float or 'auto'
@@ -1183,11 +1201,11 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           `vol_alpha` parameter.
 
         - **vol_alpha** : float between 0 and 1
-        
+
           This controls the alpha transparency only when plotting
           volumetric data according to the vol_plot_type='glass' option.
           The default value is 0.7.
-        
+
         - **darkness** : float between 0 and 1
 
           This parameter specified the darkness of the background image,
@@ -1197,7 +1215,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           if plotting in an fs_LR space, the default value is .5. 
 
         - **symmetric_cbar** : bool or 'aut'
-        
+
             Specifies whether the colorbar should range from -vmax to vmax or from vmin to vmax.
             Setting to 'auto' will select the latter if the range of
             the whole image is either positive or negative. There are some
@@ -1211,7 +1229,7 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           the image. This threshold is treated as an absolute value in
           the case of a symmetric_cbar. If 'auto' is passed,
           it will attempt to automatically set the threshold to
-          a reasonable value. 
+          a reasonable value.
 
           The default is typically 'auto', but in some cases changes,
           for example if plotting a parcellation the default value will be
@@ -1223,50 +1241,59 @@ def plot(data, space=None, hemi=None, verbose=0, returns=False, **kwargs):
           a new figure is being generated. It represents
           the size of the underlying matplotlib figure to plot on.
           The default value for this function varies based on what type of
-          plot is being made (e.g., not the same for surface collage vs. single surface).
+          plot is being made (e.g., not the same for
+          surface collage vs. single surface).
 
         - **wspace** : float
 
           This parameter refers to the width spacing between items at the top
-          level of whatever collage is being plotted. So, if plotting only a single
-          surface or volume, this parameter will be ignored. Otherwise,
+          level of whatever collage is being plotted.
+          So, if plotting only a single surface or volume,
+          this parameter will be ignored. Otherwise,
           for example if plotting a collage of 4 surface views, then this
           parameter will control the amount of horizontal space between each
           brain view. Instead, if plotting a combined collage of surface views
-          and volumetric views, then the top level of the collage that this parameter
-          controls the spacing of is the set of all surface views, all volumetric views
-          and colorbar. In this case, to override values between for example just the
-          surface views, you would have to use special extra keyword 'surf_wspace',
+          and volumetric views, then the top level of the
+          collage that this parameter controls the spacing of is the set of
+          all surface views, all volumetric views
+          and colorbar. In this case, to override values
+          between for example just the surface views, you would have to
+          use special extra keyword 'surf_wspace',
           which let's you set both parameters if desired.
 
-          The default values hover around 0, and vary a great deal based on the type
+          The default values hover around 0, and vary
+          a great deal based on the type
           of plot and requested view.
 
         - **hspace** : float
 
           This parameter refers to the height spacing between items at the top
-          level of whatever collage is being plotted. So, if plotting only a single
-          surface or volume, this parameter will be ignored. Otherwise,
-          for example if plotting a collage of 4 surface views, then this
-          parameter will control the amount of vertical space between each
-          brain view. Instead, if plotting a combined collage of surface views
-          and volumetric views, then the top level of the collage that this parameter
-          controls the spacing of is the set of all surface views, all volumetric views
-          and colorbar. In this case, to override values between for example just the
-          surface views, you would have to use special extra keyword 'surf_hspace',
+          level of whatever collage is being plotted. So, if
+          plotting only a single surface or volume, this parameter
+          will be ignored. Otherwise, for example if plotting a collage
+          of 4 surface views, then this parameter will control the amount
+          of vertical space between each brain view.
+          Instead, if plotting a combined collage of surface views
+          and volumetric views, then the top level of the collage
+          that this parameter controls the spacing of is the set of all
+          surface views, all volumetric views and colorbar.
+          In this case, to override values between for example just the
+          surface views, you would have to use
+          special extra keyword 'surf_hspace',
           which let's you set both parameters if desired.
 
-          The default values hover around 0, and vary a great deal based on the type
+          The default values hover around 0, and vary a great
+          deal based on the type
           of plot and requested view.
 
         - **surf_wspace** : float
-          
+
           See 'wspace'. This parameter is only used when there
           are multiple levels of collage and further control is still
           required for specifically the nested collage of surface plots.
 
         - **surf_hspace** : float
-          
+
           See 'hspace'. This parameter is only used when there
           are multiple levels of collage and further control is still
           required for specifically the nested collage of surface plots.

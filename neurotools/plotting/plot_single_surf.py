@@ -124,11 +124,11 @@ def plot_single_surf(surf_mesh, surf_map=None, bg_map=None,
             cmap = plt.cm.get_cmap(cmap)
 
     figsize = _default_figsize
-    
+
     # Leave space for colorbar
     if colorbar:
         figsize[0] += .7
-    
+
     # Initiate figure and 3d axes
     if axes is None:
         if figure is None:
